@@ -42,36 +42,13 @@ export async function POST(req: NextRequest) {
     html: `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /></head>
-<body style="margin:0;padding:0;background:#1B2536;font-family:system-ui,-apple-system,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#1B2536;padding:48px 24px;">
-    <tr><td align="center">
-      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
-        <tr><td style="padding-bottom:32px;">
-          <span style="font-size:18px;font-weight:500;letter-spacing:0.5px;color:#E8ECF0;">ASPIRE OS</span>
-        </td></tr>
-        <tr><td style="padding-bottom:20px;">
-          <h1 style="margin:0;font-size:32px;font-weight:600;line-height:1.15;letter-spacing:-0.75px;color:#E8ECF0;">
-            You&rsquo;re on the list.
-          </h1>
-        </td></tr>
-        <tr><td style="padding-bottom:20px;">
-          <p style="margin:0;font-size:17px;line-height:1.65;color:#C7CCD3;">
-            Aspire OS launches mid-June. You&rsquo;ll get one email when it&rsquo;s ready &mdash; nothing before then.
-          </p>
-        </td></tr>
-        <tr><td style="padding-bottom:20px;">
-          <p style="margin:0;font-size:17px;line-height:1.65;color:#C7CCD3;">
-            The research has settled. The translation hasn&rsquo;t. That&rsquo;s what we&rsquo;re building.
-          </p>
-        </td></tr>
-        <tr><td style="padding-top:32px;border-top:1px solid #2E3B55;">
-          <p style="margin:0;font-size:13px;line-height:1.5;color:#6B7682;">
-            Aspire OS &mdash; 4Foundations &mdash; aspireos.com
-          </p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
+<body style="margin:0;padding:0;background:#ffffff;font-family:Georgia,serif;">
+  <div style="max-width:520px;margin:48px auto;padding:0 24px;color:#1a1a1a;">
+    <p style="font-size:16px;line-height:1.7;margin:0 0 20px;">Got you &mdash; you&rsquo;re on the list.</p>
+    <p style="font-size:16px;line-height:1.7;margin:0 0 20px;">Aspire OS launches mid-June. You&rsquo;ll get one email when it&rsquo;s ready &mdash; nothing before then.</p>
+    <p style="font-size:16px;line-height:1.7;margin:0 0 20px;">The research has settled. The translation hasn&rsquo;t. That&rsquo;s what we&rsquo;re building.</p>
+    <p style="font-size:16px;line-height:1.7;margin:0;">&mdash; Noah</p>
+  </div>
 </body>
 </html>`,
   }).catch((err) => console.error("Confirmation email error:", err));
