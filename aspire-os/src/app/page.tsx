@@ -72,11 +72,10 @@ export default function Home() {
               In Practice
             </p>
             <h2 className="font-sans font-semibold text-[30px] md:text-[40px] leading-[1.15] tracking-[-1px] text-ink max-w-2xl">
-              The questions that don&rsquo;t wait.
+              A response to every question.
             </h2>
             <p className="mt-4 font-sans font-normal text-[19px] leading-[1.65] text-ink-soft max-w-2xl">
-              Six moments 4Foundations is built for. Not crises. Not biohacks. The everyday
-              questions that have a good answer &mdash; if you know who to ask.
+              From poor sleep to low energy and everything in between, 4Foundations has a good answer &mdash; if you know what to ask.
             </p>
           </FadeIn>
 
