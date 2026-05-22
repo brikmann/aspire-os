@@ -1,4 +1,5 @@
 import EmailForm from "@/components/EmailForm";
+import FadeIn from "@/components/FadeIn";
 
 function WordMark() {
   return (
@@ -29,24 +30,30 @@ export default function Home() {
 
       <section
         id="waitlist"
-        className="flex-1 bg-midnight flex flex-col items-center justify-center px-6 py-32 text-center"
+        className="flex-1 bg-midnight flex flex-col items-center px-6 pt-16 pb-24 text-center"
       >
-        <h1 className="font-sans font-semibold text-[40px] md:text-[64px] leading-[1.10] tracking-[-1.5px] text-silver-bright max-w-3xl">
-          The operating system for human optimization.
-        </h1>
+        <FadeIn className="w-full max-w-3xl" delay={0}>
+          <h1 className="font-sans font-semibold text-[40px] md:text-[64px] leading-[1.10] tracking-[-1.5px] text-silver-bright">
+            The operating system for human optimization.
+          </h1>
+        </FadeIn>
 
-        <p className="mt-6 font-sans font-normal text-[17px] md:text-[19px] leading-[1.60] text-silver max-w-xl">
-          4Foundations is a private AI coach for founders and ambitious people
-          who won&rsquo;t let their body be the reason they fall short.
-        </p>
+        <FadeIn className="w-full max-w-xl" delay={0.1}>
+          <p className="mt-6 font-sans font-normal text-[17px] md:text-[19px] leading-[1.60] text-silver">
+            4Foundations is a private AI coach for founders and ambitious people
+            who won&rsquo;t let their body be the reason they fall short.
+          </p>
+        </FadeIn>
 
-        <div className="mt-10 w-full max-w-md">
+        <FadeIn className="mt-10 w-full max-w-sm" delay={0.2}>
           <EmailForm />
-        </div>
+        </FadeIn>
 
-        <p className="mt-4 font-sans font-normal text-[13px] leading-[1.50] tracking-[0.2px] text-silver-dim">
-          Mid-June launch. No spam. One email when it&rsquo;s ready.
-        </p>
+        <FadeIn delay={0.3}>
+          <p className="mt-4 font-sans font-normal text-[13px] leading-[1.50] tracking-[0.2px] text-silver-dim">
+            Mid-June launch. No spam. One email when it&rsquo;s ready.
+          </p>
+        </FadeIn>
       </section>
     </>
   );
