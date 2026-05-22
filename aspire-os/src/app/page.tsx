@@ -72,10 +72,10 @@ export default function Home() {
               In Practice
             </p>
             <h2 className="font-sans font-semibold text-[30px] md:text-[40px] leading-[1.15] tracking-[-1px] text-ink max-w-2xl">
-              A response to every question.
+              Your biology insights, unlocked.
             </h2>
             <p className="mt-4 font-sans font-normal text-[19px] leading-[1.65] text-ink-soft max-w-2xl">
-              From poor sleep to low energy and everything in between, 4Foundations has a good answer &mdash; if you know what to ask.
+              4Foundations provides deep insights into questions that affect your bottom line.
             </p>
           </FadeIn>
 
