@@ -137,20 +137,20 @@ export default function Home() {
 
               <div className="space-y-5">
                 <p className="font-serif italic text-[19px] leading-[1.55] text-silver">
-                  I&rsquo;m Noah Brikman. Kinesiology researcher, human-performance
+                  I&rsquo;m Noah Brikman. Kinesiology student, human-performance
                   specialist &mdash; and I built Aspire OS because I&rsquo;ve been the
                   version of me running on 5 hours of sleep with a deadline tomorrow.
                   I know how it works. I also know what it costs.
                 </p>
                 <p className="font-serif italic text-[19px] leading-[1.55] text-silver">
                   Friends in their twenties ask me questions their team doesn&rsquo;t
-                  have answers for. My parents in their sixties ask me questions their
+                  have answers for. My parents in their fifties ask me questions their
                   doctors don&rsquo;t have time for. The gap is the same gap &mdash;
                   and it gets more expensive the longer it stays open.
                 </p>
                 <p className="font-serif italic text-[19px] leading-[1.55] text-silver">
                   4Foundations is the private coach I wish I&rsquo;d had at 19, and
-                  the one I&rsquo;m building so I never become my stepdad at 65.
+                  the one I&rsquo;m building so I never become my stepdad at 55.
                 </p>
               </div>
 
