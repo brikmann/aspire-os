@@ -166,6 +166,86 @@ export default function Home() {
           </FadeIn>
         </div>
       </section>
+      <section className="bg-paper py-16 md:py-24 px-6">
+        <div className="max-w-[720px] mx-auto">
+
+          <FadeIn>
+            <p className="font-sans font-medium text-[12px] uppercase tracking-[1.5px] text-cobalt mb-4">
+              Questions People Ask
+            </p>
+            <h2 className="font-sans font-semibold text-[30px] md:text-[40px] leading-[1.15] tracking-[-1px] text-ink mb-10">
+              What you might be wondering.
+            </h2>
+          </FadeIn>
+
+          <FadeIn delay={0.1}>
+            <div className="divide-y divide-paper-edge">
+
+              <details className="group py-5">
+                <summary className="flex items-center justify-between gap-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                  <span className="font-sans font-medium text-[18px] text-ink">Who is 4Foundations actually for?</span>
+                  <svg className="w-5 h-5 shrink-0 text-ink-soft transition-transform duration-200 group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+                  </svg>
+                </summary>
+                <p className="mt-4 pb-1 font-sans font-normal text-[16px] leading-[1.7] text-ink-soft">
+                  Founders, ambitious early-career professionals, and athletes who are pushing the limits of their own output &mdash; and want to keep doing it without their body becoming the bottleneck. If you&rsquo;re optimizing for output (cognitive or physical), this is built for you.
+                </p>
+              </details>
+
+              <details className="group py-5">
+                <summary className="flex items-center justify-between gap-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                  <span className="font-sans font-medium text-[18px] text-ink">Is this a replacement for my doctor?</span>
+                  <svg className="w-5 h-5 shrink-0 text-ink-soft transition-transform duration-200 group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+                  </svg>
+                </summary>
+                <p className="mt-4 pb-1 font-sans font-normal text-[16px] leading-[1.7] text-ink-soft">
+                  No. 4Foundations is a coach, not a clinician. It helps you understand what&rsquo;s happening, prepare better questions for your doctor, and act on the things within your control. When something belongs in a clinical setting, the coach will tell you.
+                </p>
+              </details>
+
+              <details className="group py-5">
+                <summary className="flex items-center justify-between gap-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                  <span className="font-sans font-medium text-[18px] text-ink">How is this different from ChatGPT?</span>
+                  <svg className="w-5 h-5 shrink-0 text-ink-soft transition-transform duration-200 group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+                  </svg>
+                </summary>
+                <p className="mt-4 pb-1 font-sans font-normal text-[16px] leading-[1.7] text-ink-soft">
+                  ChatGPT is a general-purpose tool. 4Foundations is trained specifically on the research and frameworks for sleep, light, nutrition, and stress &mdash; the four foundations your body actually responds to. It remembers context, references real research, and answers like someone who&rsquo;s spent years thinking about high-output physiology.
+                </p>
+              </details>
+
+              <details className="group py-5">
+                <summary className="flex items-center justify-between gap-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                  <span className="font-sans font-medium text-[18px] text-ink">When does it actually launch?</span>
+                  <svg className="w-5 h-5 shrink-0 text-ink-soft transition-transform duration-200 group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+                  </svg>
+                </summary>
+                <p className="mt-4 pb-1 font-sans font-normal text-[16px] leading-[1.7] text-ink-soft">
+                  Founding members get access starting July. Joining the waitlist now reserves your seat and locks in founding-member pricing. Alpha access for a small private cohort is available earlier.
+                </p>
+              </details>
+
+              <details className="group py-5">
+                <summary className="flex items-center justify-between gap-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                  <span className="font-sans font-medium text-[18px] text-ink">Is my information private?</span>
+                  <svg className="w-5 h-5 shrink-0 text-ink-soft transition-transform duration-200 group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+                  </svg>
+                </summary>
+                <p className="mt-4 pb-1 font-sans font-normal text-[16px] leading-[1.7] text-ink-soft">
+                  Yes. Your conversations and personal context stay with you. We never share, sell, or train external models on your data.
+                </p>
+              </details>
+
+            </div>
+          </FadeIn>
+
+        </div>
+      </section>
     </>
   );
 }
