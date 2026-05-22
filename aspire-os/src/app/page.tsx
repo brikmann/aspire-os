@@ -25,12 +25,6 @@ export default function Home() {
     <>
       <header className="sticky top-0 z-50 h-[72px] bg-midnight border-b border-midnight-edge flex items-center px-6 md:px-12">
         <WordMark />
-        <a
-          href="#waitlist"
-          className="ml-auto font-sans font-medium text-[12px] text-silver-muted uppercase tracking-[1.5px] hover:text-silver-bright transition-colors duration-150"
-        >
-          RESERVE MY SEAT
-        </a>
       </header>
 
       <section
