@@ -1,13 +1,50 @@
 import EmailForm from "@/components/EmailForm";
 import FadeIn from "@/components/FadeIn";
+import UseCaseScroll from "@/components/UseCaseScroll";
 
 const useCases = [
-  { time: "2 A.M.",           pillars: "SLEEP",            quote: "I have a launch tomorrow and I can't fall asleep." },
-  { time: "TUESDAY",          pillars: "SUN",              quote: "I haven't been outside in three days. Why does that matter?" },
-  { time: "MID-AFTERNOON",    pillars: "SATIATE",          quote: "Why does my focus die at 2 p.m. every day?" },
-  { time: "POST-DEMO DAY",    pillars: "SERENITY",         quote: "I crashed after the high. How do I not lose a week to this?" },
-  { time: "WEEK 7 OF SPRINT", pillars: "SLEEP + SERENITY", quote: "My HRV has been tanking. Do I push through?" },
-  { time: "5 A.M. WORKOUT",   pillars: "SATIATE",          quote: "I'm bonking at the end of every session. What am I missing?" },
+  {
+    time: "2 A.M.",
+    pillars: "SLEEP",
+    quote: "I have a launch tomorrow and I can't fall asleep.",
+    answer:
+      "Your cortisol is spiking from anticipation — completely normal before a high-stakes morning. Try box breathing: 4 seconds in, 4 hold, 4 out, 4 hold. Repeat 8 cycles. Put your phone face-down across the room; blue light at 2 a.m. delays melatonin by up to 90 minutes. Four hours of quality sleep beats six hours of anxious half-sleep.",
+  },
+  {
+    time: "TUESDAY",
+    pillars: "SUN",
+    quote: "I haven't been outside in three days. Why does that matter?",
+    answer:
+      "Sunlight before 10 a.m. anchors your cortisol awakening response — the hormonal signal that sets your energy, mood, and sleep pressure for the entire day. Three days without it and serotonin production drops noticeably. Ten minutes outside (no sunglasses) is enough to reset the signal. This is one of the highest-ROI habits in the 4Foundations protocol.",
+  },
+  {
+    time: "MID-AFTERNOON",
+    pillars: "SATIATE",
+    quote: "Why does my focus die at 2 p.m. every day?",
+    answer:
+      "The 2 p.m. crash is a circadian trough amplified by a blood glucose correction after lunch. Your brain uses 20% of your calories — a glucose spike and drop hits cognitive output harder than physical performance. A 10-minute walk after eating cuts the spike by ~30% without changing what you eat. Longer fix: anchor lunch around protein and fat, keep starchy carbs smaller.",
+  },
+  {
+    time: "POST-DEMO DAY",
+    pillars: "SERENITY",
+    quote: "I crashed after the high. How do I not lose a week to this?",
+    answer:
+      "Your nervous system ran at maximum output for weeks — the crash is cortisol normalizing. It's not a problem; it's the bill arriving. Protect sleep for the next two nights above everything else. Avoid alcohol (it fragments REM), keep movement light, and block high-stakes decisions for 48 hours. You'll recover faster than you expect.",
+  },
+  {
+    time: "WEEK 7 OF SPRINT",
+    pillars: "SLEEP + SERENITY",
+    quote: "My HRV has been tanking. Do I push through?",
+    answer:
+      "When HRV drops more than 10% below your baseline for three straight days, adaptation has stalled — your body is absorbing less from each session, not more. Pushing harder now compounds the deficit. One full recovery day costs you one day; ignoring it costs you a week. Reduce intensity to 60%, prioritize 8+ hours tonight, and cut alcohol completely.",
+  },
+  {
+    time: "5 A.M. WORKOUT",
+    pillars: "SATIATE",
+    quote: "I'm bonking at the end of every session. What am I missing?",
+    answer:
+      "You're training in a fasted state on depleted glycogen — your body has no choice but to burn muscle for fuel. Even 20g of fast carbs 30 minutes before (banana, dates, a rice cake) changes the last 20% of every session. Within 30 minutes after: 30–40g of protein to halt muscle breakdown. Pre-fuel for early morning training is not optional.",
+  },
 ];
 
 function WordMark() {
@@ -79,19 +116,8 @@ export default function Home() {
             </p>
           </FadeIn>
 
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-4">
-            {useCases.map((uc, i) => (
-              <FadeIn key={i} delay={i * 0.08}>
-                <div className="bg-paper-warm rounded-2xl p-6 border border-paper-edge h-full">
-                  <p className="font-sans font-medium text-[11px] uppercase tracking-[1px] text-cobalt mb-3">
-                    {uc.time} · {uc.pillars}
-                  </p>
-                  <p className="font-serif italic text-[19px] leading-[1.55] text-ink">
-                    &ldquo;{uc.quote}&rdquo;
-                  </p>
-                </div>
-              </FadeIn>
-            ))}
+          <div className="mt-12">
+            <UseCaseScroll useCases={useCases} />
           </div>
         </div>
       </section>
