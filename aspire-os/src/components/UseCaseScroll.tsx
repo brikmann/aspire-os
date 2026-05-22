@@ -56,7 +56,7 @@ export default function UseCaseScroll({ useCases }: { useCases: UseCase[] }) {
       </div>
 
       {/* Right: sticky answer panel — desktop only */}
-      <div className="hidden md:block md:w-[55%] sticky top-[88px]">
+      <div className="hidden md:block md:w-[55%] sticky top-[50vh] -translate-y-1/2">
         <div key={activeIndex} className="animate-answer">
           <p className="font-sans font-medium text-[11px] uppercase tracking-[1px] text-cobalt mb-3">
             {active.time} · {active.pillars}
