@@ -121,6 +121,52 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <section className="bg-midnight py-16 md:py-24 px-6">
+        <div className="max-w-[720px] mx-auto">
+          <FadeIn>
+            <div className="bg-midnight-light rounded-2xl p-8 md:p-12">
+
+              <div className="w-[120px] h-[120px] rounded-full bg-midnight-edge flex items-center justify-center mb-8">
+                <span className="font-sans font-medium text-[32px] text-silver-bright select-none">NB</span>
+              </div>
+
+              <p className="font-sans font-medium text-[12px] uppercase tracking-[1.5px] text-cobalt-soft mb-6">
+                A Note from the Founder
+              </p>
+
+              <div className="space-y-5">
+                <p className="font-serif italic text-[19px] leading-[1.55] text-silver">
+                  I&rsquo;m Noah Brikman. Kinesiology researcher, human-performance
+                  specialist &mdash; and I built Aspire OS because I&rsquo;ve been the
+                  version of me running on 5 hours of sleep with a deadline tomorrow.
+                  I know how it works. I also know what it costs.
+                </p>
+                <p className="font-serif italic text-[19px] leading-[1.55] text-silver">
+                  Friends in their twenties ask me questions their team doesn&rsquo;t
+                  have answers for. My parents in their sixties ask me questions their
+                  doctors don&rsquo;t have time for. The gap is the same gap &mdash;
+                  and it gets more expensive the longer it stays open.
+                </p>
+                <p className="font-serif italic text-[19px] leading-[1.55] text-silver">
+                  4Foundations is the private coach I wish I&rsquo;d had at 19, and
+                  the one I&rsquo;m building so I never become my stepdad at 65.
+                </p>
+              </div>
+
+              <div className="mt-8 pt-8 border-t border-midnight-edge">
+                <p className="font-sans font-medium text-[17px] text-silver-bright">
+                  &mdash; Noah Brikman
+                </p>
+                <p className="font-sans font-normal text-[14px] text-silver-muted mt-1">
+                  Founder, Aspire OS
+                </p>
+              </div>
+
+            </div>
+          </FadeIn>
+        </div>
+      </section>
     </>
   );
 }
