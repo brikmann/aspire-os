@@ -64,7 +64,7 @@ export default function Home() {
 
       <section
         id="waitlist"
-        className="flex-1 bg-midnight flex flex-col items-center px-6 pt-16 pb-24 text-center"
+        className="min-h-[calc(100vh-72px)] bg-midnight flex flex-col items-center justify-center px-6 py-24 text-center"
       >
         <FadeIn className="w-full max-w-3xl" delay={0} load>
           <h1 className="font-sans font-semibold text-[40px] md:text-[64px] leading-[1.10] tracking-[-1.5px] text-silver-bright">
