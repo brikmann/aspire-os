@@ -483,6 +483,15 @@ export default function CadencePage() {
           </div>
         )}
 
+        <footer className="mt-12 text-center">
+          <a
+            href="/privacy"
+            className="font-sans text-[12px] text-silver-dim hover:text-silver-muted transition-colors"
+          >
+            Privacy Policy
+          </a>
+        </footer>
+
       </div>
     </main>
   );
