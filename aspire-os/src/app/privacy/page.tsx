@@ -87,7 +87,9 @@ export default function PrivacyPage() {
               <li>
                 <span className="text-silver-bright font-medium">Anthropic</span> — your
                 biometric summary and calendar are sent to Anthropic&rsquo;s Claude API to
-                generate the protocol. Anthropic&rsquo;s data handling is governed by their{" "}
+                generate the protocol. Per Anthropic&rsquo;s commercial API terms, customer
+                inputs and outputs are not used to train Anthropic&rsquo;s models.
+                Anthropic&rsquo;s data handling is governed by their{" "}
                 <a
                   href="https://www.anthropic.com/legal/privacy"
                   target="_blank"
@@ -105,6 +107,23 @@ export default function PrivacyPage() {
                 is governed by their{" "}
                 <a
                   href="https://policies.google.com/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-cobalt hover:text-cobalt-soft underline underline-offset-2 transition-colors"
+                >
+                  privacy policy
+                </a>
+                .
+              </li>
+              <li className="mt-3">
+                <span className="text-silver-bright font-medium">Vercel</span> — Aspire OS
+                is hosted on Vercel. Vercel processes request metadata (IP address, user
+                agent, request timing) as part of normal web hosting. Vercel does not have
+                access to your form inputs, OAuth tokens, or Google Fit data — those live
+                in encrypted Supabase storage or in-memory only. Vercel&rsquo;s data
+                handling is governed by their{" "}
+                <a
+                  href="https://vercel.com/legal/privacy-policy"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-cobalt hover:text-cobalt-soft underline underline-offset-2 transition-colors"
@@ -141,6 +160,36 @@ export default function PrivacyPage() {
               are never persisted, disconnecting removes all data we hold about you. If
               you would like us to verify deletion or have other requests, email us at the
               address below.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-[13px] font-semibold uppercase tracking-widest text-cobalt mb-3">
+              Changes to this policy
+            </h2>
+            <p>
+              We may update this policy as the product evolves. The &ldquo;Last updated&rdquo; date
+              at the top reflects the most recent change. Material changes — new data types
+              collected, new third parties, or changes to deletion practices — will be
+              announced via email to any user who has connected Google Fit or submitted a
+              form.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-[13px] font-semibold uppercase tracking-widest text-cobalt mb-3">
+              Age
+            </h2>
+            <p>
+              Aspire OS is not intended for use by anyone under 18. If you believe a minor
+              has used Aspire OS, email{" "}
+              <a
+                href="mailto:noahbrikman@gmail.com"
+                className="text-cobalt hover:text-cobalt-soft underline underline-offset-2 transition-colors"
+              >
+                noahbrikman@gmail.com
+              </a>{" "}
+              and we will delete their data.
             </p>
           </section>
 
