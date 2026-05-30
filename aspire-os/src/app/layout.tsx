@@ -33,9 +33,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${lora.variable} h-full antialiased`}
+      className={`${inter.variable} ${lora.variable} antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-midnight">{children}</body>
+      <body className="min-h-screen flex flex-col bg-midnight">{children}</body>
     </html>
   );
 }
