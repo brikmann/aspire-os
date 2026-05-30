@@ -1,6 +1,8 @@
 import { streamText } from 'ai';
 import { anthropic } from '@ai-sdk/anthropic';
 import { z } from 'zod';
+import { NextRequest } from 'next/server';
+import { getRefreshedTokens, fetchTodaysHealthData } from '@/lib/google-fit';
 
 const inputSchema = z.object({
   wearable: z.string(),
@@ -11,6 +13,8 @@ const inputSchema = z.object({
   priorities: z.string(),
   calendar: z.string(),
 });
+
+type FitData = { sleepHours: number | null; restingHr: number | null; steps: number | null };
 
 const SYSTEM_PROMPT = `You are Cadence — the synthesis engine inside Aspire OS. You translate biometric data + a founder's calendar into a precise operational protocol for the whole day, plus a tomorrow-protection layer.
 
@@ -61,9 +65,10 @@ RULES:
 - Good state (sleep > 7.5, energy > 7): permission to push
 - Bad state (sleep < 5, energy < 4): damage control + aggressive evening recovery
 - Evening block must include specific wind-down timing
-- NEVER use: "journey", "wellness", "honor your body", "you deserve", "Great question", hedge words like "might/could/may help"`;
+- NEVER use: "journey", "wellness", "honor your body", "you deserve", "Great question", hedge words like "might/could/may help"
+- When wearable-derived data is provided (steps, sleep, heart rate), reference at least one specific data point in the PROTOCOL section. Frame manual input and wearable input as complementary sources, not duplicates. If the user provided manual sleep hours AND wearable sleep data, treat the wearable data as more accurate and call out the discrepancy if material (>30 min difference).`;
 
-function buildUserMessage(data: z.infer<typeof inputSchema>): string {
+function buildUserMessage(data: z.infer<typeof inputSchema>, fitData?: FitData | null): string {
   const lines: string[] = ['MORNING BIOMETRICS'];
   lines.push(`- Wearable: ${data.wearable}`);
   if (data.hrv != null) lines.push(`- HRV: ${data.hrv} ms`);
@@ -76,10 +81,22 @@ function buildUserMessage(data: z.infer<typeof inputSchema>): string {
   lines.push('');
   lines.push("TODAY'S CALENDAR");
   lines.push(data.calendar);
+
+  if (fitData && (fitData.steps !== null || fitData.sleepHours !== null || fitData.restingHr !== null)) {
+    lines.push('');
+    lines.push('WEARABLE DATA (Google Fit, last 24h):');
+    if (fitData.steps !== null) lines.push(`- Steps: ${fitData.steps.toLocaleString()}`);
+    if (fitData.sleepHours !== null) {
+      const mins = Math.round(fitData.sleepHours * 60);
+      lines.push(`- Sleep: ${fitData.sleepHours}h (${mins}min)`);
+    }
+    if (fitData.restingHr !== null) lines.push(`- Resting HR: ${fitData.restingHr} bpm`);
+  }
+
   return lines.join('\n');
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   let data: z.infer<typeof inputSchema>;
   try {
     const body = await req.json();
@@ -91,10 +108,24 @@ export async function POST(req: Request) {
     });
   }
 
+  // Opportunistically fetch Google Fit data — never blocks Cadence generation
+  let fitData: FitData | null = null;
+  try {
+    const sessionId = req.cookies.get('cadence_session')?.value;
+    if (sessionId) {
+      const tokenResult = await getRefreshedTokens(sessionId);
+      if (tokenResult.ok) {
+        fitData = await fetchTodaysHealthData(tokenResult.token);
+      }
+    }
+  } catch {
+    // Google Fit unavailable — proceed with manual data only
+  }
+
   const result = streamText({
     model: anthropic('claude-sonnet-4-5'),
     system: SYSTEM_PROMPT,
-    prompt: buildUserMessage(data),
+    prompt: buildUserMessage(data, fitData),
     maxTokens: 600,
   });
 
