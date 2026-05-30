@@ -14,7 +14,7 @@ const inputSchema = z.object({
   calendar: z.string(),
 });
 
-type FitData = { sleepHours: number | null; restingHr: number | null; steps: number | null };
+type FitData = { steps: number | null; sleepHours: number | null; restingHr: number | null; fetchedAt: string };
 
 const SYSTEM_PROMPT = `You are Cadence — the synthesis engine inside Aspire OS. You translate biometric data + a founder's calendar into a precise operational protocol for the whole day, plus a tomorrow-protection layer.
 
@@ -66,6 +66,7 @@ RULES:
 - Bad state (sleep < 5, energy < 4): damage control + aggressive evening recovery
 - Evening block must include specific wind-down timing
 - NEVER use: "journey", "wellness", "honor your body", "you deserve", "Great question", hedge words like "might/could/may help"
+- CRITICAL TIME-WINDOW INTERPRETATION: All wearable data (steps, heart rate, etc.) represents today's partial day-to-date readings — NOT yesterday's complete totals — unless explicitly labeled "last night" (e.g., sleep). The current time will be provided in the data block. A low step count means the user hasn't moved YET TODAY (often because it's still morning), not that yesterday was sedentary. Frame the protocol accordingly: "steps so far" or "today's movement is starting low" — never "yesterday you sat for X hours" unless you have explicit prior-day data.
 - When wearable-derived data is provided (steps, sleep, heart rate), reference at least one specific data point in the PROTOCOL section. Frame manual input and wearable input as complementary sources, not duplicates. If the user provided manual sleep hours AND wearable sleep data, treat the wearable data as more accurate and call out the discrepancy if material (>30 min difference).`;
 
 function buildUserMessage(data: z.infer<typeof inputSchema>, fitData?: FitData | null): string {
@@ -83,14 +84,19 @@ function buildUserMessage(data: z.infer<typeof inputSchema>, fitData?: FitData |
   lines.push(data.calendar);
 
   if (fitData && (fitData.steps !== null || fitData.sleepHours !== null || fitData.restingHr !== null)) {
+    const fetchedTime = new Date(fitData.fetchedAt).toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
     lines.push('');
-    lines.push('WEARABLE DATA (Google Fit, last 24h):');
-    if (fitData.steps !== null) lines.push(`- Steps: ${fitData.steps.toLocaleString()}`);
+    lines.push(`WEARABLE DATA (Google Fit, today since midnight, fetched ${fetchedTime}):`);
+    if (fitData.steps !== null) lines.push(`- Steps so far today: ${fitData.steps.toLocaleString()}`);
     if (fitData.sleepHours !== null) {
       const mins = Math.round(fitData.sleepHours * 60);
-      lines.push(`- Sleep: ${fitData.sleepHours}h (${mins}min)`);
+      lines.push(`- Sleep last night: ${fitData.sleepHours}h (${mins}min)`);
     }
-    if (fitData.restingHr !== null) lines.push(`- Resting HR: ${fitData.restingHr} bpm`);
+    if (fitData.restingHr !== null) lines.push(`- Resting HR (today's reading): ${fitData.restingHr} bpm`);
   }
 
   return lines.join('\n');

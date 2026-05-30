@@ -91,9 +91,10 @@ export async function getRefreshedTokens(sessionId: string): Promise<TokenStatus
 }
 
 export async function fetchTodaysHealthData(accessToken: string): Promise<{
-  sleepHours: number | null;
-  restingHr: number | null;
-  steps: number | null;
+  steps: number | null;       // since midnight today
+  sleepHours: number | null;  // last night's sleep session(s)
+  restingHr: number | null;   // today's min BPM proxy for resting HR
+  fetchedAt: string;          // ISO timestamp of when data was pulled
 }> {
   const client = makeClient();
   client.setCredentials({ access_token: accessToken });
@@ -101,35 +102,55 @@ export async function fetchTodaysHealthData(accessToken: string): Promise<{
 
   const now = Date.now();
   const yesterday = now - 24 * 60 * 60 * 1000;
+  const midnight = new Date();
+  midnight.setHours(0, 0, 0, 0);
+  const midnightMs = midnight.getTime();
 
   let sleepHours: number | null = null;
   let restingHr: number | null = null;
   let steps: number | null = null;
 
-  // Steps and heart rate via aggregate
+  // Steps: midnight → now so we only count today's movement, not yesterday afternoon
   try {
-    const agg = await fitness.users.dataset.aggregate({
+    const stepsAgg = await fitness.users.dataset.aggregate({
       userId: 'me',
       requestBody: {
-        aggregateBy: [
-          { dataTypeName: 'com.google.step_count.delta' },
-          { dataTypeName: 'com.google.heart_rate.bpm' },
-        ],
+        aggregateBy: [{ dataTypeName: 'com.google.step_count.delta' }],
+        bucketByTime: { durationMillis: String(now - midnightMs) },
+        startTimeMillis: String(midnightMs),
+        endTimeMillis: String(now),
+      },
+    });
+
+    for (const bucket of stepsAgg.data.bucket ?? []) {
+      for (const dataset of bucket.dataset ?? []) {
+        for (const point of dataset.point ?? []) {
+          const v = point.value ?? [];
+          if (v[0]?.intVal != null) steps = (steps ?? 0) + v[0].intVal;
+        }
+      }
+    }
+  } catch {
+    // no step data — leave null
+  }
+
+  // HR: yesterday → now to capture overnight readings for resting HR proxy
+  try {
+    const hrAgg = await fitness.users.dataset.aggregate({
+      userId: 'me',
+      requestBody: {
+        aggregateBy: [{ dataTypeName: 'com.google.heart_rate.bpm' }],
         bucketByTime: { durationMillis: String(now - yesterday) },
         startTimeMillis: String(yesterday),
         endTimeMillis: String(now),
       },
     });
 
-    for (const bucket of agg.data.bucket ?? []) {
+    for (const bucket of hrAgg.data.bucket ?? []) {
       for (const dataset of bucket.dataset ?? []) {
-        const src = dataset.dataSourceId ?? '';
         for (const point of dataset.point ?? []) {
           const v = point.value ?? [];
-          if (src.includes('step_count') && v[0]?.intVal != null) {
-            steps = (steps ?? 0) + v[0].intVal;
-          }
-          if (src.includes('heart_rate') && v[0]?.fpVal != null) {
+          if (v[0]?.fpVal != null) {
             const bpm = v[0].fpVal;
             if (restingHr === null || bpm < restingHr) restingHr = bpm;
           }
@@ -137,10 +158,10 @@ export async function fetchTodaysHealthData(accessToken: string): Promise<{
       }
     }
   } catch {
-    // no data available — leave null
+    // no HR data — leave null
   }
 
-  // Sleep via sessions (activityType 72 = sleeping)
+  // Sleep via sessions (activityType 72 = sleeping), last 24h to catch last night
   try {
     const sessions = await fitness.users.sessions.list({
       userId: 'me',
@@ -161,9 +182,10 @@ export async function fetchTodaysHealthData(accessToken: string): Promise<{
   }
 
   return {
+    steps,
     sleepHours,
     restingHr: restingHr !== null ? Math.round(restingHr) : null,
-    steps,
+    fetchedAt: new Date().toISOString(),
   };
 }
 
