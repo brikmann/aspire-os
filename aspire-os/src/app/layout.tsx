@@ -19,6 +19,10 @@ export const metadata: Metadata = {
   title: "Aspire OS — The operating system for human optimization.",
   description:
     "4Foundations is a private AI coach for founders and ambitious people who won't let their body be the reason they fall short.",
+  icons: {
+    icon: "/favicon-trifoil.png",
+    apple: "/favicon-trifoil.png",
+  },
 };
 
 export default function RootLayout({

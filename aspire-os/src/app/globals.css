@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+html {
+  scroll-behavior: smooth;
+}
+
 @theme {
   --color-midnight:       #1B2536;
   --color-midnight-deep:  #121A28;
