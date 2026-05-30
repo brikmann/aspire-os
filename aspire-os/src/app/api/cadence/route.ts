@@ -3,6 +3,7 @@ import { anthropic } from '@ai-sdk/anthropic';
 import { z } from 'zod';
 import { NextRequest } from 'next/server';
 import { getRefreshedTokens, fetchTodaysHealthData } from '@/lib/google-fit';
+import { getRefreshedCalendarTokens, fetchTodaysCalendarEvents, type CalendarEvent } from '@/lib/google-calendar';
 
 const inputSchema = z.object({
   wearable: z.string(),
@@ -93,22 +94,44 @@ RULES:
 - Evening block must include specific wind-down timing
 - NEVER use: "journey", "wellness", "honor your body", "you deserve", "Great question", hedge words like "might/could/may help"
 - CRITICAL TIME-WINDOW INTERPRETATION: All wearable data (steps, heart rate, etc.) represents today's partial day-to-date readings — NOT yesterday's complete totals — unless explicitly labeled "last night" (e.g., sleep). The current time will be provided in the data block. A low step count means the user hasn't moved YET TODAY (often because it's still morning), not that yesterday was sedentary. Frame the protocol accordingly: "steps so far" or "today's movement is starting low" — never "yesterday you sat for X hours" unless you have explicit prior-day data.
-- When wearable-derived data is provided (steps, sleep, heart rate), reference at least one specific data point in the PROTOCOL section. Frame manual input and wearable input as complementary sources, not duplicates. If the user provided manual sleep hours AND wearable sleep data, treat the wearable data as more accurate and call out the discrepancy if material (>30 min difference).`;
+- When wearable-derived data is provided (steps, sleep, heart rate), reference at least one specific data point in the PROTOCOL section. Frame manual input and wearable input as complementary sources, not duplicates. If the user provided manual sleep hours AND wearable sleep data, treat the wearable data as more accurate and call out the discrepancy if material (>30 min difference).
+- CALENDAR INTERPRETATION: When calendar data is provided, anchor PROTOCOL time blocks around actual meetings. Treat back-to-back meeting density as a cognitive load signal — recommend recovery blocks between demanding meetings (investor calls, technical deep dives, conflict conversations). Use gaps between meetings as protocol slots (walks, hydration, mental reset). If a high-stakes meeting is on the calendar (recognize keywords: investor, board, demo, customer, interview, pitch), bias PROTECT TODAY toward preserving readiness for that block specifically. Never schedule conflicting actions over real meetings.`;
 
-function buildUserMessage(data: z.infer<typeof inputSchema>, fitData?: FitData | null): string {
+function buildUserMessage(
+  data: z.infer<typeof inputSchema>,
+  fitData: FitData | null,
+  calEvents: CalendarEvent[] | null,
+): string {
   const lines: string[] = ['MORNING BIOMETRICS'];
   lines.push(`- Wearable: ${data.wearable}`);
   if (data.hrv != null) lines.push(`- HRV: ${data.hrv} ms`);
   if (data.restingHr != null) lines.push(`- Resting HR: ${data.restingHr} bpm`);
   lines.push(`- Sleep: ${data.sleepHours}h`);
   lines.push(`- Morning energy: ${data.morningEnergy}/10`);
+
   lines.push('');
   lines.push("TODAY'S PRIORITIES");
   lines.push(data.priorities);
-  lines.push('');
-  lines.push("TODAY'S CALENDAR");
-  lines.push(data.calendar);
 
+  // Calendar block — structured if from Google Calendar, raw textarea otherwise
+  if (calEvents && calEvents.length > 0) {
+    lines.push('');
+    lines.push('CALENDAR (Google Calendar, today):');
+    for (const ev of calEvents) {
+      lines.push(`- ${ev.start} - ${ev.end}: ${ev.summary} (${ev.duration_min} min)`);
+    }
+    if (data.calendar.trim()) {
+      lines.push('');
+      lines.push('ADDITIONAL CONTEXT (user-provided):');
+      lines.push(data.calendar);
+    }
+  } else {
+    lines.push('');
+    lines.push("TODAY'S CALENDAR");
+    lines.push(data.calendar);
+  }
+
+  // Wearable data block
   if (fitData && (fitData.steps !== null || fitData.sleepHours !== null || fitData.restingHr !== null)) {
     const fetchedTime = new Date(fitData.fetchedAt).toLocaleTimeString('en-US', {
       hour: 'numeric',
@@ -140,24 +163,36 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // Opportunistically fetch Google Fit data — never blocks Cadence generation
-  let fitData: FitData | null = null;
-  try {
-    const sessionId = req.cookies.get('cadence_session')?.value;
-    if (sessionId) {
-      const tokenResult = await getRefreshedTokens(sessionId);
-      if (tokenResult.ok) {
-        fitData = await fetchTodaysHealthData(tokenResult.token);
+  const sessionId = req.cookies.get('cadence_session')?.value;
+
+  // Fetch both integrations in parallel — neither blocks generation on failure
+  const [fitData, calEvents] = await Promise.all([
+    (async (): Promise<FitData | null> => {
+      if (!sessionId) return null;
+      try {
+        const t = await getRefreshedTokens(sessionId);
+        if (!t.ok) return null;
+        return await fetchTodaysHealthData(t.token);
+      } catch {
+        return null;
       }
-    }
-  } catch {
-    // Google Fit unavailable — proceed with manual data only
-  }
+    })(),
+    (async (): Promise<CalendarEvent[] | null> => {
+      if (!sessionId) return null;
+      try {
+        const t = await getRefreshedCalendarTokens(sessionId);
+        if (!t.ok) return null;
+        return await fetchTodaysCalendarEvents(t.token);
+      } catch {
+        return null;
+      }
+    })(),
+  ]);
 
   const result = streamText({
     model: anthropic('claude-sonnet-4-5'),
     system: SYSTEM_PROMPT,
-    prompt: buildUserMessage(data, fitData),
+    prompt: buildUserMessage(data, fitData, calEvents),
     maxTokens: 600,
   });
 

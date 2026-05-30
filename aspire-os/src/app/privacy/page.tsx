@@ -24,7 +24,7 @@ export default function PrivacyPage() {
           Privacy Policy
         </h1>
         <p className="font-sans text-[14px] text-silver-dim mb-12">
-          Last updated May 30, 2026
+          Last updated May 30, 2026 (revised)
         </p>
 
         <div className="space-y-10 font-sans text-[16px] leading-[1.75] text-silver">
@@ -42,6 +42,13 @@ export default function PrivacyPage() {
               sleep session duration, and heart rate readings from the last 24 hours) is
               used in real time to generate your protocol and is never persisted beyond
               the current request.
+            </p>
+            <p className="mt-4">
+              If you connect Google Calendar (a separate, independent connection from
+              Google Fit), we fetch today&rsquo;s events — start time, end time, title,
+              location, and duration only. We do not fetch attendees, meeting links,
+              descriptions, or events from any day other than today. This data is used
+              in real time to generate your protocol and is never persisted.
             </p>
             <p className="mt-4">
               We set a single first-party session cookie (<code className="text-silver-bright text-[14px] bg-midnight-light px-1.5 py-0.5 rounded">cadence_session</code>)
@@ -103,8 +110,11 @@ export default function PrivacyPage() {
               <li className="mt-3">
                 <span className="text-silver-bright font-medium">Google</span> — if you
                 connect Google Fit, we use Google&rsquo;s OAuth 2.0 flow and the Google
-                Fitness REST API to retrieve your health data. Google&rsquo;s data handling
-                is governed by their{" "}
+                Fitness REST API to retrieve your health data. If you connect Google
+                Calendar (a separate connection you authorize independently), we use the
+                same OAuth flow and the Google Calendar API to retrieve today&rsquo;s
+                events. You can disconnect either integration at any time without affecting
+                the other. Google&rsquo;s data handling is governed by their{" "}
                 <a
                   href="https://policies.google.com/privacy"
                   target="_blank"

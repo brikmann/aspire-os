@@ -13,11 +13,20 @@ type FormState = {
 };
 
 type FitStatus = 'loading' | 'disconnected' | 'connected' | 'reconnect-needed';
+type CalStatus = 'loading' | 'disconnected' | 'connected' | 'reconnect-needed';
 
 type FitData = {
   sleepHours: number | null;
   restingHr: number | null;
   steps: number | null;
+};
+
+type CalendarEvent = {
+  start: string;
+  end: string;
+  summary: string;
+  location?: string;
+  duration_min: number;
 };
 
 const INPUT_BASE =
@@ -29,16 +38,11 @@ const LABEL_BASE = 'block text-xs font-medium text-silver-muted uppercase tracki
 
 function ProtocolLine({ line }: { line: string }) {
   const trimmed = line.trim();
-
-  if (trimmed === '---') {
-    return <div className="border-t border-midnight-edge my-3" />;
-  }
-
+  if (trimmed === '---') return <div className="border-t border-midnight-edge my-3" />;
   const isHeader =
     trimmed.length > 1 &&
     trimmed === trimmed.toUpperCase() &&
     /^[A-Z][A-Z\s''·\-–\/0-9()~:]+$/.test(trimmed);
-
   if (isHeader) {
     return (
       <p className="text-cobalt text-[13px] font-semibold tracking-wider uppercase mt-5 mb-1 first:mt-0">
@@ -46,30 +50,38 @@ function ProtocolLine({ line }: { line: string }) {
       </p>
     );
   }
-  if (trimmed.startsWith('-')) {
-    return <p className="text-silver-bright text-[14px] leading-relaxed pl-1">{line}</p>;
-  }
-  if (trimmed === '') {
-    return <div className="h-1" />;
-  }
+  if (trimmed.startsWith('-')) return <p className="text-silver-bright text-[14px] leading-relaxed pl-1">{line}</p>;
+  if (trimmed === '') return <div className="h-1" />;
   return <p className="text-silver text-[14px] leading-relaxed">{line}</p>;
 }
 
-// Small sync badge shown on auto-filled fields
 function FitBadge() {
   return (
     <span className="inline-flex items-center gap-1 ml-2 text-[10px] font-medium text-cobalt-soft normal-case tracking-normal">
       <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-        <path
-          d="M5 1.5A3.5 3.5 0 1 1 1.5 5"
-          stroke="currentColor"
-          strokeWidth="1.4"
-          strokeLinecap="round"
-        />
+        <path d="M5 1.5A3.5 3.5 0 1 1 1.5 5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
         <path d="M1.5 2.5V5H4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
       Google Fit
     </span>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <circle cx="7" cy="7" r="6" stroke="#2C6BE0" strokeWidth="1.5" />
+      <path d="M4.5 7l2 2 3-3" stroke="#2C6BE0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ConnectIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M8 1.5A6.5 6.5 0 1 0 14.5 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M14.5 2.5V8H9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }
 
@@ -86,28 +98,40 @@ export default function CadencePage() {
 
   const [fitStatus, setFitStatus] = useState<FitStatus>('loading');
   const [fitData, setFitData] = useState<FitData | null>(null);
-  // tracks which fields were auto-populated from Google Fit
   const [fitFilled, setFitFilled] = useState<Set<keyof FormState>>(new Set());
+  const [connectError, setConnectError] = useState('');
+
+  const [calStatus, setCalStatus] = useState<CalStatus>('loading');
+  const [calEvents, setCalEvents] = useState<CalendarEvent[]>([]);
+  const [calConnectError, setCalConnectError] = useState('');
 
   const [response, setResponse] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [connectError, setConnectError] = useState('');
   const responseRef = useRef<HTMLDivElement>(null);
 
-  // On mount: handle ?connected / ?error params and fetch Fit data
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.has('connected')) {
+    const hasConnected = params.has('connected');
+    const hasCalConnected = params.has('calendar_connected');
+    const errParam = params.get('error');
+
+    if (hasConnected || hasCalConnected || errParam) {
       window.history.replaceState({}, '', '/cadence');
     }
-    if (params.get('error') === 'auth_failed') {
-      window.history.replaceState({}, '', '/cadence');
+
+    if (errParam === 'auth_failed') {
       setConnectError('Google authorisation failed — please try again.');
       setFitStatus('disconnected');
-      return;
     }
+    if (errParam === 'calendar_auth_failed') {
+      setCalConnectError('Google Calendar authorisation failed — please try again.');
+      setCalStatus('disconnected');
+    }
+
+    // Fetch both integrations in parallel
     fetchFitData();
+    fetchCalendarData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -122,12 +146,10 @@ export default function CadencePage() {
     try {
       const res = await fetch('/api/auth/google-fit/data');
       const json = await res.json();
-
       if (!json.connected) {
         setFitStatus(json.reconnectNeeded ? 'reconnect-needed' : 'disconnected');
         return;
       }
-
       setFitStatus('connected');
       const data: FitData = {
         sleepHours: json.sleepHours ?? null,
@@ -135,19 +157,11 @@ export default function CadencePage() {
         steps: json.steps ?? null,
       };
       setFitData(data);
-
-      // Auto-populate fields that have data
       const filled = new Set<keyof FormState>();
       setForm((prev) => {
         const next = { ...prev };
-        if (data.sleepHours !== null) {
-          next.sleepHours = String(data.sleepHours);
-          filled.add('sleepHours');
-        }
-        if (data.restingHr !== null) {
-          next.restingHr = String(data.restingHr);
-          filled.add('restingHr');
-        }
+        if (data.sleepHours !== null) { next.sleepHours = String(data.sleepHours); filled.add('sleepHours'); }
+        if (data.restingHr !== null) { next.restingHr = String(data.restingHr); filled.add('restingHr'); }
         return next;
       });
       setFitFilled(filled);
@@ -156,7 +170,23 @@ export default function CadencePage() {
     }
   }
 
-  async function handleDisconnect() {
+  async function fetchCalendarData() {
+    setCalStatus('loading');
+    try {
+      const res = await fetch('/api/auth/google-calendar/data');
+      const json = await res.json();
+      if (!json.connected) {
+        setCalStatus(json.reconnectNeeded ? 'reconnect-needed' : 'disconnected');
+        return;
+      }
+      setCalStatus('connected');
+      setCalEvents(json.events ?? []);
+    } catch {
+      setCalStatus('disconnected');
+    }
+  }
+
+  async function handleFitDisconnect() {
     await fetch('/api/auth/google-fit/disconnect', { method: 'POST' });
     setFitStatus('disconnected');
     setFitData(null);
@@ -164,15 +194,16 @@ export default function CadencePage() {
     setForm((prev) => ({ ...prev, sleepHours: '', restingHr: '' }));
   }
 
+  async function handleCalDisconnect() {
+    await fetch('/api/auth/google-calendar/disconnect', { method: 'POST' });
+    setCalStatus('disconnected');
+    setCalEvents([]);
+  }
+
   function set(field: keyof FormState) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-      // User edited a Fit-filled field — remove the badge
       if (fitFilled.has(field)) {
-        setFitFilled((prev) => {
-          const next = new Set(prev);
-          next.delete(field);
-          return next;
-        });
+        setFitFilled((prev) => { const next = new Set(prev); next.delete(field); return next; });
       }
       setForm((prev) => ({ ...prev, [field]: e.target.value }));
     };
@@ -184,11 +215,9 @@ export default function CadencePage() {
       setError('Sleep hours and morning energy are required.');
       return;
     }
-
     setLoading(true);
     setResponse('');
     setError('');
-
     try {
       const res = await fetch('/api/cadence', {
         method: 'POST',
@@ -203,11 +232,7 @@ export default function CadencePage() {
           calendar: form.calendar,
         }),
       });
-
-      if (!res.ok || !res.body) {
-        throw new Error((await res.text().catch(() => '')) || 'Request failed');
-      }
-
+      if (!res.ok || !res.body) throw new Error((await res.text().catch(() => '')) || 'Request failed');
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let text = '';
@@ -224,79 +249,105 @@ export default function CadencePage() {
     }
   }
 
-  // ── Google Fit banner/CTA ──────────────────────────────────────────────
+  // ── Google Fit banner ────────────────────────────────────────────────────
   function FitBanner() {
     if (fitStatus === 'loading') {
       return (
-        <div className="flex items-center gap-2 text-xs text-silver-muted mb-5 animate-pulse">
+        <div className="flex items-center gap-2 text-xs text-silver-muted animate-pulse">
           <span className="w-3 h-3 rounded-full bg-midnight-edge" />
           Checking Google Fit…
         </div>
       );
     }
-
     if (fitStatus === 'reconnect-needed') {
       return (
-        <div className="flex items-center justify-between mb-5 bg-midnight-edge/40 rounded-xl px-4 py-3">
+        <div className="flex items-center justify-between bg-midnight-edge/40 rounded-xl px-4 py-3">
           <span className="text-sm text-silver-muted">Google Fit token expired</span>
-          <a
-            href="/api/auth/google-fit"
-            className="text-xs font-semibold text-cobalt hover:text-cobalt-soft transition-colors"
-          >
-            Reconnect Google Fit →
+          <a href="/api/auth/google-fit" className="text-xs font-semibold text-cobalt hover:text-cobalt-soft transition-colors">
+            Reconnect →
           </a>
         </div>
       );
     }
-
     if (fitStatus === 'connected') {
-      const parts = [];
-      if (fitData?.steps != null) parts.push(`${fitData.steps.toLocaleString()} steps`);
+      const parts: string[] = [];
+      if (fitData?.steps != null) parts.push(`${fitData.steps.toLocaleString()} steps today`);
       return (
-        <div className="flex items-center justify-between mb-5 bg-cobalt/10 border border-cobalt/20 rounded-xl px-4 py-3">
+        <div className="flex items-center justify-between bg-cobalt/10 border border-cobalt/20 rounded-xl px-4 py-3">
           <div className="flex items-center gap-2 text-sm">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-              <circle cx="7" cy="7" r="6" stroke="#2C6BE0" strokeWidth="1.5" />
-              <path d="M4.5 7l2 2 3-3" stroke="#2C6BE0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <CheckIcon />
             <span className="text-silver-bright font-medium">Google Fit connected</span>
-            {parts.length > 0 && (
-              <span className="text-silver-muted">· {parts.join(' · ')}</span>
-            )}
+            {parts.length > 0 && <span className="text-silver-muted">· {parts.join(' · ')}</span>}
           </div>
-          <button
-            type="button"
-            onClick={handleDisconnect}
-            className="text-xs text-silver-muted hover:text-silver transition-colors"
-          >
+          <button type="button" onClick={handleFitDisconnect} className="text-xs text-silver-muted hover:text-silver transition-colors">
             Disconnect
           </button>
         </div>
       );
     }
-
-    // disconnected
     return (
-      <div className="mb-5">
-        {connectError && (
-          <p className="text-xs text-red-400 mb-3">{connectError}</p>
-        )}
+      <div>
+        {connectError && <p className="text-xs text-red-400 mb-2">{connectError}</p>}
         <a
           href="/api/auth/google-fit"
-          className="flex items-center justify-center gap-2 w-full rounded-xl py-3 px-5 bg-cobalt/15 border border-cobalt/30 text-cobalt text-[14px] font-semibold hover:bg-cobalt/20 transition-colors"
+          className="flex items-center justify-center gap-2 w-full rounded-xl py-2.5 px-5 bg-cobalt/15 border border-cobalt/30 text-cobalt text-[13px] font-semibold hover:bg-cobalt/20 transition-colors"
         >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M8 1.5A6.5 6.5 0 1 0 14.5 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            <path d="M14.5 2.5V8H9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          <ConnectIcon />
           Connect Google Fit for auto-fill
         </a>
-        <p className="text-center text-xs text-silver-dim mt-2">
-          or fill in manually below ↓
-        </p>
       </div>
     );
   }
+
+  // ── Google Calendar banner ───────────────────────────────────────────────
+  function CalBanner() {
+    if (calStatus === 'loading') {
+      return (
+        <div className="flex items-center gap-2 text-xs text-silver-muted animate-pulse">
+          <span className="w-3 h-3 rounded-full bg-midnight-edge" />
+          Checking Google Calendar…
+        </div>
+      );
+    }
+    if (calStatus === 'reconnect-needed') {
+      return (
+        <div className="flex items-center justify-between bg-midnight-edge/40 rounded-xl px-4 py-3">
+          <span className="text-sm text-silver-muted">Google Calendar token expired</span>
+          <a href="/api/auth/google-calendar" className="text-xs font-semibold text-cobalt hover:text-cobalt-soft transition-colors">
+            Reconnect →
+          </a>
+        </div>
+      );
+    }
+    if (calStatus === 'connected') {
+      return (
+        <div className="flex items-center justify-between bg-cobalt/10 border border-cobalt/20 rounded-xl px-4 py-3">
+          <div className="flex items-center gap-2 text-sm">
+            <CheckIcon />
+            <span className="text-silver-bright font-medium">Google Calendar connected</span>
+            <span className="text-silver-muted">· {calEvents.length} event{calEvents.length !== 1 ? 's' : ''} today</span>
+          </div>
+          <button type="button" onClick={handleCalDisconnect} className="text-xs text-silver-muted hover:text-silver transition-colors">
+            Disconnect
+          </button>
+        </div>
+      );
+    }
+    return (
+      <div>
+        {calConnectError && <p className="text-xs text-red-400 mb-2">{calConnectError}</p>}
+        <a
+          href="/api/auth/google-calendar"
+          className="flex items-center justify-center gap-2 w-full rounded-xl py-2.5 px-5 bg-cobalt/15 border border-cobalt/30 text-cobalt text-[13px] font-semibold hover:bg-cobalt/20 transition-colors"
+        >
+          <ConnectIcon />
+          Connect Google Calendar for auto-fill
+        </a>
+      </div>
+    );
+  }
+
+  const calConnected = calStatus === 'connected';
 
   return (
     <main className="min-h-screen bg-midnight">
@@ -304,12 +355,8 @@ export default function CadencePage() {
 
         {/* Header */}
         <header className="mb-10">
-          <p className="font-sans font-medium text-[22px] text-silver-bright mb-6">
-            ASPIRE OS
-          </p>
-          <p className="font-sans font-medium text-[12px] uppercase tracking-[1.5px] text-cobalt mb-3">
-            CADENCE · alpha
-          </p>
+          <p className="font-sans font-medium text-[22px] text-silver-bright mb-6">ASPIRE OS</p>
+          <p className="font-sans font-medium text-[12px] uppercase tracking-[1.5px] text-cobalt mb-3">CADENCE · alpha</p>
           <h1 className="font-sans font-semibold text-[28px] sm:text-[38px] text-silver-bright leading-[1.15] tracking-[-0.5px] sm:tracking-[-1px] mb-4">
             Today&apos;s protocol — from your biometrics and your calendar
           </h1>
@@ -320,7 +367,12 @@ export default function CadencePage() {
 
         {/* Form card */}
         <div className="bg-midnight-light rounded-2xl p-6 sm:p-8">
-          <FitBanner />
+
+          {/* Dual integration banners */}
+          <div className="flex flex-col gap-3 mb-6">
+            <FitBanner />
+            <CalBanner />
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
 
@@ -329,12 +381,7 @@ export default function CadencePage() {
               <div>
                 <label htmlFor="wearable" className={LABEL_BASE}>Wearable</label>
                 <div className="relative">
-                  <select
-                    id="wearable"
-                    value={form.wearable}
-                    onChange={set('wearable')}
-                    className={`${INPUT_BASE} appearance-none pr-8 cursor-pointer`}
-                  >
+                  <select id="wearable" value={form.wearable} onChange={set('wearable')} className={`${INPUT_BASE} appearance-none pr-8 cursor-pointer`}>
                     <option value="Whoop">Whoop</option>
                     <option value="Oura">Oura</option>
                     <option value="Apple Watch">Apple Watch</option>
@@ -342,10 +389,7 @@ export default function CadencePage() {
                     <option value="Other">Other</option>
                     <option value="None">None</option>
                   </select>
-                  <svg
-                    className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-silver-muted"
-                    width="14" height="14" viewBox="0 0 14 14" fill="none"
-                  >
+                  <svg className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-silver-muted" width="14" height="14" viewBox="0 0 14 14" fill="none">
                     <path d="M3 5l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </div>
@@ -356,33 +400,17 @@ export default function CadencePage() {
                   HRV (ms){' '}
                   <span className="normal-case tracking-normal text-silver-dim">optional</span>
                 </label>
-                <input
-                  id="hrv"
-                  type="number"
-                  min="0"
-                  max="300"
-                  placeholder="65"
-                  value={form.hrv}
-                  onChange={set('hrv')}
-                  className={INPUT_BASE}
-                />
+                <input id="hrv" type="number" min="0" max="300" placeholder="65" value={form.hrv} onChange={set('hrv')} className={INPUT_BASE} />
               </div>
 
               <div>
                 <label htmlFor="restingHr" className={LABEL_BASE}>
                   Resting HR
-                  {fitFilled.has('restingHr') ? <FitBadge /> : (
-                    <span className="normal-case tracking-normal text-silver-dim"> optional</span>
-                  )}
+                  {fitFilled.has('restingHr') ? <FitBadge /> : <span className="normal-case tracking-normal text-silver-dim"> optional</span>}
                 </label>
                 <input
-                  id="restingHr"
-                  type="number"
-                  min="30"
-                  max="120"
-                  placeholder="55"
-                  value={form.restingHr}
-                  onChange={set('restingHr')}
+                  id="restingHr" type="number" min="30" max="120" placeholder="55"
+                  value={form.restingHr} onChange={set('restingHr')}
                   className={`${INPUT_BASE} ${fitFilled.has('restingHr') ? 'border-cobalt/40' : ''}`}
                 />
               </div>
@@ -392,37 +420,17 @@ export default function CadencePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="sleepHours" className={LABEL_BASE}>
-                  Sleep hours
-                  {fitFilled.has('sleepHours') && <FitBadge />}
+                  Sleep hours{fitFilled.has('sleepHours') && <FitBadge />}
                 </label>
                 <input
-                  id="sleepHours"
-                  type="number"
-                  min="0"
-                  max="24"
-                  step="0.5"
-                  placeholder="7.5"
-                  value={form.sleepHours}
-                  onChange={set('sleepHours')}
-                  required
+                  id="sleepHours" type="number" min="0" max="24" step="0.5" placeholder="7.5"
+                  value={form.sleepHours} onChange={set('sleepHours')} required
                   className={`${INPUT_BASE} ${fitFilled.has('sleepHours') ? 'border-cobalt/40' : ''}`}
                 />
               </div>
               <div>
-                <label htmlFor="morningEnergy" className={LABEL_BASE}>
-                  Morning energy (1–10)
-                </label>
-                <input
-                  id="morningEnergy"
-                  type="number"
-                  min="1"
-                  max="10"
-                  placeholder="7"
-                  value={form.morningEnergy}
-                  onChange={set('morningEnergy')}
-                  required
-                  className={INPUT_BASE}
-                />
+                <label htmlFor="morningEnergy" className={LABEL_BASE}>Morning energy (1–10)</label>
+                <input id="morningEnergy" type="number" min="1" max="10" placeholder="7" value={form.morningEnergy} onChange={set('morningEnergy')} required className={INPUT_BASE} />
               </div>
             </div>
 
@@ -430,42 +438,55 @@ export default function CadencePage() {
             <div>
               <label htmlFor="priorities" className={LABEL_BASE}>Today&apos;s priorities</label>
               <textarea
-                id="priorities"
-                rows={3}
+                id="priorities" rows={3}
                 placeholder={`1. Ship onboarding flow v2\n2. Prep Series A deck for Thursday call\n3. 1:1 with lead engineer at 3 PM`}
-                value={form.priorities}
-                onChange={set('priorities')}
-                className={`${INPUT_BASE} resize-none`}
+                value={form.priorities} onChange={set('priorities')} className={`${INPUT_BASE} resize-none`}
               />
             </div>
 
-            {/* Calendar */}
+            {/* Calendar — auto-fetched when connected, manual textarea otherwise */}
             <div>
-              <label htmlFor="calendar" className={LABEL_BASE}>Today&apos;s calendar</label>
-              <textarea
-                id="calendar"
-                rows={6}
-                placeholder={`9:00 AM — Team standup (30 min)\n11:00 AM — Investor call with Benchmark\n1:00 PM — Lunch / no meetings\n3:00 PM — 1:1 with lead engineer\n5:00 PM — Demo prep session\n7:00 PM — Free`}
-                value={form.calendar}
-                onChange={set('calendar')}
-                className={`${INPUT_BASE} resize-none`}
-              />
+              {calConnected && calEvents.length > 0 ? (
+                <>
+                  <p className={LABEL_BASE}>Today&apos;s calendar (Google Calendar)</p>
+                  <div className="bg-midnight border border-midnight-edge rounded-lg px-3 py-2.5 space-y-1.5 mb-4">
+                    {calEvents.map((ev, i) => (
+                      <p key={i} className="text-sm text-silver-bright leading-relaxed">
+                        {ev.start} — {ev.summary}
+                        <span className="text-silver-muted"> ({ev.duration_min} min)</span>
+                      </p>
+                    ))}
+                  </div>
+                  <label htmlFor="calendar" className={LABEL_BASE}>
+                    Add anything else{' '}
+                    <span className="normal-case tracking-normal text-silver-dim">events not on calendar, prep blocks, notes</span>
+                  </label>
+                  <textarea
+                    id="calendar" rows={3}
+                    placeholder="e.g. prep block before investor call, gym at 6 PM, early dinner"
+                    value={form.calendar} onChange={set('calendar')} className={`${INPUT_BASE} resize-none`}
+                  />
+                </>
+              ) : (
+                <>
+                  <label htmlFor="calendar" className={LABEL_BASE}>Today&apos;s calendar</label>
+                  <textarea
+                    id="calendar" rows={6}
+                    placeholder={`9:00 AM — Team standup (30 min)\n11:00 AM — Investor call with Benchmark\n1:00 PM — Lunch / no meetings\n3:00 PM — 1:1 with lead engineer\n5:00 PM — Demo prep session\n7:00 PM — Free`}
+                    value={form.calendar} onChange={set('calendar')} className={`${INPUT_BASE} resize-none`}
+                  />
+                </>
+              )}
             </div>
 
             {/* Error */}
-            {error && (
-              <p className="text-sm text-red-400 bg-red-400/10 rounded-lg px-3 py-2">{error}</p>
-            )}
+            {error && <p className="text-sm text-red-400 bg-red-400/10 rounded-lg px-3 py-2">{error}</p>}
 
             {/* Submit */}
             <button
-              type="submit"
-              disabled={loading}
+              type="submit" disabled={loading}
               className={`w-full rounded-lg py-3 px-6 text-[15px] font-semibold text-silver-bright transition-all
-                ${loading
-                  ? 'bg-cobalt-soft animate-pulse cursor-not-allowed'
-                  : 'bg-cobalt hover:bg-cobalt-soft active:scale-[0.99] cursor-pointer'
-                }`}
+                ${loading ? 'bg-cobalt-soft animate-pulse cursor-not-allowed' : 'bg-cobalt hover:bg-cobalt-soft active:scale-[0.99] cursor-pointer'}`}
             >
               {loading ? 'Computing protocol…' : "Generate today's Cadence →"}
             </button>
@@ -484,10 +505,7 @@ export default function CadencePage() {
         )}
 
         <footer className="mt-12 text-center">
-          <a
-            href="/privacy"
-            className="font-sans text-[12px] text-silver-dim hover:text-silver-muted transition-colors"
-          >
+          <a href="/privacy" className="font-sans text-[12px] text-silver-dim hover:text-silver-muted transition-colors">
             Privacy Policy
           </a>
         </footer>
