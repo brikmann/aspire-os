@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { type CadenceOutput } from '@/lib/cadence-schema';
 
-// ── Types ──────────────────────────────────────────────────────────────────
+// ── Types ─────────────────────────────────────────────────────────────────
 
 type FormState = {
   wearable: string;
@@ -17,27 +17,69 @@ type FormState = {
 
 type FitStatus = 'loading' | 'disconnected' | 'connected' | 'reconnect-needed';
 type CalStatus = 'loading' | 'disconnected' | 'connected' | 'reconnect-needed';
-
 type FitData = { sleepHours: number | null; restingHr: number | null; steps: number | null };
+type CalendarEvent = { start: string; end: string; summary: string; location?: string; duration_min: number };
+type ProtocolItem = CadenceOutput['protocol'][number];
 
-type CalendarEvent = {
-  start: string;
-  end: string;
-  summary: string;
-  location?: string;
-  duration_min: number;
-};
+// ── JSON streaming helpers ────────────────────────────────────────────────
 
-// ── Custom streaming hook ──────────────────────────────────────────────────
+// Extracts complete {...} objects from a JSON array fragment,
+// properly skipping over string contents so stray braces don't confuse it.
+function extractCompleteObjects(text: string): unknown[] {
+  const items: unknown[] = [];
+  let i = 0;
+  while (i < text.length) {
+    // Skip leading whitespace / commas
+    while (i < text.length && ' \n\r\t,'.includes(text[i])) i++;
+    if (i >= text.length || text[i] !== '{') break;
+
+    const start = i;
+    let depth = 0;
+    let inStr = false;
+    let esc = false;
+
+    while (i < text.length) {
+      const ch = text[i];
+      if (esc) { esc = false; }
+      else if (ch === '\\' && inStr) { esc = true; }
+      else if (ch === '"') { inStr = !inStr; }
+      else if (!inStr) {
+        if (ch === '{') depth++;
+        else if (ch === '}') {
+          depth--;
+          if (depth === 0) {
+            try { items.push(JSON.parse(text.slice(start, i + 1))); } catch { /* skip malformed */ }
+            i++;
+            break;
+          }
+        }
+      }
+      i++;
+    }
+    if (depth > 0) break; // Incomplete object — wait for more chunks
+  }
+  return items;
+}
+
+function extractStreamingProtocol(accumulated: string): ProtocolItem[] {
+  const match = accumulated.match(/"protocol"\s*:\s*\[/);
+  if (!match || match.index === undefined) return [];
+  const arrayStart = match.index + match[0].length;
+  return extractCompleteObjects(accumulated.slice(arrayStart)) as ProtocolItem[];
+}
+
+// ── Streaming hook ────────────────────────────────────────────────────────
 
 function useCadenceStream() {
   const [cadence, setCadence] = useState<CadenceOutput | null>(null);
+  const [streamingProtocol, setStreamingProtocol] = useState<ProtocolItem[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [genError, setGenError] = useState<string | null>(null);
 
   const generate = useCallback(async (input: Record<string, unknown>) => {
     setIsGenerating(true);
     setCadence(null);
+    setStreamingProtocol([]);
     setGenError(null);
 
     try {
@@ -46,34 +88,37 @@ function useCadenceStream() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(input),
       });
-
       if (!res.ok || !res.body) {
-        const msg = await res.text().catch(() => 'Request failed');
-        throw new Error(msg || 'Request failed');
+        throw new Error((await res.text().catch(() => '')) || 'Request failed');
       }
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let accumulated = '';
+      let complete = false;
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         accumulated += decoder.decode(value, { stream: true });
-        // Attempt parse at each chunk — succeeds once JSON is complete
-        try {
-          const parsed = JSON.parse(accumulated) as CadenceOutput;
-          setCadence(parsed);
-        } catch {
-          // Partial JSON — keep reading
+
+        if (!complete) {
+          try {
+            const parsed = JSON.parse(accumulated) as CadenceOutput;
+            setCadence(parsed);
+            setStreamingProtocol([]);
+            complete = true;
+          } catch {
+            // Not yet valid JSON — extract partial protocol items
+            const items = extractStreamingProtocol(accumulated);
+            if (items.length > 0) setStreamingProtocol(items);
+          }
         }
       }
 
-      // Final guaranteed parse
-      try {
-        setCadence(JSON.parse(accumulated) as CadenceOutput);
-      } catch {
-        throw new Error('Response was not valid JSON — please retry.');
+      if (!complete) {
+        try { setCadence(JSON.parse(accumulated) as CadenceOutput); }
+        catch { throw new Error('Response was not valid JSON — please retry.'); }
       }
     } catch (err) {
       setGenError(err instanceof Error ? err.message : 'Something went wrong');
@@ -82,7 +127,7 @@ function useCadenceStream() {
     }
   }, []);
 
-  return { cadence, isGenerating, genError, generate };
+  return { cadence, streamingProtocol, isGenerating, genError, generate };
 }
 
 // ── UI constants ──────────────────────────────────────────────────────────
@@ -93,12 +138,18 @@ const INPUT_BASE =
   'transition-colors';
 
 const LABEL_BASE = 'block text-xs font-medium text-silver-muted uppercase tracking-wide mb-1.5';
-
 const CARD_BASE = 'bg-midnight-light/50 rounded-2xl p-6 border border-midnight-edge';
-
 const EYEBROW = 'text-xs font-medium uppercase tracking-[1.5px] text-cobalt-soft mb-3';
 
-// ── Skeleton ──────────────────────────────────────────────────────────────
+const CATEGORY_EMOJI: Record<string, string> = {
+  work: '💻',
+  recovery: '🌱',
+  meeting: '🗓',
+  meal: '🍽',
+  sleep: '😴',
+};
+
+// ── Sub-components ────────────────────────────────────────────────────────
 
 function CardSkeleton() {
   return (
@@ -109,8 +160,6 @@ function CardSkeleton() {
     </div>
   );
 }
-
-// ── Small shared components ───────────────────────────────────────────────
 
 function FitBadge() {
   return (
@@ -142,17 +191,51 @@ function ConnectIcon() {
   );
 }
 
+function ProtocolCard({ item, index }: { item: ProtocolItem; index: number }) {
+  const timeParts = item.time.split(' ');
+  const timeNum = timeParts[0] ?? item.time;
+  const timePeriod = timeParts[1] ?? '';
+  const emoji = CATEGORY_EMOJI[item.category] ?? '·';
+
+  return (
+    <div
+      className="flex bg-midnight-light/30 rounded-xl p-4 border border-midnight-edge/50 animate-answer"
+      style={{ animationDelay: `${index * 0.06}s` }}
+    >
+      {/* Time column */}
+      <div className="w-16 flex-shrink-0 pt-0.5">
+        <p className="font-mono text-lg font-semibold text-cobalt-soft leading-none">{timeNum}</p>
+        <p className="font-mono text-xs text-cobalt-soft/60 mt-0.5">{timePeriod}</p>
+      </div>
+
+      {/* Content column */}
+      <div className="flex-1 pl-4 border-l border-midnight-edge">
+        <div className="flex items-start justify-between gap-2">
+          <p className="text-base text-silver-bright font-medium leading-snug flex-1">
+            {item.action}
+            {item.duration_min != null && (
+              <span className="text-silver-muted font-normal"> ({item.duration_min} min)</span>
+            )}
+          </p>
+          <div className="flex items-center gap-1.5 flex-shrink-0 pt-0.5">
+            {item.is_from_calendar && (
+              <span className="text-[10px] uppercase tracking-wider text-cobalt-soft">From Calendar</span>
+            )}
+            <span className="text-base leading-none">{emoji}</span>
+          </div>
+        </div>
+        <p className="text-sm text-silver leading-relaxed mt-1">{item.rationale}</p>
+      </div>
+    </div>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────
 
 export default function CadencePage() {
   const [form, setForm] = useState<FormState>({
-    wearable: 'None',
-    hrv: '',
-    restingHr: '',
-    sleepHours: '',
-    morningEnergy: '',
-    priorities: '',
-    calendar: '',
+    wearable: 'None', hrv: '', restingHr: '', sleepHours: '',
+    morningEnergy: '', priorities: '', calendar: '',
   });
 
   const [fitStatus, setFitStatus] = useState<FitStatus>('loading');
@@ -166,36 +249,29 @@ export default function CadencePage() {
 
   const [formError, setFormError] = useState('');
 
-  const { cadence, isGenerating, genError, generate } = useCadenceStream();
+  const { cadence, streamingProtocol, isGenerating, genError, generate } = useCadenceStream();
 
   const heroRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to hero cards when generation completes
   useEffect(() => {
     if (!isGenerating && cadence) {
       heroRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [isGenerating, cadence]);
 
-  // On mount: handle URL params + fetch both integrations in parallel
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const hasConnected = params.has('connected');
-    const hasCalConnected = params.has('calendar_connected');
-    const errParam = params.get('error');
-
-    if (hasConnected || hasCalConnected || errParam) {
+    if (params.has('connected') || params.has('calendar_connected') || params.get('error')) {
       window.history.replaceState({}, '', '/cadence');
     }
-    if (errParam === 'auth_failed') {
+    if (params.get('error') === 'auth_failed') {
       setConnectError('Google authorisation failed — please try again.');
       setFitStatus('disconnected');
     }
-    if (errParam === 'calendar_auth_failed') {
+    if (params.get('error') === 'calendar_auth_failed') {
       setCalConnectError('Google Calendar authorisation failed — please try again.');
       setCalStatus('disconnected');
     }
-
     fetchFitData();
     fetchCalendarData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -211,7 +287,7 @@ export default function CadencePage() {
       const data: FitData = { sleepHours: json.sleepHours ?? null, restingHr: json.restingHr ?? null, steps: json.steps ?? null };
       setFitData(data);
       const filled = new Set<keyof FormState>();
-      setForm((prev) => {
+      setForm(prev => {
         const next = { ...prev };
         if (data.sleepHours !== null) { next.sleepHours = String(data.sleepHours); filled.add('sleepHours'); }
         if (data.restingHr !== null) { next.restingHr = String(data.restingHr); filled.add('restingHr'); }
@@ -235,7 +311,7 @@ export default function CadencePage() {
   async function handleFitDisconnect() {
     await fetch('/api/auth/google-fit/disconnect', { method: 'POST' });
     setFitStatus('disconnected'); setFitData(null); setFitFilled(new Set());
-    setForm((prev) => ({ ...prev, sleepHours: '', restingHr: '' }));
+    setForm(prev => ({ ...prev, sleepHours: '', restingHr: '' }));
   }
 
   async function handleCalDisconnect() {
@@ -245,17 +321,14 @@ export default function CadencePage() {
 
   function set(field: keyof FormState) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-      if (fitFilled.has(field)) setFitFilled((prev) => { const n = new Set(prev); n.delete(field); return n; });
-      setForm((prev) => ({ ...prev, [field]: e.target.value }));
+      if (fitFilled.has(field)) setFitFilled(prev => { const n = new Set(prev); n.delete(field); return n; });
+      setForm(prev => ({ ...prev, [field]: e.target.value }));
     };
   }
 
   function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!form.sleepHours || !form.morningEnergy) {
-      setFormError('Sleep hours and morning energy are required.');
-      return;
-    }
+    if (!form.sleepHours || !form.morningEnergy) { setFormError('Sleep hours and morning energy are required.'); return; }
     setFormError('');
     generate({
       wearable: form.wearable || 'None',
@@ -268,7 +341,7 @@ export default function CadencePage() {
     });
   }
 
-  // ── Banners ────────────────────────────────────────────────────────────
+  // ── Banners ───────────────────────────────────────────────────────────
 
   function FitBanner() {
     if (fitStatus === 'loading') return (
@@ -340,6 +413,8 @@ export default function CadencePage() {
 
   const calConnected = calStatus === 'connected';
   const showHero = isGenerating || !!cadence;
+  // During streaming: use extracted items; after complete: use final object
+  const displayProtocol: ProtocolItem[] = cadence?.protocol ?? streamingProtocol;
 
   // ── Render ────────────────────────────────────────────────────────────
 
@@ -367,7 +442,6 @@ export default function CadencePage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Wearable · HRV · Resting HR */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label htmlFor="wearable" className={LABEL_BASE}>Wearable</label>
@@ -397,7 +471,6 @@ export default function CadencePage() {
               </div>
             </div>
 
-            {/* Sleep · Energy */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="sleepHours" className={LABEL_BASE}>Sleep hours{fitFilled.has('sleepHours') && <FitBadge />}</label>
@@ -409,13 +482,11 @@ export default function CadencePage() {
               </div>
             </div>
 
-            {/* Priorities */}
             <div>
               <label htmlFor="priorities" className={LABEL_BASE}>Today&apos;s priorities</label>
               <textarea id="priorities" rows={3} placeholder={`1. Ship onboarding flow v2\n2. Prep Series A deck for Thursday call\n3. 1:1 with lead engineer at 3 PM`} value={form.priorities} onChange={set('priorities')} className={`${INPUT_BASE} resize-none`} />
             </div>
 
-            {/* Calendar — auto-list when connected, textarea otherwise */}
             <div>
               {calConnected && calEvents.length > 0 ? (
                 <>
@@ -451,24 +522,22 @@ export default function CadencePage() {
           </form>
         </div>
 
-        {/* ── Hero cards ─────────────────────────────────────────────────── */}
+        {/* ── Output ─────────────────────────────────────────────────────── */}
         {showHero && (
-          <div ref={heroRef} className="mt-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div ref={heroRef} className="mt-8 space-y-6">
+
+            {/* Hero cards — STATE / PEAK / CRASH */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
               {/* STATE */}
               <div className={CARD_BASE}>
                 <p className={EYEBROW}>State</p>
-                {isGenerating && !cadence?.verdict ? (
-                  <CardSkeleton />
-                ) : (
+                {isGenerating && !cadence?.verdict ? <CardSkeleton /> : (
                   <>
                     <p className="font-serif italic text-xl text-silver-bright mb-2 leading-snug">
                       {cadence?.verdict?.headline}
                     </p>
-                    <p className="text-sm text-silver leading-relaxed">
-                      {cadence?.verdict?.summary}
-                    </p>
+                    <p className="text-sm text-silver leading-relaxed">{cadence?.verdict?.summary}</p>
                   </>
                 )}
               </div>
@@ -476,16 +545,12 @@ export default function CadencePage() {
               {/* PEAK WINDOW */}
               <div className={CARD_BASE}>
                 <p className={EYEBROW}>Peak Window</p>
-                {isGenerating && !cadence?.windows?.peak?.start ? (
-                  <CardSkeleton />
-                ) : (
+                {isGenerating && !cadence?.windows?.peak?.start ? <CardSkeleton /> : (
                   <>
-                    <p className="font-mono text-2xl font-semibold text-silver-bright mb-2 tracking-tight">
+                    <p className="font-serif italic text-xl text-silver-bright mb-2 leading-snug">
                       {cadence?.windows?.peak?.start} — {cadence?.windows?.peak?.end}
                     </p>
-                    <p className="text-sm text-silver leading-relaxed">
-                      {cadence?.windows?.peak?.rationale}
-                    </p>
+                    <p className="text-sm text-silver leading-relaxed">{cadence?.windows?.peak?.rationale}</p>
                   </>
                 )}
               </div>
@@ -493,27 +558,44 @@ export default function CadencePage() {
               {/* CRASH WINDOW */}
               <div className={CARD_BASE}>
                 <p className={EYEBROW}>Crash Window</p>
-                {isGenerating && !cadence?.windows?.crash?.start ? (
-                  <CardSkeleton />
-                ) : (
+                {isGenerating && !cadence?.windows?.crash?.start ? <CardSkeleton /> : (
                   <>
-                    <p className="font-mono text-2xl font-semibold text-silver-bright mb-2 tracking-tight">
+                    <p className="font-serif italic text-xl text-silver-bright mb-2 leading-snug">
                       {cadence?.windows?.crash?.start} — {cadence?.windows?.crash?.end}
                     </p>
-                    <p className="text-sm text-silver leading-relaxed">
-                      {cadence?.windows?.crash?.rationale}
-                    </p>
+                    <p className="text-sm text-silver leading-relaxed">{cadence?.windows?.crash?.rationale}</p>
                   </>
                 )}
               </div>
             </div>
 
-            {/* Phase 3 — Protocol timeline placeholder */}
+            {/* Protocol timeline */}
+            {displayProtocol.length > 0 && (
+              <div>
+                <p className={EYEBROW}>Protocol</p>
+                <div className="space-y-3">
+                  {displayProtocol.map((item, i) => (
+                    <ProtocolCard key={`${item.time}-${i}`} item={item} index={i} />
+                  ))}
+                  {isGenerating && (
+                    <div className="flex bg-midnight-light/30 rounded-xl p-4 border border-midnight-edge/50 animate-pulse">
+                      <div className="w-16 flex-shrink-0">
+                        <div className="h-5 bg-midnight-edge/60 rounded w-10 mb-1" />
+                        <div className="h-3 bg-midnight-edge/40 rounded w-6" />
+                      </div>
+                      <div className="flex-1 pl-4 border-l border-midnight-edge space-y-2">
+                        <div className="h-4 bg-midnight-edge/60 rounded w-2/3" />
+                        <div className="h-3 bg-midnight-edge/40 rounded w-full" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Phase 4 — Protect cards placeholder */}
 
-            {genError && (
-              <p className="text-sm text-red-400 bg-red-400/10 rounded-lg px-3 py-2 mt-4">{genError}</p>
-            )}
+            {genError && <p className="text-sm text-red-400 bg-red-400/10 rounded-lg px-3 py-2">{genError}</p>}
           </div>
         )}
 
