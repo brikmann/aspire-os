@@ -1,4 +1,4 @@
-import { streamText } from 'ai';
+import { streamObject } from 'ai';
 import { anthropic } from '@ai-sdk/anthropic';
 import { z } from 'zod';
 import { NextRequest } from 'next/server';
@@ -17,7 +17,74 @@ const inputSchema = z.object({
 
 type FitData = { steps: number | null; sleepHours: number | null; restingHr: number | null; fetchedAt: string };
 
-const SYSTEM_PROMPT = `You are Cadence — the synthesis engine inside Aspire OS. You translate biometric data + a founder's calendar into a precise operational protocol for the whole day, plus a tomorrow-protection layer.
+const cadenceSchema = z.object({
+  verdict: z.object({
+    headline: z.string().describe(
+      'One-line state-of-day verdict, max 10 words. Examples: ' +
+      '"Elite recovery, sedentary morning" / "Mixed signals, protect the afternoon" / ' +
+      '"Damage control day, minimum viable execution"'
+    ),
+    summary: z.string().describe(
+      'One sentence explaining the verdict using the actual numbers. Max 25 words. ' +
+      'Reference HRV, sleep hours, steps, energy explicitly.'
+    ),
+  }),
+  windows: z.object({
+    peak: z.object({
+      start: z.string().describe('Time in 12-hour format, e.g. "9:00 AM"'),
+      end: z.string().describe('Time in 12-hour format, e.g. "1:00 PM"'),
+      rationale: z.string().describe(
+        'One sentence on why this is the peak window, grounded in physiology ' +
+        '(cortisol, glycogen, circadian phase). Max 20 words.'
+      ),
+    }),
+    crash: z.object({
+      start: z.string(),
+      end: z.string(),
+      rationale: z.string().describe(
+        'One sentence on why this is the crash window and one mitigation. Max 20 words.'
+      ),
+    }),
+  }),
+  protocol: z.array(z.object({
+    time: z.string().describe('Time in 12-hour format, e.g. "9:00 AM"'),
+    duration_min: z.number().nullable().describe(
+      'Duration in minutes if applicable, null otherwise'
+    ),
+    category: z.enum(['work', 'recovery', 'meeting', 'meal', 'sleep']).describe(
+      'work = focused execution block; recovery = walk, breath, rest; ' +
+      'meeting = calendar event; meal = food/hydration; sleep = bedtime/wind-down'
+    ),
+    is_from_calendar: z.boolean().describe(
+      "True if this item corresponds to an event in the user's Google Calendar data, false otherwise"
+    ),
+    action: z.string().describe(
+      'The action in 3-8 words. Examples: "500ml water + 30g protein" / ' +
+      '"Deep work block — Cadence v0" / "Thomas/Noah meeting". No prose, just the action.'
+    ),
+    rationale: z.string().describe(
+      'One sentence on the physiological "why" for this action. Max 18 words. ' +
+      'Bloomberg terminal voice — no military or hustle framing.'
+    ),
+  })).describe(
+    'Time-ordered protocol items from now through bedtime. Between 6 and 12 items typically. ' +
+    'Anchor to actual calendar events when provided.'
+  ),
+  protect: z.object({
+    today: z.string().describe(
+      'The single most important thing to protect TODAY given state + schedule. ' +
+      'Max 30 words. Should be specific and time-bound.'
+    ),
+    tomorrow: z.string().describe(
+      'What to do tonight to set up tomorrow well. Max 30 words. ' +
+      'Reference specific bedtime and reasoning.'
+    ),
+  }),
+});
+
+const SYSTEM_PROMPT = `You are Cadence — the synthesis engine inside Aspire OS. You translate biometric data + a founder's calendar into a structured operational protocol.
+
+Generate a structured Cadence protocol matching the schema. Each field has constraints in its description — follow them exactly. The protocol array should contain time-ordered items from the current time through bedtime. Cap at 12 items max — prioritize density over coverage.
 
 VOICE & REGISTER:
 You write like a senior performance physician who is also a Bloomberg terminal. Directness comes from precision and physiological grounding, NEVER from melodrama or aggression.
@@ -35,67 +102,24 @@ FORBIDDEN:
 - Drill-sergeant imperatives ("MOVE.", "NOW.", "DO IT.")
 - Macho compression ("Walk. Now.", "No excuses.", etc.)
 - Exclamation points
-- ALL CAPS for emphasis within body copy (caps are only for section headers like PROTOCOL, PROTECT TODAY)
+- ALL CAPS for emphasis within action or rationale fields
 
 CALIBRATION EXAMPLES:
-BAD: "1,648 steps at 4 PM means you're running a stationary marathon. Walk or die."
-GOOD: "1,648 steps at 4 PM is a circulation deficit. A 20-minute walk before 5 PM is the cheapest insurance against tomorrow's cognitive drag."
+BAD rationale: "1,648 steps at 4 PM means you're running a stationary marathon. Walk or die."
+GOOD rationale: "1,648 steps at 4 PM is a circulation deficit — a 20-minute walk before 5 PM cuts tomorrow's cognitive drag."
 
-BAD: "Crash window 8-9 PM. Adenosine debt will spike hard. Move or die at your desk."
-GOOD: "Crash window 8-9 PM. Adenosine load is elevated from 13 hours of cognitive work — a 10-minute walk at 7:30 PM resets the curve."
-
-BAD: "Execute hard today. No excuses on the HRV gift."
-GOOD: "HRV at 60 ms is a recovery surplus. The cleanest use is sustained focus in the 9 AM - 1 PM window, not extra training volume."
-
-OUTPUT FORMAT (exactly this structure):
-
-TODAY'S CADENCE
-[1-line state read]
-
-PEAK COGNITIVE WINDOW
-[Time range + why, 1 sentence]
-
-CRASH WINDOW
-[Time range + mitigation, 1 sentence]
-
-PROTOCOL
-
-AM (wake to ~11:30)
-- [specific timed action]
-- [specific timed action]
-
-MIDDAY (~11:30–3:30)
-- [specific timed action]
-- [specific timed action]
-
-PM (~3:30–6:30)
-- [specific timed action]
-- [specific timed action]
-
-EVENING (~6:30 onward)
-- [specific timed action — focused on protecting tomorrow]
-- [specific timed action]
-
-PROTECT TODAY
-[Single most important thing for today's execution, one sentence]
-
-PROTECT TOMORROW
-[Single most important thing tonight for tomorrow's recovery, one sentence]
-
----
+BAD rationale: "Adenosine debt will spike hard. Move or die at your desk."
+GOOD rationale: "Adenosine load is elevated from 13 hours of cognitive work — a 10-minute walk resets the curve."
 
 RULES:
-- Max 350 words total
-- Every action specific and timed (not "drink water" — "200ml water at 9 AM")
-- Reference user's actual calendar items by name when relevant
+- Every protocol item must have a specific time — no vague ranges
 - Don't fabricate metrics they didn't provide
-- Good state (sleep > 7.5, energy > 7): permission to push
-- Bad state (sleep < 5, energy < 4): damage control + aggressive evening recovery
-- Evening block must include specific wind-down timing
-- NEVER use: "journey", "wellness", "honor your body", "you deserve", "Great question", hedge words like "might/could/may help"
-- CRITICAL TIME-WINDOW INTERPRETATION: All wearable data (steps, heart rate, etc.) represents today's partial day-to-date readings — NOT yesterday's complete totals — unless explicitly labeled "last night" (e.g., sleep). The current time will be provided in the data block. A low step count means the user hasn't moved YET TODAY (often because it's still morning), not that yesterday was sedentary. Frame the protocol accordingly: "steps so far" or "today's movement is starting low" — never "yesterday you sat for X hours" unless you have explicit prior-day data.
-- When wearable-derived data is provided (steps, sleep, heart rate), reference at least one specific data point in the PROTOCOL section. Frame manual input and wearable input as complementary sources, not duplicates. If the user provided manual sleep hours AND wearable sleep data, treat the wearable data as more accurate and call out the discrepancy if material (>30 min difference).
-- CALENDAR INTERPRETATION: When calendar data is provided, anchor PROTOCOL time blocks around actual meetings. Treat back-to-back meeting density as a cognitive load signal — recommend recovery blocks between demanding meetings (investor calls, technical deep dives, conflict conversations). Use gaps between meetings as protocol slots (walks, hydration, mental reset). If a high-stakes meeting is on the calendar (recognize keywords: investor, board, demo, customer, interview, pitch), bias PROTECT TODAY toward preserving readiness for that block specifically. Never schedule conflicting actions over real meetings.`;
+- Good state (sleep > 7.5, energy > 7): permission to push in work blocks
+- Bad state (sleep < 5, energy < 4): damage control — fewer work blocks, aggressive recovery items
+- NEVER use: "journey", "wellness", "honor your body", "you deserve", hedge words like "might/could/may help"
+- CRITICAL TIME-WINDOW INTERPRETATION: All wearable data (steps, heart rate, etc.) represents today's partial day-to-date readings — NOT yesterday's complete totals — unless explicitly labeled "last night" (e.g., sleep). A low step count means the user hasn't moved YET TODAY. Set is_from_calendar=false for protocol items you generate; set is_from_calendar=true only for items that directly correspond to a named calendar event in the input.
+- When wearable-derived data is provided, reference at least one specific data point in a rationale field. If manual sleep hours AND wearable sleep data are both present, treat wearable as more accurate and call out the discrepancy in the verdict summary if material (>30 min).
+- CALENDAR INTERPRETATION: When calendar data is provided, anchor protocol items around actual meetings (set is_from_calendar=true for those items). Treat back-to-back meeting density as a cognitive load signal — insert recovery items in gaps. If a high-stakes meeting is present (keywords: investor, board, demo, customer, interview, pitch), bias protect.today toward preserving readiness for that block. Never schedule conflicting protocol items over real meetings.`;
 
 function buildUserMessage(
   data: z.infer<typeof inputSchema>,
@@ -113,7 +137,6 @@ function buildUserMessage(
   lines.push("TODAY'S PRIORITIES");
   lines.push(data.priorities);
 
-  // Calendar block — structured if from Google Calendar, raw textarea otherwise
   if (calEvents && calEvents.length > 0) {
     lines.push('');
     lines.push('CALENDAR (Google Calendar, today):');
@@ -131,7 +154,6 @@ function buildUserMessage(
     lines.push(data.calendar);
   }
 
-  // Wearable data block
   if (fitData && (fitData.steps !== null || fitData.sleepHours !== null || fitData.restingHr !== null)) {
     const fetchedTime = new Date(fitData.fetchedAt).toLocaleTimeString('en-US', {
       hour: 'numeric',
@@ -165,7 +187,6 @@ export async function POST(req: NextRequest) {
 
   const sessionId = req.cookies.get('cadence_session')?.value;
 
-  // Fetch both integrations in parallel — neither blocks generation on failure
   const [fitData, calEvents] = await Promise.all([
     (async (): Promise<FitData | null> => {
       if (!sessionId) return null;
@@ -189,11 +210,11 @@ export async function POST(req: NextRequest) {
     })(),
   ]);
 
-  const result = streamText({
+  const result = streamObject({
     model: anthropic('claude-sonnet-4-5'),
+    schema: cadenceSchema,
     system: SYSTEM_PROMPT,
     prompt: buildUserMessage(data, fitData, calEvents),
-    maxTokens: 600,
   });
 
   return result.toTextStreamResponse();
