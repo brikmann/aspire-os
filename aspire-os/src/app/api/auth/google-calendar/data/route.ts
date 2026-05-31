@@ -17,7 +17,9 @@ export async function GET(req: NextRequest) {
   try {
     const events = await fetchTodaysCalendarEvents(result.token);
     return NextResponse.json({ connected: true, events });
-  } catch {
-    return NextResponse.json({ connected: true, events: [] });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[calendar/data] fetchTodaysCalendarEvents failed:', msg);
+    return NextResponse.json({ connected: true, events: [], _debug: msg });
   }
 }

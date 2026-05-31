@@ -194,10 +194,10 @@ export default function PrivacyPage() {
               Aspire OS is not intended for use by anyone under 18. If you believe a minor
               has used Aspire OS, email{" "}
               <a
-                href="mailto:noahbrikman@gmail.com"
+                href="mailto:support@aspireos.co"
                 className="text-cobalt hover:text-cobalt-soft underline underline-offset-2 transition-colors"
               >
-                noahbrikman@gmail.com
+                support@aspireos.co
               </a>{" "}
               and we will delete their data.
             </p>
@@ -210,10 +210,10 @@ export default function PrivacyPage() {
             <p>
               Questions or deletion requests:{" "}
               <a
-                href="mailto:noahbrikman@gmail.com"
+                href="mailto:support@aspireos.co"
                 className="text-cobalt hover:text-cobalt-soft underline underline-offset-2 transition-colors"
               >
-                noahbrikman@gmail.com
+                support@aspireos.co
               </a>
             </p>
           </section>
