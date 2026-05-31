@@ -1,6 +1,1 @@
-{
-  "buildCommand": "cd aspire-os && npm install && npm run build",
-  "outputDirectory": "aspire-os/.next",
-  "installCommand": "echo skip-root-install",
-  "framework": "nextjs"
-}
+{}
