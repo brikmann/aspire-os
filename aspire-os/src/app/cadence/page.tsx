@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { type CadenceOutput } from '@/lib/cadence-schema';
 
 // ── Types ─────────────────────────────────────────────────────────────────
@@ -23,21 +23,14 @@ type ProtocolItem = CadenceOutput['protocol'][number];
 
 // ── JSON streaming helpers ────────────────────────────────────────────────
 
-// Extracts complete {...} objects from a JSON array fragment,
-// properly skipping over string contents so stray braces don't confuse it.
 function extractCompleteObjects(text: string): unknown[] {
   const items: unknown[] = [];
   let i = 0;
   while (i < text.length) {
-    // Skip leading whitespace / commas
     while (i < text.length && ' \n\r\t,'.includes(text[i])) i++;
     if (i >= text.length || text[i] !== '{') break;
-
     const start = i;
-    let depth = 0;
-    let inStr = false;
-    let esc = false;
-
+    let depth = 0, inStr = false, esc = false;
     while (i < text.length) {
       const ch = text[i];
       if (esc) { esc = false; }
@@ -48,15 +41,14 @@ function extractCompleteObjects(text: string): unknown[] {
         else if (ch === '}') {
           depth--;
           if (depth === 0) {
-            try { items.push(JSON.parse(text.slice(start, i + 1))); } catch { /* skip malformed */ }
-            i++;
-            break;
+            try { items.push(JSON.parse(text.slice(start, i + 1))); } catch { /* skip */ }
+            i++; break;
           }
         }
       }
       i++;
     }
-    if (depth > 0) break; // Incomplete object — wait for more chunks
+    if (depth > 0) break;
   }
   return items;
 }
@@ -64,8 +56,7 @@ function extractCompleteObjects(text: string): unknown[] {
 function extractStreamingProtocol(accumulated: string): ProtocolItem[] {
   const match = accumulated.match(/"protocol"\s*:\s*\[/);
   if (!match || match.index === undefined) return [];
-  const arrayStart = match.index + match[0].length;
-  return extractCompleteObjects(accumulated.slice(arrayStart)) as ProtocolItem[];
+  return extractCompleteObjects(accumulated.slice(match.index + match[0].length)) as ProtocolItem[];
 }
 
 // ── Streaming hook ────────────────────────────────────────────────────────
@@ -76,6 +67,9 @@ function useCadenceStream() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [genError, setGenError] = useState<string | null>(null);
   const [generatedAt, setGeneratedAt] = useState<string | null>(null);
+
+  const stamp = () =>
+    new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 
   const generate = useCallback(async (input: Record<string, unknown>) => {
     setIsGenerating(true);
@@ -103,18 +97,14 @@ function useCadenceStream() {
         const { done, value } = await reader.read();
         if (done) break;
         accumulated += decoder.decode(value, { stream: true });
-
         if (!complete) {
           try {
             const parsed = JSON.parse(accumulated) as CadenceOutput;
             setCadence(parsed);
             setStreamingProtocol([]);
-            setGeneratedAt(
-              new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
-            );
+            setGeneratedAt(stamp());
             complete = true;
           } catch {
-            // Not yet valid JSON — extract partial protocol items
             const items = extractStreamingProtocol(accumulated);
             if (items.length > 0) setStreamingProtocol(items);
           }
@@ -124,9 +114,7 @@ function useCadenceStream() {
       if (!complete) {
         try {
           setCadence(JSON.parse(accumulated) as CadenceOutput);
-          setGeneratedAt(
-            new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
-          );
+          setGeneratedAt(stamp());
         } catch { throw new Error('Response was not valid JSON — please retry.'); }
       }
     } catch (err) {
@@ -145,17 +133,11 @@ const INPUT_BASE =
   'w-full bg-midnight border border-midnight-edge text-silver-bright rounded-lg px-3 py-2.5 text-sm ' +
   'placeholder:text-silver-muted focus:outline-none focus:ring-2 focus:ring-cobalt focus:border-cobalt ' +
   'transition-colors';
-
 const LABEL_BASE = 'block text-xs font-medium text-silver-muted uppercase tracking-wide mb-1.5';
 const CARD_BASE = 'bg-midnight-light/50 rounded-2xl p-6 border border-midnight-edge';
 const EYEBROW = 'text-xs font-medium uppercase tracking-[1.5px] text-cobalt-soft mb-3';
-
 const CATEGORY_EMOJI: Record<string, string> = {
-  work: '💻',
-  recovery: '🌱',
-  meeting: '🗓',
-  meal: '🍽',
-  sleep: '😴',
+  work: '💻', recovery: '🌱', meeting: '🗓', meal: '🍽', sleep: '😴',
 };
 
 // ── Sub-components ────────────────────────────────────────────────────────
@@ -166,6 +148,21 @@ function CardSkeleton() {
       <div className="h-6 bg-midnight-edge/60 rounded-md animate-pulse w-3/4" />
       <div className="h-4 bg-midnight-edge/40 rounded-md animate-pulse w-full" />
       <div className="h-4 bg-midnight-edge/40 rounded-md animate-pulse w-5/6" />
+    </div>
+  );
+}
+
+function SkeletonProtocolCard() {
+  return (
+    <div className="flex bg-midnight-light/30 rounded-xl p-4 border border-midnight-edge/50 animate-pulse">
+      <div className="w-16 flex-shrink-0">
+        <div className="h-5 bg-midnight-edge/60 rounded w-10 mb-1" />
+        <div className="h-3 bg-midnight-edge/40 rounded w-6" />
+      </div>
+      <div className="flex-1 pl-4 border-l border-midnight-edge space-y-2">
+        <div className="h-4 bg-midnight-edge/60 rounded w-2/3" />
+        <div className="h-3 bg-midnight-edge/40 rounded w-full" />
+      </div>
     </div>
   );
 }
@@ -201,23 +198,17 @@ function ConnectIcon() {
 }
 
 function ProtocolCard({ item, index }: { item: ProtocolItem; index: number }) {
-  const timeParts = item.time.split(' ');
-  const timeNum = timeParts[0] ?? item.time;
-  const timePeriod = timeParts[1] ?? '';
+  const [timeNum, timePeriod] = item.time.split(' ');
   const emoji = CATEGORY_EMOJI[item.category] ?? '·';
-
   return (
     <div
       className="flex bg-midnight-light/30 rounded-xl p-4 border border-midnight-edge/50 animate-answer"
       style={{ animationDelay: `${index * 0.06}s` }}
     >
-      {/* Time column */}
       <div className="w-16 flex-shrink-0 pt-0.5">
         <p className="font-mono text-lg font-semibold text-cobalt-soft leading-none">{timeNum}</p>
         <p className="font-mono text-xs text-cobalt-soft/60 mt-0.5">{timePeriod}</p>
       </div>
-
-      {/* Content column */}
       <div className="flex-1 pl-4 border-l border-midnight-edge">
         <div className="flex items-start justify-between gap-2">
           <p className="text-base text-silver-bright font-medium leading-snug flex-1">
@@ -242,6 +233,8 @@ function ProtocolCard({ item, index }: { item: ProtocolItem; index: number }) {
 // ── Main component ────────────────────────────────────────────────────────
 
 export default function CadencePage() {
+  const [view, setView] = useState<'input' | 'output'>('input');
+
   const [form, setForm] = useState<FormState>({
     wearable: 'None', hrv: '', restingHr: '', sleepHours: '',
     morningEnergy: '', priorities: '', calendar: '',
@@ -260,13 +253,10 @@ export default function CadencePage() {
 
   const { cadence, streamingProtocol, isGenerating, genError, generatedAt, generate } = useCadenceStream();
 
-  const heroRef = useRef<HTMLDivElement>(null);
-
+  // Scroll to top when switching to output view
   useEffect(() => {
-    if (!isGenerating && cadence) {
-      heroRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }, [isGenerating, cadence]);
+    if (view === 'output') window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [view]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -335,11 +325,8 @@ export default function CadencePage() {
     };
   }
 
-  function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (!form.sleepHours || !form.morningEnergy) { setFormError('Sleep hours and morning energy are required.'); return; }
-    setFormError('');
-    generate({
+  function buildPayload() {
+    return {
       wearable: form.wearable || 'None',
       hrv: form.hrv ? parseFloat(form.hrv) : undefined,
       restingHr: form.restingHr ? parseFloat(form.restingHr) : undefined,
@@ -347,10 +334,32 @@ export default function CadencePage() {
       morningEnergy: parseFloat(form.morningEnergy),
       priorities: form.priorities,
       calendar: form.calendar,
-    });
+    };
   }
 
-  // ── Banners ───────────────────────────────────────────────────────────
+  function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!form.sleepHours || !form.morningEnergy) { setFormError('Sleep hours and morning energy are required.'); return; }
+    setFormError('');
+    setView('output');
+    generate(buildPayload());
+  }
+
+  function handleRetry() {
+    generate(buildPayload());
+  }
+
+  // ── Derived ───────────────────────────────────────────────────────────
+
+  const calConnected = calStatus === 'connected';
+  const displayProtocol: ProtocolItem[] = cadence?.protocol ?? streamingProtocol;
+
+  const connectedServices = [
+    fitStatus === 'connected' ? 'Google Fit' : null,
+    calStatus === 'connected' ? 'Google Calendar' : null,
+  ].filter(Boolean).join(' · ');
+
+  // ── Banners (input view only) ─────────────────────────────────────────
 
   function FitBanner() {
     if (fitStatus === 'loading') return (
@@ -420,18 +429,13 @@ export default function CadencePage() {
     );
   }
 
-  const calConnected = calStatus === 'connected';
-  const showHero = isGenerating || !!cadence;
-  // During streaming: use extracted items; after complete: use final object
-  const displayProtocol: ProtocolItem[] = cadence?.protocol ?? streamingProtocol;
-
   // ── Render ────────────────────────────────────────────────────────────
 
   return (
     <main className="min-h-screen bg-midnight">
       <div className="max-w-[680px] mx-auto px-4 sm:px-6 py-16">
 
-        {/* Header */}
+        {/* Page header — always visible */}
         <header className="mb-10">
           <p className="font-sans font-medium text-[22px] text-silver-bright mb-6">ASPIRE OS</p>
           <p className="font-sans font-medium text-[12px] uppercase tracking-[1.5px] text-cobalt mb-3">CADENCE · alpha</p>
@@ -443,115 +447,126 @@ export default function CadencePage() {
           </p>
         </header>
 
-        {/* Form card */}
-        <div className="bg-midnight-light rounded-2xl p-6 sm:p-8">
-          <div className="flex flex-col gap-3 mb-6">
-            <FitBanner />
-            <CalBanner />
-          </div>
+        {/* ── INPUT VIEW ───────────────────────────────────────────────── */}
+        {view === 'input' && (
+          <div className="bg-midnight-light rounded-2xl p-6 sm:p-8">
+            <div className="flex flex-col gap-3 mb-6">
+              <FitBanner />
+              <CalBanner />
+            </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <label htmlFor="wearable" className={LABEL_BASE}>Wearable</label>
-                <div className="relative">
-                  <select id="wearable" value={form.wearable} onChange={set('wearable')} className={`${INPUT_BASE} appearance-none pr-8 cursor-pointer`}>
-                    <option value="Whoop">Whoop</option>
-                    <option value="Oura">Oura</option>
-                    <option value="Apple Watch">Apple Watch</option>
-                    <option value="Garmin">Garmin</option>
-                    <option value="Other">Other</option>
-                    <option value="None">None</option>
-                  </select>
-                  <svg className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-silver-muted" width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <path d="M3 5l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label htmlFor="wearable" className={LABEL_BASE}>Wearable</label>
+                  <div className="relative">
+                    <select id="wearable" value={form.wearable} onChange={set('wearable')} className={`${INPUT_BASE} appearance-none pr-8 cursor-pointer`}>
+                      <option value="Whoop">Whoop</option>
+                      <option value="Oura">Oura</option>
+                      <option value="Apple Watch">Apple Watch</option>
+                      <option value="Garmin">Garmin</option>
+                      <option value="Other">Other</option>
+                      <option value="None">None</option>
+                    </select>
+                    <svg className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-silver-muted" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <path d="M3 5l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="hrv" className={LABEL_BASE}>HRV (ms) <span className="normal-case tracking-normal text-silver-dim">optional</span></label>
+                  <input id="hrv" type="number" min="0" max="300" placeholder="65" value={form.hrv} onChange={set('hrv')} className={INPUT_BASE} />
+                </div>
+                <div>
+                  <label htmlFor="restingHr" className={LABEL_BASE}>
+                    Resting HR{fitFilled.has('restingHr') ? <FitBadge /> : <span className="normal-case tracking-normal text-silver-dim"> optional</span>}
+                  </label>
+                  <input id="restingHr" type="number" min="30" max="120" placeholder="55" value={form.restingHr} onChange={set('restingHr')} className={`${INPUT_BASE} ${fitFilled.has('restingHr') ? 'border-cobalt/40' : ''}`} />
                 </div>
               </div>
-              <div>
-                <label htmlFor="hrv" className={LABEL_BASE}>HRV (ms) <span className="normal-case tracking-normal text-silver-dim">optional</span></label>
-                <input id="hrv" type="number" min="0" max="300" placeholder="65" value={form.hrv} onChange={set('hrv')} className={INPUT_BASE} />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="sleepHours" className={LABEL_BASE}>Sleep hours{fitFilled.has('sleepHours') && <FitBadge />}</label>
+                  <input id="sleepHours" type="number" min="0" max="24" step="0.5" placeholder="7.5" value={form.sleepHours} onChange={set('sleepHours')} required className={`${INPUT_BASE} ${fitFilled.has('sleepHours') ? 'border-cobalt/40' : ''}`} />
+                </div>
+                <div>
+                  <label htmlFor="morningEnergy" className={LABEL_BASE}>Morning energy (1–10)</label>
+                  <input id="morningEnergy" type="number" min="1" max="10" placeholder="7" value={form.morningEnergy} onChange={set('morningEnergy')} required className={INPUT_BASE} />
+                </div>
               </div>
+
               <div>
-                <label htmlFor="restingHr" className={LABEL_BASE}>
-                  Resting HR{fitFilled.has('restingHr') ? <FitBadge /> : <span className="normal-case tracking-normal text-silver-dim"> optional</span>}
-                </label>
-                <input id="restingHr" type="number" min="30" max="120" placeholder="55" value={form.restingHr} onChange={set('restingHr')} className={`${INPUT_BASE} ${fitFilled.has('restingHr') ? 'border-cobalt/40' : ''}`} />
+                <label htmlFor="priorities" className={LABEL_BASE}>Today&apos;s priorities</label>
+                <textarea id="priorities" rows={3} placeholder={`1. Ship onboarding flow v2\n2. Prep Series A deck for Thursday call\n3. 1:1 with lead engineer at 3 PM`} value={form.priorities} onChange={set('priorities')} className={`${INPUT_BASE} resize-none`} />
               </div>
-            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="sleepHours" className={LABEL_BASE}>Sleep hours{fitFilled.has('sleepHours') && <FitBadge />}</label>
-                <input id="sleepHours" type="number" min="0" max="24" step="0.5" placeholder="7.5" value={form.sleepHours} onChange={set('sleepHours')} required className={`${INPUT_BASE} ${fitFilled.has('sleepHours') ? 'border-cobalt/40' : ''}`} />
-              </div>
-              <div>
-                <label htmlFor="morningEnergy" className={LABEL_BASE}>Morning energy (1–10)</label>
-                <input id="morningEnergy" type="number" min="1" max="10" placeholder="7" value={form.morningEnergy} onChange={set('morningEnergy')} required className={INPUT_BASE} />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="priorities" className={LABEL_BASE}>Today&apos;s priorities</label>
-              <textarea id="priorities" rows={3} placeholder={`1. Ship onboarding flow v2\n2. Prep Series A deck for Thursday call\n3. 1:1 with lead engineer at 3 PM`} value={form.priorities} onChange={set('priorities')} className={`${INPUT_BASE} resize-none`} />
-            </div>
-
-            <div>
-              {calConnected && calEvents.length > 0 ? (
-                <>
-                  <p className={LABEL_BASE}>Today&apos;s calendar (Google Calendar)</p>
-                  <div className="bg-midnight border border-midnight-edge rounded-lg px-3 py-2.5 space-y-1.5 mb-4">
-                    {calEvents.map((ev, i) => (
-                      <p key={i} className="text-sm text-silver-bright leading-relaxed">
-                        {ev.start} — {ev.summary}<span className="text-silver-muted"> ({ev.duration_min} min)</span>
-                      </p>
-                    ))}
-                  </div>
-                  <label htmlFor="calendar" className={LABEL_BASE}>Add anything else <span className="normal-case tracking-normal text-silver-dim">events not on calendar, prep blocks, notes</span></label>
-                  <textarea id="calendar" rows={3} placeholder="e.g. prep block before investor call, gym at 6 PM, early dinner" value={form.calendar} onChange={set('calendar')} className={`${INPUT_BASE} resize-none`} />
-                </>
-              ) : (
-                <>
-                  <label htmlFor="calendar" className={LABEL_BASE}>Today&apos;s calendar</label>
-                  <textarea id="calendar" rows={6} placeholder={`9:00 AM — Team standup (30 min)\n11:00 AM — Investor call with Benchmark\n1:00 PM — Lunch / no meetings\n3:00 PM — 1:1 with lead engineer\n5:00 PM — Demo prep session\n7:00 PM — Free`} value={form.calendar} onChange={set('calendar')} className={`${INPUT_BASE} resize-none`} />
-                </>
-              )}
-            </div>
-
-            {formError && <p className="text-sm text-red-400 bg-red-400/10 rounded-lg px-3 py-2">{formError}</p>}
-
-            <button
-              type="submit"
-              disabled={isGenerating}
-              className={`w-full rounded-lg py-3 px-6 text-[15px] font-semibold text-silver-bright transition-all
-                ${isGenerating ? 'bg-cobalt-soft animate-pulse cursor-not-allowed' : 'bg-cobalt hover:bg-cobalt-soft active:scale-[0.99] cursor-pointer'}`}
-            >
-              {isGenerating ? 'Computing protocol…' : "Generate today's Cadence →"}
-            </button>
-          </form>
-        </div>
-
-        {/* ── Output ─────────────────────────────────────────────────────── */}
-        {showHero && (
-          <div ref={heroRef} className="mt-8 space-y-6">
-
-            {/* Hero cards — STATE / PEAK / CRASH */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-              {/* STATE */}
-              <div className={CARD_BASE}>
-                <p className={EYEBROW}>State</p>
-                {isGenerating && !cadence?.verdict ? <CardSkeleton /> : (
+                {calConnected && calEvents.length > 0 ? (
                   <>
-                    <p className="font-serif italic text-xl text-silver-bright mb-2 leading-snug">
-                      {cadence?.verdict?.headline}
-                    </p>
-                    <p className="text-sm text-silver leading-relaxed">{cadence?.verdict?.summary}</p>
+                    <p className={LABEL_BASE}>Today&apos;s calendar (Google Calendar)</p>
+                    <div className="bg-midnight border border-midnight-edge rounded-lg px-3 py-2.5 space-y-1.5 mb-4">
+                      {calEvents.map((ev, i) => (
+                        <p key={i} className="text-sm text-silver-bright leading-relaxed">
+                          {ev.start} — {ev.summary}<span className="text-silver-muted"> ({ev.duration_min} min)</span>
+                        </p>
+                      ))}
+                    </div>
+                    <label htmlFor="calendar" className={LABEL_BASE}>Add anything else <span className="normal-case tracking-normal text-silver-dim">events not on calendar, prep blocks, notes</span></label>
+                    <textarea id="calendar" rows={3} placeholder="e.g. prep block before investor call, gym at 6 PM, early dinner" value={form.calendar} onChange={set('calendar')} className={`${INPUT_BASE} resize-none`} />
+                  </>
+                ) : (
+                  <>
+                    <label htmlFor="calendar" className={LABEL_BASE}>Today&apos;s calendar</label>
+                    <textarea id="calendar" rows={6} placeholder={`9:00 AM — Team standup (30 min)\n11:00 AM — Investor call with Benchmark\n1:00 PM — Lunch / no meetings\n3:00 PM — 1:1 with lead engineer\n5:00 PM — Demo prep session\n7:00 PM — Free`} value={form.calendar} onChange={set('calendar')} className={`${INPUT_BASE} resize-none`} />
                   </>
                 )}
               </div>
 
-              {/* PEAK WINDOW */}
+              {formError && <p className="text-sm text-red-400 bg-red-400/10 rounded-lg px-3 py-2">{formError}</p>}
+
+              <button
+                type="submit"
+                className="w-full rounded-lg py-3 px-6 text-[15px] font-semibold text-silver-bright bg-cobalt hover:bg-cobalt-soft active:scale-[0.99] cursor-pointer transition-all"
+              >
+                Generate today&apos;s Cadence →
+              </button>
+            </form>
+          </div>
+        )}
+
+        {/* ── OUTPUT VIEW ──────────────────────────────────────────────── */}
+        {view === 'output' && (
+          <div className="space-y-6 animate-answer">
+
+            {/* Compact nav bar */}
+            <div className="flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => setView('input')}
+                className="flex items-center gap-1.5 text-sm text-cobalt-soft hover:text-cobalt transition-colors"
+              >
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Edit inputs
+              </button>
+              {connectedServices && (
+                <p className="text-xs text-silver-muted">{connectedServices}</p>
+              )}
+            </div>
+
+            {/* Hero cards — STATE / PEAK / CRASH */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className={CARD_BASE}>
+                <p className={EYEBROW}>State</p>
+                {isGenerating && !cadence?.verdict ? <CardSkeleton /> : (
+                  <>
+                    <p className="font-serif italic text-xl text-silver-bright mb-2 leading-snug">{cadence?.verdict?.headline}</p>
+                    <p className="text-sm text-silver leading-relaxed">{cadence?.verdict?.summary}</p>
+                  </>
+                )}
+              </div>
               <div className={CARD_BASE}>
                 <p className={EYEBROW}>Peak Window</p>
                 {isGenerating && !cadence?.windows?.peak?.start ? <CardSkeleton /> : (
@@ -563,8 +578,6 @@ export default function CadencePage() {
                   </>
                 )}
               </div>
-
-              {/* CRASH WINDOW */}
               <div className={CARD_BASE}>
                 <p className={EYEBROW}>Crash Window</p>
                 {isGenerating && !cadence?.windows?.crash?.start ? <CardSkeleton /> : (
@@ -578,69 +591,57 @@ export default function CadencePage() {
               </div>
             </div>
 
-            {/* Protocol timeline */}
-            {displayProtocol.length > 0 && (
-              <div>
-                <p className={EYEBROW}>Protocol</p>
-                <div className="space-y-3">
-                  {displayProtocol.map((item, i) => (
-                    <ProtocolCard key={`${item.time}-${i}`} item={item} index={i} />
-                  ))}
-                  {isGenerating && (
-                    <div className="flex bg-midnight-light/30 rounded-xl p-4 border border-midnight-edge/50 animate-pulse">
-                      <div className="w-16 flex-shrink-0">
-                        <div className="h-5 bg-midnight-edge/60 rounded w-10 mb-1" />
-                        <div className="h-3 bg-midnight-edge/40 rounded w-6" />
-                      </div>
-                      <div className="flex-1 pl-4 border-l border-midnight-edge space-y-2">
-                        <div className="h-4 bg-midnight-edge/60 rounded w-2/3" />
-                        <div className="h-3 bg-midnight-edge/40 rounded w-full" />
-                      </div>
-                    </div>
-                  )}
-                </div>
+            {/* Protocol timeline — skeletons from the start */}
+            <div>
+              <p className={EYEBROW}>Protocol</p>
+              <div className="space-y-3">
+                {displayProtocol.map((item, i) => (
+                  <ProtocolCard key={`${item.time}-${i}`} item={item} index={i} />
+                ))}
+                {isGenerating && displayProtocol.length === 0 && (
+                  <>{[0, 1, 2].map(i => <SkeletonProtocolCard key={i} />)}</>
+                )}
+                {isGenerating && displayProtocol.length > 0 && <SkeletonProtocolCard />}
               </div>
-            )}
+            </div>
 
-            {/* Protect cards */}
-            {(cadence?.protect || (isGenerating && displayProtocol.length > 0)) && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                {/* PROTECT TODAY */}
-                <div className="bg-midnight-light/50 rounded-2xl p-6 border-l-4 border-cobalt">
-                  <p className={`${EYEBROW} text-cobalt`}>Protect Today</p>
-                  {isGenerating && !cadence?.protect?.today ? (
-                    <CardSkeleton />
-                  ) : (
-                    <p className="font-serif text-base italic text-silver-bright leading-relaxed">
-                      {cadence?.protect?.today}
-                    </p>
-                  )}
-                </div>
-
-                {/* PROTECT TOMORROW */}
-                <div className="bg-midnight-light/50 rounded-2xl p-6 border-l-4 border-cobalt-soft">
-                  <p className={`${EYEBROW} text-cobalt-soft`}>Protect Tomorrow</p>
-                  {isGenerating && !cadence?.protect?.tomorrow ? (
-                    <CardSkeleton />
-                  ) : (
-                    <p className="font-serif text-base italic text-silver-bright leading-relaxed">
-                      {cadence?.protect?.tomorrow}
-                    </p>
-                  )}
-                </div>
-
+            {/* Protect cards — always visible in output view */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-midnight-light/50 rounded-2xl p-6 border-l-4 border-cobalt">
+                <p className={`${EYEBROW} text-cobalt`}>Protect Today</p>
+                {isGenerating && !cadence?.protect?.today ? <CardSkeleton /> : (
+                  <p className="font-serif text-base italic text-silver-bright leading-relaxed">
+                    {cadence?.protect?.today}
+                  </p>
+                )}
               </div>
-            )}
+              <div className="bg-midnight-light/50 rounded-2xl p-6 border-l-4 border-cobalt-soft">
+                <p className={`${EYEBROW} text-cobalt-soft`}>Protect Tomorrow</p>
+                {isGenerating && !cadence?.protect?.tomorrow ? <CardSkeleton /> : (
+                  <p className="font-serif text-base italic text-silver-bright leading-relaxed">
+                    {cadence?.protect?.tomorrow}
+                  </p>
+                )}
+              </div>
+            </div>
 
-            {/* Generated-at timestamp */}
+            {/* Footer: timestamp + error */}
             {generatedAt && !isGenerating && (
-              <p className="text-xs text-silver-muted text-center pt-2">
-                Generated at {generatedAt}
-              </p>
+              <p className="text-xs text-silver-muted text-center pt-1">Generated at {generatedAt}</p>
+            )}
+            {genError && (
+              <div className="bg-red-400/10 rounded-xl px-4 py-3 flex items-center justify-between gap-4">
+                <p className="text-sm text-red-400">{genError}</p>
+                <button
+                  type="button"
+                  onClick={handleRetry}
+                  className="text-xs font-semibold text-cobalt hover:text-cobalt-soft transition-colors whitespace-nowrap flex-shrink-0"
+                >
+                  Try again →
+                </button>
+              </div>
             )}
 
-            {genError && <p className="text-sm text-red-400 bg-red-400/10 rounded-lg px-3 py-2">{genError}</p>}
           </div>
         )}
 
