@@ -121,12 +121,17 @@ export async function fetchTodaysCalendarEvents(accessToken: string): Promise<Ca
     const endMs = new Date(endStr).getTime();
     const duration_min = Math.round((endMs - startMs) / 60_000);
 
-    const fmt = (iso: string) =>
-      new Date(iso).toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      });
+    // Extract local time directly from the RFC 3339 string ("2026-05-31T14:00:00-04:00")
+    // so the server's UTC timezone never corrupts the display time.
+    const fmt = (iso: string): string => {
+      const m = iso.match(/T(\d{2}):(\d{2})/);
+      if (!m) return '';
+      let h = parseInt(m[1]);
+      const min = m[2];
+      const period = h >= 12 ? 'PM' : 'AM';
+      h = h % 12 || 12;
+      return `${h}:${min} ${period}`;
+    };
 
     return {
       start: fmt(startStr),
