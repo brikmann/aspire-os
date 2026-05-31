@@ -75,12 +75,14 @@ function useCadenceStream() {
   const [streamingProtocol, setStreamingProtocol] = useState<ProtocolItem[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [genError, setGenError] = useState<string | null>(null);
+  const [generatedAt, setGeneratedAt] = useState<string | null>(null);
 
   const generate = useCallback(async (input: Record<string, unknown>) => {
     setIsGenerating(true);
     setCadence(null);
     setStreamingProtocol([]);
     setGenError(null);
+    setGeneratedAt(null);
 
     try {
       const res = await fetch('/api/cadence', {
@@ -107,6 +109,9 @@ function useCadenceStream() {
             const parsed = JSON.parse(accumulated) as CadenceOutput;
             setCadence(parsed);
             setStreamingProtocol([]);
+            setGeneratedAt(
+              new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+            );
             complete = true;
           } catch {
             // Not yet valid JSON — extract partial protocol items
@@ -117,8 +122,12 @@ function useCadenceStream() {
       }
 
       if (!complete) {
-        try { setCadence(JSON.parse(accumulated) as CadenceOutput); }
-        catch { throw new Error('Response was not valid JSON — please retry.'); }
+        try {
+          setCadence(JSON.parse(accumulated) as CadenceOutput);
+          setGeneratedAt(
+            new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+          );
+        } catch { throw new Error('Response was not valid JSON — please retry.'); }
       }
     } catch (err) {
       setGenError(err instanceof Error ? err.message : 'Something went wrong');
@@ -127,7 +136,7 @@ function useCadenceStream() {
     }
   }, []);
 
-  return { cadence, streamingProtocol, isGenerating, genError, generate };
+  return { cadence, streamingProtocol, isGenerating, genError, generatedAt, generate };
 }
 
 // ── UI constants ──────────────────────────────────────────────────────────
@@ -249,7 +258,7 @@ export default function CadencePage() {
 
   const [formError, setFormError] = useState('');
 
-  const { cadence, streamingProtocol, isGenerating, genError, generate } = useCadenceStream();
+  const { cadence, streamingProtocol, isGenerating, genError, generatedAt, generate } = useCadenceStream();
 
   const heroRef = useRef<HTMLDivElement>(null);
 
@@ -593,7 +602,43 @@ export default function CadencePage() {
               </div>
             )}
 
-            {/* Phase 4 — Protect cards placeholder */}
+            {/* Protect cards */}
+            {(cadence?.protect || (isGenerating && displayProtocol.length > 0)) && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                {/* PROTECT TODAY */}
+                <div className="bg-midnight-light/50 rounded-2xl p-6 border-l-4 border-cobalt">
+                  <p className={`${EYEBROW} text-cobalt`}>Protect Today</p>
+                  {isGenerating && !cadence?.protect?.today ? (
+                    <CardSkeleton />
+                  ) : (
+                    <p className="font-serif text-base italic text-silver-bright leading-relaxed">
+                      {cadence?.protect?.today}
+                    </p>
+                  )}
+                </div>
+
+                {/* PROTECT TOMORROW */}
+                <div className="bg-midnight-light/50 rounded-2xl p-6 border-l-4 border-cobalt-soft">
+                  <p className={`${EYEBROW} text-cobalt-soft`}>Protect Tomorrow</p>
+                  {isGenerating && !cadence?.protect?.tomorrow ? (
+                    <CardSkeleton />
+                  ) : (
+                    <p className="font-serif text-base italic text-silver-bright leading-relaxed">
+                      {cadence?.protect?.tomorrow}
+                    </p>
+                  )}
+                </div>
+
+              </div>
+            )}
+
+            {/* Generated-at timestamp */}
+            {generatedAt && !isGenerating && (
+              <p className="text-xs text-silver-muted text-center pt-2">
+                Generated at {generatedAt}
+              </p>
+            )}
 
             {genError && <p className="text-sm text-red-400 bg-red-400/10 rounded-lg px-3 py-2">{genError}</p>}
           </div>
