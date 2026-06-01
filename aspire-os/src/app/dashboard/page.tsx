@@ -18,6 +18,8 @@ type FormState = {
 type FitStatus = 'loading' | 'disconnected' | 'connected' | 'reconnect-needed';
 type CalStatus = 'loading' | 'disconnected' | 'connected' | 'reconnect-needed';
 type HealthStatus = 'loading' | 'disconnected' | 'connected' | 'reconnect-needed';
+type NotionStatus = 'loading' | 'disconnected' | 'connected';
+type PushState = 'idle' | 'pushing' | 'success' | 'error';
 type FitData = { sleepHours: number | null; restingHr: number | null; steps: number | null };
 type HealthData = { steps: number | null; restingHr: number | null; hrv: number | null; sleepHours: number | null; sourceDevices: string[] };
 type CalendarEvent = { start: string; end: string; summary: string; location?: string; duration_min: number };
@@ -255,6 +257,13 @@ export default function DashboardPage() {
   const [calEvents, setCalEvents] = useState<CalendarEvent[]>([]);
   const [calConnectError, setCalConnectError] = useState('');
 
+  const [notionStatus, setNotionStatus] = useState<NotionStatus>('loading');
+  const [notionWorkspace, setNotionWorkspace] = useState<string>('');
+  const [notionConnectError, setNotionConnectError] = useState('');
+  const [pushState, setPushState] = useState<PushState>('idle');
+  const [pushResult, setPushResult] = useState<{ count: number; database_url: string } | null>(null);
+  const [pushError, setPushError] = useState<string | null>(null);
+
   const [formError, setFormError] = useState('');
 
   const { cadence, streamingProtocol, isGenerating, genError, generatedAt, generate } = useCadenceStream();
@@ -270,9 +279,14 @@ export default function DashboardPage() {
       params.has('connected') ||
       params.has('calendar_connected') ||
       params.has('health_connected') ||
+      params.has('notion_connected') ||
       params.get('error')
     ) {
       window.history.replaceState({}, '', '/dashboard');
+    }
+    if (params.get('error') === 'notion_auth_failed') {
+      setNotionConnectError('Notion authorisation failed — please try again.');
+      setNotionStatus('disconnected');
     }
     if (params.get('error') === 'health_auth_failed') {
       setHealthConnectError('Google Health authorisation failed — please try again.');
@@ -286,11 +300,23 @@ export default function DashboardPage() {
       setCalConnectError('Google Calendar authorisation failed — please try again.');
       setCalStatus('disconnected');
     }
+    fetchNotionData();
     fetchHealthData();
     fetchFitData();
     fetchCalendarData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  async function fetchNotionData() {
+    setNotionStatus('loading');
+    try {
+      const res = await fetch('/api/auth/notion/data');
+      const json = await res.json();
+      if (!json.connected) { setNotionStatus('disconnected'); return; }
+      setNotionStatus('connected');
+      setNotionWorkspace(json.workspace_name ?? '');
+    } catch { setNotionStatus('disconnected'); }
+  }
 
   async function fetchHealthData() {
     setHealthStatus('loading');
@@ -351,6 +377,41 @@ export default function DashboardPage() {
       setCalStatus('connected');
       setCalEvents(json.events ?? []);
     } catch { setCalStatus('disconnected'); }
+  }
+
+  async function handleNotionDisconnect() {
+    await fetch('/api/auth/notion/disconnect', { method: 'POST' });
+    setNotionStatus('disconnected');
+    setNotionWorkspace('');
+    setPushState('idle');
+    setPushResult(null);
+    setPushError(null);
+  }
+
+  async function handlePushToNotion() {
+    if (!cadence?.protocol?.length) return;
+    setPushState('pushing');
+    setPushResult(null);
+    setPushError(null);
+    try {
+      const date = new Date().toISOString().split('T')[0];
+      const res = await fetch('/api/cadence/push-to-notion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ protocol: cadence.protocol, date }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        setPushState('error');
+        setPushError(json.error ?? 'Push failed — please try again.');
+      } else {
+        setPushState('success');
+        setPushResult({ count: json.count, database_url: json.database_url });
+      }
+    } catch {
+      setPushState('error');
+      setPushError('Network error — please try again.');
+    }
   }
 
   async function handleHealthDisconnect() {
@@ -417,6 +478,32 @@ export default function DashboardPage() {
   ].filter(Boolean).join(' · ');
 
   // ── Banners (input view only) ─────────────────────────────────────────
+
+  function NotionBanner() {
+    if (notionStatus === 'loading') return (
+      <div className="flex items-center gap-2 text-xs text-silver-muted animate-pulse">
+        <span className="w-3 h-3 rounded-full bg-midnight-edge" />Checking Notion…
+      </div>
+    );
+    if (notionStatus === 'connected') return (
+      <div className="flex items-center justify-between bg-cobalt/10 border border-cobalt/20 rounded-xl px-4 py-3">
+        <div className="flex items-center gap-2 text-sm">
+          <CheckIcon />
+          <span className="text-silver-bright font-medium">Notion connected</span>
+          {notionWorkspace && <span className="text-silver-muted">· {notionWorkspace}</span>}
+        </div>
+        <button type="button" onClick={handleNotionDisconnect} className="text-xs text-silver-muted hover:text-silver transition-colors ml-3">Disconnect</button>
+      </div>
+    );
+    return (
+      <div>
+        {notionConnectError && <p className="text-xs text-red-400 mb-2">{notionConnectError}</p>}
+        <a href="/api/auth/notion" className="flex items-center justify-center gap-2 w-full rounded-xl py-2.5 px-5 bg-cobalt/15 border border-cobalt/30 text-cobalt text-[13px] font-semibold hover:bg-cobalt/20 transition-colors">
+          <ConnectIcon />Connect Notion — push your daily protocol
+        </a>
+      </div>
+    );
+  }
 
   function HealthBanner() {
     if (healthStatus === 'loading') return (
@@ -550,6 +637,7 @@ export default function DashboardPage() {
               {/* Show legacy Fit banner only when Google Health is not connected */}
               {healthStatus !== 'connected' && <FitBanner />}
               <CalBanner />
+              <NotionBanner />
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -721,6 +809,61 @@ export default function DashboardPage() {
                 )}
               </div>
             </div>
+
+            {/* Push to Notion — visible once protocol is ready */}
+            {!isGenerating && cadence && (
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between bg-midnight-light/30 rounded-xl px-4 py-3 border border-midnight-edge">
+                  <div className="text-sm">
+                    {notionStatus === 'connected'
+                      ? <span className="text-silver-muted">{notionWorkspace || 'Notion'}</span>
+                      : <a href="/api/auth/notion" className="text-cobalt text-xs font-semibold hover:text-cobalt-soft transition-colors">Connect Notion to push →</a>
+                    }
+                  </div>
+                  <button
+                    type="button"
+                    onClick={notionStatus === 'connected' ? handlePushToNotion : undefined}
+                    disabled={notionStatus !== 'connected' || pushState === 'pushing'}
+                    title={notionStatus !== 'connected' ? 'Connect Notion to push' : undefined}
+                    className={`text-sm font-semibold px-4 py-1.5 rounded-lg transition-all ${
+                      notionStatus === 'connected' && pushState !== 'pushing'
+                        ? 'bg-cobalt text-silver-bright hover:bg-cobalt-soft cursor-pointer'
+                        : 'bg-midnight-edge text-silver-dim cursor-not-allowed'
+                    }`}
+                  >
+                    {pushState === 'pushing' ? 'Pushing…' : 'Push to Notion'}
+                  </button>
+                </div>
+
+                {pushState === 'success' && pushResult && (
+                  <div className="bg-green-400/10 border border-green-400/20 rounded-xl px-4 py-3 space-y-1.5">
+                    <p className="text-sm text-green-400 font-medium">
+                      ✓ Pushed {pushResult.count} item{pushResult.count !== 1 ? 's' : ''} to Notion
+                      {' — '}
+                      <a href={pushResult.database_url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-green-300 transition-colors">
+                        Open database →
+                      </a>
+                    </p>
+                    <p className="text-xs text-silver-muted">
+                      Tip: In Notion, open a protocol item and add a reminder to the &ldquo;Scheduled For&rdquo; date — you&rsquo;ll get a native notification when each block is due.
+                    </p>
+                  </div>
+                )}
+
+                {pushState === 'error' && pushError && (
+                  <div className="bg-red-400/10 rounded-xl px-4 py-3 flex items-center justify-between gap-4">
+                    <p className="text-sm text-red-400">{pushError}</p>
+                    <button
+                      type="button"
+                      onClick={handlePushToNotion}
+                      className="text-xs font-semibold text-cobalt hover:text-cobalt-soft transition-colors whitespace-nowrap flex-shrink-0"
+                    >
+                      Retry →
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Footer: timestamp + error */}
             {generatedAt && !isGenerating && (

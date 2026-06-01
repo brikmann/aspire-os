@@ -66,6 +66,15 @@ export default function PrivacyPage() {
               generate your protocol and is never persisted.
             </p>
             <p className="mt-4">
+              If you connect Notion, we store an encrypted OAuth access token and the IDs
+              of the parent page and Cadence Protocol database in your workspace. When you
+              use &ldquo;Push to Notion,&rdquo; we write your generated protocol items as
+              pages in that database — action text, scheduled time, category, rationale,
+              and duration. We never read, list, or modify any other content in your Notion
+              workspace. Notion tokens do not expire; you can revoke access at any time
+              from the dashboard or from Notion&rsquo;s integration settings.
+            </p>
+            <p className="mt-4">
               We set a single first-party session cookie (<code className="text-silver-bright text-[14px] bg-midnight-light px-1.5 py-0.5 rounded">cadence_session</code>)
               to associate your browser with your stored OAuth tokens across all
               integrations. This cookie has a 30-day lifespan and is marked{" "}
@@ -159,6 +168,23 @@ export default function PrivacyPage() {
                 handling is governed by their{" "}
                 <a
                   href="https://vercel.com/legal/privacy-policy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-cobalt hover:text-cobalt-soft underline underline-offset-2 transition-colors"
+                >
+                  privacy policy
+                </a>
+                .
+              </li>
+              <li className="mt-3">
+                <span className="text-silver-bright font-medium">Notion</span> — if you
+                connect Notion, we use Notion&rsquo;s public OAuth 2.0 flow to obtain a
+                workspace-scoped access token. This token is used only to create and write
+                to the &ldquo;Cadence Protocol&rdquo; database in your chosen parent page.
+                We do not read other pages in your workspace. Notion&rsquo;s data handling
+                is governed by their{" "}
+                <a
+                  href="https://www.notion.so/privacy"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-cobalt hover:text-cobalt-soft underline underline-offset-2 transition-colors"
