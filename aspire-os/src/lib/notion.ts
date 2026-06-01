@@ -126,19 +126,20 @@ export async function findOrCreateCadenceDatabase(
   // Search for an existing "Cadence Protocol" database under this parent page
   const search = await notionClient.search({
     query: 'Cadence Protocol',
-    filter: { property: 'object', value: 'database' },
   });
 
-  const existing = search.results.find((r) => {
+  type SearchResult = { object: string; id: string; parent?: { type?: string; page_id?: string } };
+  const existing = (search.results as SearchResult[]).find((r) => {
     if (r.object !== 'database') return false;
-    const parent = (r as { parent?: { type?: string; page_id?: string } }).parent;
-    return parent?.type === 'page_id' && parent.page_id?.replace(/-/g, '') === parentPageId.replace(/-/g, '');
+    return r.parent?.type === 'page_id' && r.parent.page_id?.replace(/-/g, '') === parentPageId.replace(/-/g, '');
   });
 
   if (existing) return existing.id;
 
-  // Create new database
-  const created = await notionClient.databases.create({
+  // Cast as any: @notionhq/client v5 dropped 'properties' from its types
+  // but the Notion REST API still accepts it and requires it for database creation.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const created = await (notionClient.databases.create as any)({
     parent: { type: 'page_id', page_id: parentPageId },
     title: [{ type: 'text', text: { content: 'Cadence Protocol' } }],
     properties: {
