@@ -1,5 +1,5 @@
 import { google } from 'googleapis';
-import { OAuth2Client } from 'google-auth-library';
+import { makeGoogleClient } from './google-auth';
 import { supabase } from './supabase';
 import { encryptToken, decryptToken } from './crypto';
 
@@ -9,21 +9,10 @@ const SCOPES = [
   'https://www.googleapis.com/auth/fitness.heart_rate.read',
 ];
 
-function getCallbackUrl(): string {
-  const base = process.env.APP_URL ?? 'http://localhost:3000';
-  return `${base}/api/auth/google-fit/callback`;
-}
-
-function makeClient(): OAuth2Client {
-  return new OAuth2Client(
-    process.env.GOOGLE_FIT_CLIENT_ID!,
-    process.env.GOOGLE_FIT_CLIENT_SECRET!,
-    getCallbackUrl(),
-  );
-}
+const CALLBACK = '/api/auth/google-fit/callback';
 
 export function getAuthUrl(sessionId: string): string {
-  return makeClient().generateAuthUrl({
+  return makeGoogleClient(CALLBACK).generateAuthUrl({
     access_type: 'offline',
     prompt: 'consent',
     scope: SCOPES,
@@ -32,7 +21,7 @@ export function getAuthUrl(sessionId: string): string {
 }
 
 export async function exchangeCode(code: string, sessionId: string): Promise<void> {
-  const client = makeClient();
+  const client = makeGoogleClient(CALLBACK);
   const { tokens } = await client.getToken(code);
 
   await supabase.from('user_oauth').upsert(
@@ -43,7 +32,7 @@ export async function exchangeCode(code: string, sessionId: string): Promise<voi
       refresh_token: tokens.refresh_token ? encryptToken(tokens.refresh_token) : null,
       expires_at: tokens.expiry_date ? new Date(tokens.expiry_date).toISOString() : null,
     },
-    { onConflict: 'session_id' },
+    { onConflict: 'session_id,provider' },
   );
 }
 
@@ -56,6 +45,7 @@ export async function getRefreshedTokens(sessionId: string): Promise<TokenStatus
     .from('user_oauth')
     .select('access_token, refresh_token, expires_at')
     .eq('session_id', sessionId)
+    .eq('provider', 'google_fit')
     .single();
 
   if (error || !data) return { ok: false, reconnectNeeded: false };
@@ -70,7 +60,7 @@ export async function getRefreshedTokens(sessionId: string): Promise<TokenStatus
   if (!data.refresh_token) return { ok: false, reconnectNeeded: true };
 
   try {
-    const client = makeClient();
+    const client = makeGoogleClient(CALLBACK);
     client.setCredentials({ refresh_token: decryptToken(data.refresh_token) });
     const { credentials } = await client.refreshAccessToken();
 
@@ -82,7 +72,8 @@ export async function getRefreshedTokens(sessionId: string): Promise<TokenStatus
           ? new Date(credentials.expiry_date).toISOString()
           : null,
       })
-      .eq('session_id', sessionId);
+      .eq('session_id', sessionId)
+      .eq('provider', 'google_fit');
 
     return { ok: true, token: credentials.access_token! };
   } catch {
@@ -91,12 +82,12 @@ export async function getRefreshedTokens(sessionId: string): Promise<TokenStatus
 }
 
 export async function fetchTodaysHealthData(accessToken: string): Promise<{
-  steps: number | null;       // since midnight today
-  sleepHours: number | null;  // last night's sleep session(s)
-  restingHr: number | null;   // today's min BPM proxy for resting HR
-  fetchedAt: string;          // ISO timestamp of when data was pulled
+  steps: number | null;
+  sleepHours: number | null;
+  restingHr: number | null;
+  fetchedAt: string;
 }> {
-  const client = makeClient();
+  const client = makeGoogleClient(CALLBACK);
   client.setCredentials({ access_token: accessToken });
   const fitness = google.fitness({ version: 'v1', auth: client });
 
@@ -190,5 +181,9 @@ export async function fetchTodaysHealthData(accessToken: string): Promise<{
 }
 
 export async function disconnectUser(sessionId: string): Promise<void> {
-  await supabase.from('user_oauth').delete().eq('session_id', sessionId);
+  await supabase
+    .from('user_oauth')
+    .delete()
+    .eq('session_id', sessionId)
+    .eq('provider', 'google_fit');
 }

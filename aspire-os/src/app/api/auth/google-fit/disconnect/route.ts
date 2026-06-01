@@ -8,7 +8,5 @@ export async function POST(req: NextRequest) {
     await disconnectUser(sessionId);
   }
 
-  const res = NextResponse.json({ ok: true });
-  res.cookies.delete('cadence_session');
-  return res;
+  return NextResponse.json({ ok: true });
 }

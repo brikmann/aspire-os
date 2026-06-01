@@ -1,25 +1,14 @@
 import { google } from 'googleapis';
-import { OAuth2Client } from 'google-auth-library';
+import { makeGoogleClient } from './google-auth';
 import { supabase } from './supabase';
 import { encryptToken, decryptToken } from './crypto';
 
 const SCOPES = ['https://www.googleapis.com/auth/calendar.readonly'];
 
-function getCallbackUrl(): string {
-  const base = process.env.APP_URL ?? 'http://localhost:3000';
-  return `${base}/api/auth/google-calendar/callback`;
-}
-
-function makeClient(): OAuth2Client {
-  return new OAuth2Client(
-    process.env.GOOGLE_FIT_CLIENT_ID!,
-    process.env.GOOGLE_FIT_CLIENT_SECRET!,
-    getCallbackUrl(),
-  );
-}
+const CALLBACK = '/api/auth/google-calendar/callback';
 
 export function getCalendarAuthUrl(sessionId: string): string {
-  return makeClient().generateAuthUrl({
+  return makeGoogleClient(CALLBACK).generateAuthUrl({
     access_type: 'offline',
     prompt: 'consent',
     scope: SCOPES,
@@ -28,7 +17,7 @@ export function getCalendarAuthUrl(sessionId: string): string {
 }
 
 export async function exchangeCalendarCode(code: string, sessionId: string): Promise<void> {
-  const client = makeClient();
+  const client = makeGoogleClient(CALLBACK);
   const { tokens } = await client.getToken(code);
 
   await supabase.from('user_oauth').upsert(
@@ -67,7 +56,7 @@ export async function getRefreshedCalendarTokens(sessionId: string): Promise<Cal
   if (!data.refresh_token) return { ok: false, reconnectNeeded: true };
 
   try {
-    const client = makeClient();
+    const client = makeGoogleClient(CALLBACK);
     client.setCredentials({ refresh_token: decryptToken(data.refresh_token) });
     const { credentials } = await client.refreshAccessToken();
 
@@ -97,7 +86,7 @@ export type CalendarEvent = {
 };
 
 export async function fetchTodaysCalendarEvents(accessToken: string): Promise<CalendarEvent[]> {
-  const client = makeClient();
+  const client = makeGoogleClient(CALLBACK);
   client.setCredentials({ access_token: accessToken });
   const calendar = google.calendar({ version: 'v3', auth: client });
 
