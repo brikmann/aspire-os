@@ -232,7 +232,7 @@ function ProtocolCard({ item, index }: { item: ProtocolItem; index: number }) {
 
 // ── Main component ────────────────────────────────────────────────────────
 
-export default function CadencePage() {
+export default function DashboardPage() {
   const [view, setView] = useState<'input' | 'output'>('input');
 
   const [form, setForm] = useState<FormState>({
@@ -261,7 +261,7 @@ export default function CadencePage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.has('connected') || params.has('calendar_connected') || params.get('error')) {
-      window.history.replaceState({}, '', '/cadence');
+      window.history.replaceState({}, '', '/dashboard');
     }
     if (params.get('error') === 'auth_failed') {
       setConnectError('Google authorisation failed — please try again.');

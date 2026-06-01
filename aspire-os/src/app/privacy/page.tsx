@@ -222,10 +222,10 @@ export default function PrivacyPage() {
 
         <div className="mt-16 pt-8 border-t border-midnight-edge">
           <Link
-            href="/cadence"
+            href="/dashboard"
             className="text-sm text-silver-dim hover:text-silver transition-colors"
           >
-            ← Back to Cadence
+            ← Back to Dashboard
           </Link>
         </div>
 

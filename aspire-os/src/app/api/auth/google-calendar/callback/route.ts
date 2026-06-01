@@ -8,15 +8,15 @@ export async function GET(req: NextRequest) {
   const sessionId = req.cookies.get('cadence_session')?.value;
 
   if (!code || !state || !sessionId || state !== sessionId) {
-    return NextResponse.redirect(new URL('/cadence?error=calendar_auth_failed', req.url));
+    return NextResponse.redirect(new URL('/dashboard?error=calendar_auth_failed', req.url));
   }
 
   try {
     await exchangeCalendarCode(code, sessionId);
   } catch (err) {
     console.error('Google Calendar callback error:', err);
-    return NextResponse.redirect(new URL('/cadence?error=calendar_auth_failed', req.url));
+    return NextResponse.redirect(new URL('/dashboard?error=calendar_auth_failed', req.url));
   }
 
-  return NextResponse.redirect(new URL('/cadence?calendar_connected=true', req.url));
+  return NextResponse.redirect(new URL('/dashboard?calendar_connected=true', req.url));
 }
