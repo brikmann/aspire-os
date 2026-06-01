@@ -17,7 +17,9 @@ type FormState = {
 
 type FitStatus = 'loading' | 'disconnected' | 'connected' | 'reconnect-needed';
 type CalStatus = 'loading' | 'disconnected' | 'connected' | 'reconnect-needed';
+type HealthStatus = 'loading' | 'disconnected' | 'connected' | 'reconnect-needed';
 type FitData = { sleepHours: number | null; restingHr: number | null; steps: number | null };
+type HealthData = { steps: number | null; restingHr: number | null; hrv: number | null; sleepHours: number | null; sourceDevices: string[] };
 type CalendarEvent = { start: string; end: string; summary: string; location?: string; duration_min: number };
 type ProtocolItem = CadenceOutput['protocol'][number];
 
@@ -240,6 +242,10 @@ export default function DashboardPage() {
     morningEnergy: '', priorities: '', calendar: '',
   });
 
+  const [healthStatus, setHealthStatus] = useState<HealthStatus>('loading');
+  const [healthData, setHealthData] = useState<HealthData | null>(null);
+  const [healthConnectError, setHealthConnectError] = useState('');
+
   const [fitStatus, setFitStatus] = useState<FitStatus>('loading');
   const [fitData, setFitData] = useState<FitData | null>(null);
   const [fitFilled, setFitFilled] = useState<Set<keyof FormState>>(new Set());
@@ -260,8 +266,17 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.has('connected') || params.has('calendar_connected') || params.get('error')) {
+    if (
+      params.has('connected') ||
+      params.has('calendar_connected') ||
+      params.has('health_connected') ||
+      params.get('error')
+    ) {
       window.history.replaceState({}, '', '/dashboard');
+    }
+    if (params.get('error') === 'health_auth_failed') {
+      setHealthConnectError('Google Health authorisation failed — please try again.');
+      setHealthStatus('disconnected');
     }
     if (params.get('error') === 'auth_failed') {
       setConnectError('Google authorisation failed — please try again.');
@@ -271,10 +286,41 @@ export default function DashboardPage() {
       setCalConnectError('Google Calendar authorisation failed — please try again.');
       setCalStatus('disconnected');
     }
+    fetchHealthData();
     fetchFitData();
     fetchCalendarData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  async function fetchHealthData() {
+    setHealthStatus('loading');
+    try {
+      const res = await fetch('/api/auth/google-health/data');
+      const json = await res.json();
+      if (!json.connected) { setHealthStatus(json.reconnectNeeded ? 'reconnect-needed' : 'disconnected'); return; }
+      setHealthStatus('connected');
+      const data: HealthData = {
+        steps: json.steps ?? null,
+        restingHr: json.restingHr ?? null,
+        hrv: json.hrv ?? null,
+        sleepHours: json.sleepHours ?? null,
+        sourceDevices: json.sourceDevices ?? [],
+      };
+      setHealthData(data);
+      // Google Health is primary — pre-fill form fields (overrides Fit values)
+      setFitFilled(prev => {
+        const n = new Set(prev);
+        setForm(prevForm => {
+          const next = { ...prevForm };
+          if (data.sleepHours !== null) { next.sleepHours = String(data.sleepHours); n.add('sleepHours'); }
+          if (data.restingHr !== null) { next.restingHr = String(data.restingHr); n.add('restingHr'); }
+          if (data.hrv !== null) { next.hrv = String(data.hrv); n.add('hrv'); }
+          return next;
+        });
+        return n;
+      });
+    } catch { setHealthStatus('disconnected'); }
+  }
 
   async function fetchFitData() {
     setFitStatus('loading');
@@ -305,6 +351,17 @@ export default function DashboardPage() {
       setCalStatus('connected');
       setCalEvents(json.events ?? []);
     } catch { setCalStatus('disconnected'); }
+  }
+
+  async function handleHealthDisconnect() {
+    await fetch('/api/auth/google-health/disconnect', { method: 'POST' });
+    setHealthStatus('disconnected');
+    setHealthData(null);
+    // Clear health-filled fields only if Fit doesn't also have them
+    setFitFilled(new Set());
+    setForm(prev => ({ ...prev, hrv: '' }));
+    // Re-fetch Fit data so it can re-fill sleep/HR if available
+    fetchFitData();
   }
 
   async function handleFitDisconnect() {
@@ -360,6 +417,44 @@ export default function DashboardPage() {
   ].filter(Boolean).join(' · ');
 
   // ── Banners (input view only) ─────────────────────────────────────────
+
+  function HealthBanner() {
+    if (healthStatus === 'loading') return (
+      <div className="flex items-center gap-2 text-xs text-silver-muted animate-pulse">
+        <span className="w-3 h-3 rounded-full bg-midnight-edge" />Checking Google Health…
+      </div>
+    );
+    if (healthStatus === 'reconnect-needed') return (
+      <div className="flex items-center justify-between bg-midnight-edge/40 rounded-xl px-4 py-3">
+        <span className="text-sm text-silver-muted">Google Health token expired</span>
+        <a href="/api/auth/google-health" className="text-xs font-semibold text-cobalt hover:text-cobalt-soft transition-colors">Reconnect →</a>
+      </div>
+    );
+    if (healthStatus === 'connected') {
+      const parts: string[] = [];
+      if (healthData?.steps != null) parts.push(`${healthData.steps.toLocaleString()} steps`);
+      const sources = healthData?.sourceDevices.join(' + ') ?? '';
+      return (
+        <div className="flex items-center justify-between bg-cobalt/10 border border-cobalt/20 rounded-xl px-4 py-3">
+          <div className="flex items-center gap-2 text-sm flex-wrap">
+            <CheckIcon />
+            <span className="text-silver-bright font-medium">Google Health connected</span>
+            {sources && <span className="text-silver-muted">· {sources}</span>}
+            {parts.length > 0 && <span className="text-silver-muted">· {parts.join(' · ')}</span>}
+          </div>
+          <button type="button" onClick={handleHealthDisconnect} className="text-xs text-silver-muted hover:text-silver transition-colors ml-3 flex-shrink-0">Disconnect</button>
+        </div>
+      );
+    }
+    return (
+      <div>
+        {healthConnectError && <p className="text-xs text-red-400 mb-2">{healthConnectError}</p>}
+        <a href="/api/auth/google-health" className="flex items-center justify-center gap-2 w-full rounded-xl py-2.5 px-5 bg-cobalt/15 border border-cobalt/30 text-cobalt text-[13px] font-semibold hover:bg-cobalt/20 transition-colors">
+          <ConnectIcon />Connect Google Health — Fitbit, Wear OS, Pixel Watch
+        </a>
+      </div>
+    );
+  }
 
   function FitBanner() {
     if (fitStatus === 'loading') return (
@@ -451,7 +546,9 @@ export default function DashboardPage() {
         {view === 'input' && (
           <div className="bg-midnight-light rounded-2xl p-6 sm:p-8">
             <div className="flex flex-col gap-3 mb-6">
-              <FitBanner />
+              <HealthBanner />
+              {/* Show legacy Fit banner only when Google Health is not connected */}
+              {healthStatus !== 'connected' && <FitBanner />}
               <CalBanner />
             </div>
 

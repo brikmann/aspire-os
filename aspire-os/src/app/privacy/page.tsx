@@ -44,16 +44,32 @@ export default function PrivacyPage() {
               the current request.
             </p>
             <p className="mt-4">
-              If you connect Google Calendar (a separate, independent connection from
-              Google Fit), we fetch today&rsquo;s events — start time, end time, title,
-              location, and duration only. We do not fetch attendees, meeting links,
-              descriptions, or events from any day other than today. This data is used
-              in real time to generate your protocol and is never persisted.
+              If you connect Google Health (the primary wearable integration), we store
+              an encrypted OAuth access token and refresh token and use them to fetch
+              steps, resting heart rate, HRV, and sleep duration for the current day.
+              Google Health consolidates data from Fitbit, Wear OS, Pixel Watch, and
+              any Android device syncing through Health Connect. The health data we
+              retrieve is used in real time to generate your protocol and is never
+              persisted beyond the current request.
+            </p>
+            <p className="mt-4">
+              If you connect Google Fit (legacy), we store an encrypted OAuth token and
+              use it to fetch step count, sleep session duration, and heart rate readings
+              from the last 24 hours. This integration remains active for backward
+              compatibility; Google Health is preferred when both are connected.
+            </p>
+            <p className="mt-4">
+              If you connect Google Calendar (a separate, independent connection), we
+              fetch today&rsquo;s events — start time, end time, title, location, and
+              duration only. We do not fetch attendees, meeting links, descriptions, or
+              events from any day other than today. This data is used in real time to
+              generate your protocol and is never persisted.
             </p>
             <p className="mt-4">
               We set a single first-party session cookie (<code className="text-silver-bright text-[14px] bg-midnight-light px-1.5 py-0.5 rounded">cadence_session</code>)
-              to associate your browser with your stored OAuth tokens. This cookie has a
-              30-day lifespan and is marked <code className="text-silver-bright text-[14px] bg-midnight-light px-1.5 py-0.5 rounded">HttpOnly</code> and{" "}
+              to associate your browser with your stored OAuth tokens across all
+              integrations. This cookie has a 30-day lifespan and is marked{" "}
+              <code className="text-silver-bright text-[14px] bg-midnight-light px-1.5 py-0.5 rounded">HttpOnly</code> and{" "}
               <code className="text-silver-bright text-[14px] bg-midnight-light px-1.5 py-0.5 rounded">SameSite=Lax</code>.
             </p>
           </section>
@@ -108,13 +124,13 @@ export default function PrivacyPage() {
                 .
               </li>
               <li className="mt-3">
-                <span className="text-silver-bright font-medium">Google</span> — if you
-                connect Google Fit, we use Google&rsquo;s OAuth 2.0 flow and the Google
-                Fitness REST API to retrieve your health data. If you connect Google
-                Calendar (a separate connection you authorize independently), we use the
-                same OAuth flow and the Google Calendar API to retrieve today&rsquo;s
-                events. You can disconnect either integration at any time without affecting
-                the other. Google&rsquo;s data handling is governed by their{" "}
+                <span className="text-silver-bright font-medium">Google</span> — we use
+                Google&rsquo;s OAuth 2.0 flow for three independent integrations: Google
+                Health API (primary wearable data — unifies Fitbit, Wear OS, Pixel Watch,
+                and Health Connect sources), Google Fit (legacy wearable integration), and
+                Google Calendar. Each requires a separate authorization and can be
+                disconnected independently without affecting the others. Google&rsquo;s
+                data handling is governed by their{" "}
                 <a
                   href="https://policies.google.com/privacy"
                   target="_blank"
@@ -124,6 +140,15 @@ export default function PrivacyPage() {
                   privacy policy
                 </a>
                 .
+              </li>
+              <li className="mt-3">
+                <span className="text-silver-bright font-medium">Fitbit / Wear OS / Health Connect</span> — when
+                you connect Google Health, data from your Fitbit device, Wear OS watch,
+                or any Android app syncing through Health Connect may be retrieved via
+                the Google Health API. We do not communicate directly with Fitbit or Wear
+                OS servers; Google Health acts as the intermediary. The data we receive
+                carries source attribution (device and platform) which is displayed in
+                the dashboard but is not stored beyond the current request.
               </li>
               <li className="mt-3">
                 <span className="text-silver-bright font-medium">Vercel</span> — Aspire OS

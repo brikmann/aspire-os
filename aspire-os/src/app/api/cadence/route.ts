@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { NextRequest } from 'next/server';
 import { getRefreshedTokens, fetchTodaysHealthData } from '@/lib/google-fit';
 import { getRefreshedCalendarTokens, fetchTodaysCalendarEvents, type CalendarEvent } from '@/lib/google-calendar';
+import { getRefreshedGoogleHealthTokens, fetchTodaysGoogleHealthData, type HealthData } from '@/lib/google-health';
 import { cadenceSchema } from '@/lib/cadence-schema';
 
 export { cadenceSchema };
@@ -59,8 +60,13 @@ RULES:
 - When wearable-derived data is provided, reference at least one specific data point in a rationale field. If manual sleep hours AND wearable sleep data are both present, treat wearable as more accurate and call out the discrepancy in the verdict summary if material (>30 min).
 - CALENDAR INTERPRETATION: When calendar data is provided, anchor protocol items around actual meetings (set is_from_calendar=true for those items). Treat back-to-back meeting density as a cognitive load signal — insert recovery items in gaps. If a high-stakes meeting is present (keywords: investor, board, demo, customer, interview, pitch), bias protect.today toward preserving readiness for that block. Never schedule conflicting protocol items over real meetings.`;
 
+function formatTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+}
+
 function buildUserMessage(
   data: z.infer<typeof inputSchema>,
+  healthData: HealthData | null,
   fitData: FitData | null,
   calEvents: CalendarEvent[] | null,
 ): string {
@@ -92,14 +98,25 @@ function buildUserMessage(
     lines.push(data.calendar);
   }
 
-  if (fitData && (fitData.steps !== null || fitData.sleepHours !== null || fitData.restingHr !== null)) {
-    const fetchedTime = new Date(fitData.fetchedAt).toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    });
+  // DATA SOURCE PREFERENCE: Google Health (primary) > Google Fit (legacy fallback)
+  if (healthData && (healthData.steps !== null || healthData.sleepHours !== null || healthData.restingHr !== null || healthData.hrv !== null)) {
+    const fetchedTime = formatTime(healthData.fetchedAt);
+    const sources = healthData.sourceDevices.length > 0
+      ? healthData.sourceDevices.join(' + ')
+      : 'Google Health';
     lines.push('');
-    lines.push(`WEARABLE DATA (Google Fit, today since midnight, fetched ${fetchedTime}):`);
+    lines.push(`WEARABLE DATA (Google Health, today as of ${fetchedTime}, source: ${sources}):`);
+    if (healthData.steps !== null) lines.push(`- Steps so far today: ${healthData.steps.toLocaleString()}`);
+    if (healthData.sleepHours !== null) {
+      const mins = Math.round(healthData.sleepHours * 60);
+      lines.push(`- Sleep last night: ${healthData.sleepHours}h (${mins}min)`);
+    }
+    if (healthData.restingHr !== null) lines.push(`- Resting HR: ${healthData.restingHr} bpm`);
+    if (healthData.hrv !== null) lines.push(`- HRV (RMSSD): ${healthData.hrv} ms`);
+  } else if (fitData && (fitData.steps !== null || fitData.sleepHours !== null || fitData.restingHr !== null)) {
+    const fetchedTime = formatTime(fitData.fetchedAt);
+    lines.push('');
+    lines.push(`WEARABLE DATA (Google Fit legacy, today since midnight, fetched ${fetchedTime}):`);
     if (fitData.steps !== null) lines.push(`- Steps so far today: ${fitData.steps.toLocaleString()}`);
     if (fitData.sleepHours !== null) {
       const mins = Math.round(fitData.sleepHours * 60);
@@ -125,7 +142,17 @@ export async function POST(req: NextRequest) {
 
   const sessionId = req.cookies.get('cadence_session')?.value;
 
-  const [fitData, calEvents] = await Promise.all([
+  const [healthData, fitData, calEvents] = await Promise.all([
+    (async (): Promise<HealthData | null> => {
+      if (!sessionId) return null;
+      try {
+        const t = await getRefreshedGoogleHealthTokens(sessionId);
+        if (!t.ok) return null;
+        return await fetchTodaysGoogleHealthData(t.token);
+      } catch {
+        return null;
+      }
+    })(),
     (async (): Promise<FitData | null> => {
       if (!sessionId) return null;
       try {
@@ -152,7 +179,7 @@ export async function POST(req: NextRequest) {
     model: anthropic('claude-sonnet-4-5'),
     schema: cadenceSchema,
     system: SYSTEM_PROMPT,
-    prompt: buildUserMessage(data, fitData, calEvents),
+    prompt: buildUserMessage(data, healthData, fitData, calEvents),
   });
 
   return result.toTextStreamResponse();
