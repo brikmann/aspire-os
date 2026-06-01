@@ -793,9 +793,10 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Push to Notion — visible once protocol is ready */}
+            {/* Export Protocol — visible once protocol is ready */}
             {!isGenerating && cadence && (
               <div className="flex flex-col gap-3">
+                <p className={EYEBROW}>Export Protocol</p>
                 <div className="flex items-center justify-between bg-midnight-light/30 rounded-xl px-4 py-3 border border-midnight-edge">
                   <div className="text-sm">
                     {notionStatus === 'connected'
