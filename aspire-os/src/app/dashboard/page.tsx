@@ -473,7 +473,8 @@ export default function DashboardPage() {
   const displayProtocol: ProtocolItem[] = cadence?.protocol ?? streamingProtocol;
 
   const connectedServices = [
-    fitStatus === 'connected' ? 'Google Fit' : null,
+    healthStatus === 'connected' ? 'Google Health' : null,
+    fitStatus === 'connected' ? 'Google Fit (legacy)' : null,
     calStatus === 'connected' ? 'Google Calendar' : null,
   ].filter(Boolean).join(' · ');
 
@@ -544,37 +545,20 @@ export default function DashboardPage() {
   }
 
   function FitBanner() {
-    if (fitStatus === 'loading') return (
-      <div className="flex items-center gap-2 text-xs text-silver-muted animate-pulse">
-        <span className="w-3 h-3 rounded-full bg-midnight-edge" />Checking Google Fit…
-      </div>
-    );
-    if (fitStatus === 'reconnect-needed') return (
-      <div className="flex items-center justify-between bg-midnight-edge/40 rounded-xl px-4 py-3">
-        <span className="text-sm text-silver-muted">Google Fit token expired</span>
-        <a href="/api/auth/google-fit" className="text-xs font-semibold text-cobalt hover:text-cobalt-soft transition-colors">Reconnect →</a>
-      </div>
-    );
-    if (fitStatus === 'connected') {
-      const parts: string[] = [];
-      if (fitData?.steps != null) parts.push(`${fitData.steps.toLocaleString()} steps today`);
-      return (
-        <div className="flex items-center justify-between bg-cobalt/10 border border-cobalt/20 rounded-xl px-4 py-3">
-          <div className="flex items-center gap-2 text-sm">
-            <CheckIcon />
-            <span className="text-silver-bright font-medium">Google Fit connected</span>
-            {parts.length > 0 && <span className="text-silver-muted">· {parts.join(' · ')}</span>}
-          </div>
-          <button type="button" onClick={handleFitDisconnect} className="text-xs text-silver-muted hover:text-silver transition-colors">Disconnect</button>
-        </div>
-      );
-    }
+    // Only renders for legacy users who already have Google Fit connected.
+    // New users see Google Health instead — no connect button is shown.
+    if (fitStatus !== 'connected') return null;
+    const parts: string[] = [];
+    if (fitData?.steps != null) parts.push(`${fitData.steps.toLocaleString()} steps today`);
     return (
-      <div>
-        {connectError && <p className="text-xs text-red-400 mb-2">{connectError}</p>}
-        <a href="/api/auth/google-fit" className="flex items-center justify-center gap-2 w-full rounded-xl py-2.5 px-5 bg-cobalt/15 border border-cobalt/30 text-cobalt text-[13px] font-semibold hover:bg-cobalt/20 transition-colors">
-          <ConnectIcon />Connect Google Fit for auto-fill
-        </a>
+      <div className="flex items-center justify-between bg-cobalt/10 border border-cobalt/20 rounded-xl px-4 py-3">
+        <div className="flex items-center gap-2 text-sm">
+          <CheckIcon />
+          <span className="text-silver-bright font-medium">Google Fit</span>
+          <span className="text-xs text-silver-muted">(legacy)</span>
+          {parts.length > 0 && <span className="text-silver-muted">· {parts.join(' · ')}</span>}
+        </div>
+        <button type="button" onClick={handleFitDisconnect} className="text-xs text-silver-muted hover:text-silver transition-colors">Disconnect</button>
       </div>
     );
   }
@@ -634,8 +618,7 @@ export default function DashboardPage() {
           <div className="bg-midnight-light rounded-2xl p-6 sm:p-8">
             <div className="flex flex-col gap-3 mb-6">
               <HealthBanner />
-              {/* Show legacy Fit banner only when Google Health is not connected */}
-              {healthStatus !== 'connected' && <FitBanner />}
+              <FitBanner />
               <CalBanner />
               <NotionBanner />
             </div>
