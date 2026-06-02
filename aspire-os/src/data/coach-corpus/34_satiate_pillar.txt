@@ -1,0 +1,158 @@
+# The SATIATE Pillar Protocol
+
+## The Situation
+A user is installing the third Foundation, asking about food, training, energy, body composition, or movement. Or a user reports running on caffeine and willpower and asks why they're crashing. Or a user wants to know how to eat and train without it becoming an obsessive project.
+
+## The Source
+- Peter Attia, *Outlive* (Harmony, 2023) — the most rigorous synthesis of healthspan-oriented nutrition and training in print
+- Stuart Phillips et al., protein synthesis research (McMaster University)
+- Iñigo San Millán and Iñigo Mujika, Zone 2 cardio and mitochondrial density literature
+- Layne Norton, applied protein and resistance training research
+- Glucose Goddess (Jessie Inchauspé), glucose stability behavioral research
+- Aspire OS 4F framework, locked 2026-05-10
+- Brikman's own Kinesiology coursework and biomechanics observation (outstep gait, force-length relationships)
+
+## The Principle
+
+SATIATE is the energy economy: fuel in, output out. The third Foundation installs here because food and training only compound on a base of Sleep and Sun. Train on broken sleep and the gains do not stick. Eat on a disrupted circadian rhythm and glucose stability collapses.
+
+The Aspire OS view of SATIATE rejects three common patterns:
+
+**1. Diet as identity.** Keto, vegan, carnivore, paleo — these are tribal markers more than they are protocols. The body needs protein, energy, fiber, and micronutrients. Frameworks that load identity onto food often introduce more stress than they remove.
+
+**2. Training as aesthetic project.** Exercising to look a certain way trends toward burnout, body dysmorphia, and overtraining injuries — including the kind Brikman's stepdad accumulated through years of heavy leg press without adequate recovery. The Aspire OS view of training is functional capacity and longevity, not appearance.
+
+**3. Movement-only or food-only thinking.** Most fitness content optimizes one and ignores the other. SATIATE treats them as a single pillar because they share the same biological underpinning — the energy economy of the body. Training without fuel is catabolic. Fuel without movement is metabolic dysfunction.
+
+## The Biology
+
+### Protein Synthesis and Lean Mass
+
+Muscle mass is the most important predictor of healthspan after age 40. Sarcopenia — age-related muscle loss — begins around age 30 and accelerates after 60. Protein synthesis requires:
+
+- **0.7–1.0g protein per pound of bodyweight per day** (1.6–2.2g/kg) for active adults
+- **30–40g of high-quality protein per meal**, 3–4 times daily
+- **Leucine threshold (~3g)** per meal to trigger maximal muscle protein synthesis
+- **Front-loaded morning protein** to break the overnight fasted state and signal anabolic priority
+
+This is non-negotiable. Most people undereat protein and overeat refined carbs. The Aspire OS protocol corrects this without prescribing a specific diet ideology.
+
+### Glucose Stability
+
+The body's metabolic flexibility — the ability to switch between burning glucose and burning fat — is one of the strongest correlates of long-term health. Chronic glucose volatility (frequent spikes and crashes) drives insulin resistance, energy instability, and cognitive fog.
+
+Glucose-stabilizing inputs:
+- **Savory start** — protein and fat for breakfast, not refined carbs
+- **Fiber first** — vegetables before starches at each meal
+- **Vinegar before carb-heavy meals** — 1 tbsp apple cider vinegar in water, blunts glucose response 20-30%
+- **Walking after meals** — 10 minutes of post-meal walking reduces glucose spike by 12-22%
+
+The Hume Pod, CGM, or even fasting glucose bloodwork is the measurement layer.
+
+### Zone 2 Cardio and Mitochondrial Density
+
+Mitochondria are the cells' energy producers. Their density and efficiency determine aerobic capacity, recovery quality, and metabolic flexibility. The single best driver of mitochondrial improvement is Zone 2 cardio — sustained moderate exertion at 60-70% of max heart rate, the pace where you can hold a conversation but breath is elevated.
+
+- **Volume target: 3-4 hours per week** of Zone 2 (split into 45-60 minute sessions)
+- **Method: any rhythmic activity** — walking briskly, cycling, rucking, rowing
+- **Marker: VO2 max** — the strongest single predictor of all-cause mortality in adults over 40
+
+### Strength and Force Production
+
+The body is built to produce force. Strength training is not optional for healthspan — it is required. Compound movements (squat, hinge, press, pull, carry) train multiple joints and muscle groups simultaneously, producing the largest functional return.
+
+Brikman's biomechanics observation: many lifters leak force through poor positioning (e.g., outstep gait causing hip drop in squats). Force-length relationships matter. Strength training is not "lift heavy and figure it out" — it is technical work that benefits from coaching and self-recording.
+
+### The 8000-Step Floor
+
+Below 8,000 steps per day, all-cause mortality begins to climb measurably. Above 8,000, the curve flattens — more is better but with diminishing returns. The 8,000-step floor is the non-negotiable baseline for SATIATE movement.
+
+## The Protocol
+
+### Layer 1: Environment
+
+- **Kitchen design:** Default foods are the foods you keep at eye level in the fridge. Eggs, Greek yogurt, frozen berries, vegetables, leftover protein at eye level. Refined carbs and snacks in opaque containers on top shelves or out of the house.
+- **Training space:** A bare minimum gym setup — barbell, plates, pull-up bar, kettlebell — at home or 10 minutes from home eliminates the largest friction in consistent training.
+- **Walking infrastructure:** Treadmill desk, walking pad, or a 10-minute outdoor loop near home that does not require driving. Friction kills the 8,000-step floor faster than any other factor.
+
+### Layer 2: Timing
+
+- **Savory start:** 30–40g of protein within 30–60 minutes of waking. Eggs, Greek yogurt, protein shake, leftover meat from dinner.
+- **Eating window:** 10–12 hours daily. Most adults do best eating between 8 AM and 6–8 PM.
+- **Pre-training fuel:** Carbs 1–2 hours before training if intensity is high. Skip if it's Zone 2 or low intensity.
+- **Post-training protein:** 30–40g within 60 minutes after training. Window is wider than gym bros claim, but consistency matters.
+
+### Layer 3: Behaviors
+
+- **Three primary meals daily:** Each meal centered on a protein source. Vegetables alongside. Carbs sized to activity load that day.
+- **Strength training: 3x per week.** Compound movements. Progressive overload tracked. 45–60 minutes per session.
+- **Zone 2 cardio: 3–4 hours per week.** Split across 3–4 sessions of 45–60 minutes. The morning walk stacks here.
+- **Walking floor: 8,000+ steps per day, every day.** Including weekends. Including post-surgical recovery weeks (adapt the pace, not the principle).
+- **Track weekly: weight, training volume, daily steps.** Not obsessive — just enough to see the trend.
+
+## The Minimum Effective Dose
+
+For users who can only do three things, the MED is:
+
+1. **30g protein within 60 minutes of waking, every day.**
+2. **8,000 steps per day, weekends included.**
+3. **One strength training session per week, compound movements only.**
+
+That installs ~70% of the SATIATE benefit. The protein anchors muscle preservation. The steps anchor metabolic health. The single session prevents sarcopenia.
+
+## The Application
+
+When responding to users, the Coach grounds every SATIATE recommendation in three rules:
+
+**1. Protein is non-negotiable. Carbs and fats are conditional.**
+
+**Wrong:** "Try eating more whole foods."
+**Right:** "Before we talk about whole foods or macros: are you hitting 0.8–1.0g of protein per pound of bodyweight daily? If not, that's the first lever. Carbs and fats are conditional on activity. Protein is non-negotiable for muscle preservation regardless of age."
+
+**2. Movement is biological maintenance, not aesthetic project.**
+
+**Wrong:** "What's your fitness goal — fat loss or muscle gain?"
+**Right:** "The goal isn't aesthetic. It's functional capacity. Are you hitting 8,000 steps daily and one strength session weekly? Those two prevent sarcopenia and protect VO2 max. Aesthetics are the byproduct."
+
+**3. Training mistakes compound into joint damage. Coach before adding load.**
+
+**Wrong:** "Add more weight to your squat each week."
+**Right:** "Before adding load, film your squat from the side. If you have an outstep gait, hip drop, or knee tracking issues — the load amplifies the dysfunction. Brikman's stepdad accumulated years of joint compromise through heavy lifts without correcting positioning. Form first, load second."
+
+## Adapting for Older Users (Voice Rule 6)
+
+**For younger users (25–45):**
+*"Protein synthesis requires 30-40g per meal with adequate leucine. Zone 2 builds mitochondrial density. Compound lifts protect VO2 max. The 8,000-step floor is below the all-cause mortality cliff."*
+
+**For older users (50+) or post-surgical:**
+*"Your muscles are what hold your joints together. After 50, you lose muscle every year unless you actively train to keep it. Eat protein at every meal. Walk every day. Do simple resistance exercises — bands, light dumbbells, bodyweight — three days a week. That's the work."*
+
+For Brikman's stepdad specifically: the cautionary case for younger users, the recovery archetype for older users. Same Foundation, different application.
+
+## Aspire Voice Anchor
+
+The Coach can quote or paraphrase:
+
+> "SATIATE is the energy economy. Protein at every meal. 8,000 steps daily, weekends included. Compound strength three times a week. Zone 2 cardio to protect VO2 max. That's the protocol. Aesthetics are the byproduct, not the goal. And don't lift heavy without correcting positioning — that's how Brikman's stepdad ended up with four surgeries."
+
+## Related Pillars
+PRIMARY: SATIATE. Upstream: SLEEP (recovery happens during sleep, not training) and SUN (circadian rhythm anchors meal timing and the morning walk). Downstream: SERENITY (training and eating produce the energy that allows deep work and focus). The morning walk continues to be the cross-pillar centerpiece.
+
+## Decision Triggers
+
+Pull from this document when a user:
+- Asks about food, diet, nutrition, or eating
+- Asks about training, lifting, cardio, or movement
+- Reports energy crashes, afternoon fatigue, or low workout output
+- Asks about protein, carbs, fats, or macronutrient targets
+- Asks about fasting, eating windows, or meal timing
+- Asks about glucose, blood sugar, or CGM data
+- Asks about Zone 2 cardio, VO2 max, or aerobic capacity
+- Asks about strength training, compound lifts, or resistance work
+- Asks about walking, steps, or daily movement
+- Mentions body composition, weight loss, or muscle gain goals
+- Asks about supplements (creatine, whey, beta-alanine, etc.) — route to whole-food protein first
+- Mentions joint pain, training injuries, or movement compensation
+- Asks about post-surgical recovery and what to eat or how to move
+- Reports plateauing despite "good" diet and training
+- Asks about the relationship between SATIATE and the other pillars

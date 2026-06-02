@@ -1,0 +1,115 @@
+# Marcus Aurelius — "Confine yourself to the present"
+
+## The Situation
+A user is dwelling on past failures, catastrophizing about future events, suffering anticipatory anxiety about a parent's eventual decline, ruminating on protocol days they missed, or worrying about Tech Week / exams / a difficult conversation that hasn't happened yet. The Coach pulls this document when the user needs the Stoic discipline of present-moment focus — the practice of restricting attention to what is actually here, refusing to spend energy on the past that cannot be retrieved or the future that has not arrived.
+
+## The Source
+- Marcus Aurelius, *Meditations*, Book 7, Paragraph 29 (Hays translation):
+
+> "Wipe out your imaginings. Stop being jerked like a puppet. Limit yourself to the present. Understand what is happening — to you, to others. Analyze what exists, break it down into matter and cause. Anticipate your final hour. Other people's mistakes — leave them to their makers."
+
+- Related passages reinforcing the same principle:
+  - Book 2, Paragraph 14: *"Each of us lives only now, this brief instant. The rest has been lived already, or is impossible to see."*
+  - Book 3, Paragraph 10: *"All you need are these: certainty of judgment in the present moment; action for the common good in the present moment; and an attitude of gratitude in the present moment."*
+  - Book 8, Paragraph 36: *"Don't let your imagination be crushed by life as a whole. Don't try to picture everything bad that could possibly happen. Stick with the situation at hand."*
+  - Book 12, Paragraph 3: *"Remember that man lives only in the present, in this fleeting instant; all the rest of his life is either past and gone, or not yet revealed."*
+- The principle threads through *Meditations* more consistently than almost any other Stoic theme. Aurelius returned to it because the empire he ran and the campaigns he led offered constant opportunity for anticipatory anxiety about the future and rumination about the past. The discipline he practiced in his journal is the discipline the Coach inherits.
+
+## The Principle
+
+The Stoic claim:
+
+**The only place where life is actually lived is the present. The past is gone and cannot be retrieved. The future is unrevealed and may not arrive. Both are imaginings. The present is the only territory where action is possible.**
+
+Aurelius's prescription follows directly: confine yourself to the present. Do not be jerked like a puppet by your imaginings of what might happen or your replays of what has. The present moment is the only place where you can perceive, act, or accept. Everything else is rumination — a kind of suffering invented by the mind operating outside its actual jurisdiction.
+
+This is not mindfulness in the contemporary contemplative sense. Aurelius is not asking the user to sit and observe. He is making a structural claim about *where life happens.* The user who spends their energy on past failures and future catastrophes is, in a literal sense, *not living* — they are processing imaginings about times that are not the time they are actually in.
+
+For the Aspire OS protocol, this is one of the operationally most important Stoic disciplines because most protocol failure happens in two failure modes:
+
+- **Past-mode:** *"I missed three days, the protocol is broken, what's the point."* The user is acting on a past that the present cannot retrieve.
+- **Future-mode:** *"I won't be able to keep this up for the next decade."* The user is acting on a future that the present has no access to.
+
+Aurelius's discipline cuts through both. The protocol cannot be done in the missed past or the imagined future. It can only be done *today.* The work is to confine attention to that fact and act from it.
+
+## The Stoic Lens
+
+### The Trichotomy of Time
+
+Aurelius's framework distinguishes three regions of time, each with different operational properties:
+
+**The Past.** Closed. Cannot be changed. Not controllable. Available only as memory, which is a present-moment perception of a no-longer-existing event. Any energy spent on the past is energy spent on a perception in the present that has been mislabeled.
+
+**The Future.** Unrevealed. May not arrive. Not controllable in any literal sense. Available only as imagining, which is a present-moment construction of an event that does not yet exist. Any energy spent on the future is energy spent on a construction in the present that has been mislabeled.
+
+**The Present.** Open. Actionable. Partially controllable (Doc 39 — the Stoic dichotomy of control applies). The only region in which perception, decision, and action actually occur.
+
+The Aspire OS Coach uses this trichotomy as a diagnostic. When a user reports emotional disturbance, the Coach can ask: where is your attention right now? Past? Future? Present? Almost always, the answer is past or future, and the disturbance is mostly an artifact of attention being in the wrong region.
+
+### The Anti-Anticipation Move
+
+Aurelius's Book 8.36 passage is the sharpest version of the anti-anticipation discipline:
+
+> "Don't let your imagination be crushed by life as a whole. Don't try to picture everything bad that could possibly happen. Stick with the situation at hand, and ask, 'Why is this so unbearable? Why can't I endure it?' You'll be embarrassed to answer."
+
+The user who imagines "everything bad that could possibly happen" is generating their own suffering. *The bad thing they're imagining is not happening.* If it happens, it will happen in its own present, with its own facts, and the user will respond then. Anticipating it now produces all the cost of the bad thing — emotional disturbance, cortisol elevation, fragmented sleep, attention fragmentation — without any of the actual event having occurred.
+
+This is one of the most important applications of Stoic doctrine in the dual-arc context (Doc 40). Users with declining parents often spend years in anticipatory grief — suffering, in advance, the loss that has not yet happened. Aurelius's discipline does not deny that the loss will eventually come. It refuses to pre-pay the cost. The parent is here today. The loss is not here today. Spend today's attention on today's parent.
+
+### The Connection to Deep Work
+
+Aurelius's present-moment discipline is the philosophical version of Newport's deep work (Doc 17) and the neuroscience of sustained attention (Doc 30). Deep work is, operationally, the cultivated capacity to keep attention in the present-moment task. Without the Stoic discipline, deep work is mechanically possible but psychologically fragile — the user's attention drifts to past failures or future deadlines, eroding the sustained presence that deep work requires.
+
+The Coach can teach this connection: deep work *is* Aurelian present-moment practice applied to cognitive labor. The 90-minute block is not just a productivity technique. It is a structured opportunity to live, for 90 minutes, in the only place life is actually lived.
+
+### What This Is Not
+
+**It is not "don't plan for the future."** Aurelius spent his career running an empire and an army. He planned obsessively. The discipline is not about refusing to think about the future. It is about refusing to *suffer the future in advance.* Planning is a present-moment activity directed at the future. Anticipatory suffering is a present-moment activity that produces present-moment cost for an event that hasn't occurred. The Coach distinguishes the two.
+
+**It is not "forget the past."** Memory is information. Lessons can be drawn from past events. The discipline is about refusing to *re-live and re-suffer* events that are not happening now. Remembering an event differs from emotionally inhabiting it in the present.
+
+## The Application
+
+When responding to users, the Coach uses this passage in three ways:
+
+**1. Diagnose emotional disturbance by asking where the user's attention is in time.**
+
+*"You're upset. Before we work on the upsetness, let's locate it in time. Are you spending energy on something that happened (past) or something that might happen (future)? Aurelius's discipline is sharp here — life only happens in the present, and emotional disturbance about past or future is, structurally, suffering about something that does not exist as you experience it. The fact (your dad's decline, the missed protocol days, the upcoming exam) may be real. The present-moment suffering about it is generated by attention being in the wrong region of time. Bring attention back to what's here now. The energy that was funding the imagined suffering becomes available for present-moment action."*
+
+**2. Apply the discipline to protocol failure rumination.**
+
+*"You missed three days of the protocol last week and you're still thinking about it. Run Aurelius's discipline: those days are past. They cannot be retrieved. The energy you're spending on them is energy that could be funding today's protocol. The work is not to feel less bad about the missed days. The work is to notice that the rumination is happening in the present, about events that aren't, and to reclaim that attention for what is. Today's walk. Today's breakfast. Today's deep work block. The protocol is not built in the missed past. It is built in this morning."*
+
+**3. Apply the discipline to anticipatory grief or anxiety about a parent's decline.**
+
+*"You're suffering, today, the eventual loss of your dad — a loss that has not happened. Aurelius's discipline does not pretend the loss won't come. It refuses to pre-pay the cost. Your dad is here today. The loss is not. Spend today's attention on today's dad. The walk you can take with him this weekend. The conversation you can have this evening. The protocol you can offer to help his recovery. When the loss comes, it will come in its own present, with its own facts, and you will respond then. Until then, the only place he exists is now. That's the only place to meet him."*
+
+## Aspire Voice Anchor
+
+The Coach can quote or paraphrase:
+
+> "Aurelius wrote it in *Meditations*, Book 7: *Wipe out your imaginings. Stop being jerked like a puppet. Limit yourself to the present.* The past is gone. The future hasn't arrived. The only place life is actually lived is the present moment. Most emotional disturbance — anxiety, regret, anticipatory grief, protocol rumination — happens because attention drifts to a region of time where action isn't possible. Bring attention back. The protocol is not built in the past you missed or the future you fear. It is built in this morning."
+
+## Related Pillars
+PRIMARY: SERENITY (the present-moment discipline is the operating system of the entire pillar). Cross-references: Doc 1 (Aurelius / *At dawn*) — paired morning practice from the same author; Doc 2 (Aurelius / *Today I escaped anxiety*) — the emotional regulation principle this discipline operationalizes; Doc 9 (Epictetus / *Men are disturbed not by things*) — the parallel claim about emotional source; Doc 39 (Stoic Dichotomy of Control) — only the present is actionable, therefore only the present is controllable; Doc 17 (Newport / Deep Work) — deep work as Aurelian present-moment practice applied to cognitive labor; Doc 30 (Deep Work Neuroscience) — sustained present-moment attention as cognitive infrastructure; Doc 35 (Serenity Pillar Protocol) — operational practices that build present-moment capacity; Doc 13 (Frankl / Stimulus and Response) — the gap is the present-moment territory in which choice happens; Doc 12 (Frankl / Meaning) — meaning is constructed in the present, not discovered in the past or future; Doc 40 (Dual-Arc Strategy) — anticipatory grief about parents' decline is the most important present-moment application in the brand's audience.
+
+## Decision Triggers
+
+Pull from this document when a user:
+- Dwells on past failures, missed protocol days, or things they didn't do
+- Catastrophizes about future events, exams, deadlines, or outcomes
+- Reports anticipatory anxiety or anticipatory grief
+- Mentions worrying about a parent's eventual decline before it has happened
+- Asks about mindfulness, present-moment awareness, or meditation
+- Reports rumination, intrusive thoughts, or being unable to stop thinking about something
+- Asks about Stoic practice for worry or regret
+- Mentions Marcus Aurelius or *Meditations* in relation to present-moment focus
+- Says "I can't stop thinking about..." (past) or "What if..." (future)
+- Reports protocol failure rumination — replaying missed days
+- Asks how the Stoics handled anxiety about the future
+- Mentions deep work struggles where attention drifts to past or future
+- Asks for a daily practice for present-moment focus
+- Reports being "stuck" in something that already happened
+- Wants the Stoic answer to anticipatory suffering
+- Asks why anxiety persists even when the user "knows" they shouldn't worry
+- Mentions feeling "out of time" — neither in the past nor in the future nor in the present

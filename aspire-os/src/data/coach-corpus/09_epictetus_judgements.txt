@@ -1,0 +1,126 @@
+# Epictetus — "Men are disturbed not by things but by their judgments"
+
+## The Situation
+A user describes being "made" to feel a certain way by someone else, an event, or a circumstance — *they made me angry, the news made me anxious, the meeting made me feel stupid, my father makes me feel powerless.* Or a user wants to understand the source claim under modern CBT, or the foundational principle of Stoic emotional regulation at the source-text level. The Coach pulls this document when the user needs Epictetus's most-quoted passage on emotion — the structural claim that locates the cause of disturbance inside, not outside, and the three-stage progression of growth that follows from internalizing it.
+
+## The Source
+- Epictetus, *Enchiridion* (Handbook), Chapter 5
+- Compiled by Arrian circa 125 CE from Epictetus's lectures
+- Standard English translations: Robin Hard (Oxford World's Classics, 2014); Robert Dobbin (Penguin Classics, 2008); George Long (1888) — Long's older rendering is the version most quoted in CBT literature; W.A. Oldfather (Loeb Classical Library, 1928)
+- Historical and intellectual context: Albert Ellis, founder of Rational Emotive Behavior Therapy (REBT, 1955) and one of the two parallel founders of Cognitive Behavioral Therapy (with Aaron Beck), credited this exact passage as the seed of his entire therapeutic framework. Ellis quoted it constantly in his clinical writings. The modern field of CBT, which has become the most empirically supported psychotherapy in the world, is in a direct lineage from this short paragraph by a freed Roman slave teaching philosophy in the early second century.
+
+The passage in full (Long translation, with the Socrates reference intact — this is the version Ellis most often quoted):
+
+> "Men are disturbed not by the things which happen, but by the opinions about the things; for example, death is nothing terrible, else it would have appeared so to Socrates; for the opinion about death, that it is terrible, is the terrible thing.
+>
+> When then we are impeded, or disturbed, or grieved, let us never blame others, but ourselves, that is, our opinions. It is the act of an ill-instructed man to blame others for his own bad condition; it is the act of one who has begun to be instructed, to lay the blame on himself; and of one whose instruction is completed, neither to blame another, nor himself."
+
+## The Principle
+
+Epictetus makes two distinct claims in this short passage, both load-bearing.
+
+**The first claim — the source of disturbance is internal, not external:**
+
+The events that happen to us are not, in themselves, disturbing. They are events. The *interpretation* we place on those events — the judgment that the event is terrible, unfair, threatening, or unbearable — produces the emotional disturbance. Different judgments produce different disturbances. The same event, judged differently, produces different experiences.
+
+Epictetus uses death as the strongest test case. If death itself were terrible, Socrates would have found it terrible. Socrates did not find it terrible (he drank the hemlock calmly). Therefore the terror that most people feel about death is not produced by death itself but by their judgments about it. This is not a rhetorical flourish — Epictetus is making a structural claim. If death, the most-feared event, is not inherently terrible, then no event is inherently disturbing in itself. The disturbance always lives in the judgment.
+
+**The second claim — the three-stage progression of philosophical maturity:**
+
+Epictetus identifies three stages a student moves through as they internalize this principle:
+
+1. **The ill-instructed (uninstructed)** — blames external causes for their disturbance. *They* made me angry. *It* made me anxious. *The circumstance* made me unhappy. The locus of cause is outside. This is the default condition of most adults.
+
+2. **The one beginning to be instructed** — blames themselves. *I made myself angry. I produced the anxiety. My judgments caused the disturbance.* The locus of cause has moved inside. This is the first move of philosophical training. It is necessary but not yet complete.
+
+3. **The one whose instruction is completed** — blames no one. Neither external causes nor self. The disturbance, properly understood, is not a thing to be blamed at all. It is data — information about a judgment that requires examination. The mature Stoic does not flagellate themselves for having had the disturbance. They notice it, examine the judgment that produced it, and adjust.
+
+This three-stage progression is one of the most operationally precise teaching maps in ancient philosophy. The Coach can locate where a user currently sits and offer the next move.
+
+## The Stoic Lens
+
+### The CBT Inheritance, Explicit
+
+Albert Ellis was reading Epictetus when he developed REBT in the 1950s. He frequently said that he had not invented cognitive therapy — he had translated Stoic philosophy into a clinical framework. The basic CBT formulation:
+
+> A (Activating event) → B (Belief / interpretation) → C (Consequence / emotion)
+
+is Epictetus's claim restated for a 20th-century therapeutic audience. The activating event does not produce the emotion. The belief about the event produces the emotion. Therefore intervention happens at B — the belief — not at A — the event.
+
+The Coach can deploy this directly for users with therapeutic backgrounds: *what you encountered in CBT is Epictetus, translated. The clinical framework has decades of evidence. The philosophical source is 2,000 years old. Same insight. Same operational lever. The Stoics just got there first.*
+
+### The Three-Stage Map as Diagnostic
+
+The progression Epictetus describes is one of the most useful Coach diagnostics. When a user reports disturbance, the Coach can quietly ask which stage they're in:
+
+- *Are they blaming externally?* (Stage 1 — the ill-instructed default)
+- *Are they blaming themselves for having the reaction?* (Stage 2 — beginning instruction)
+- *Are they examining the underlying judgment without self-criticism or external blame?* (Stage 3 — completed instruction)
+
+Most users live in Stage 1 most of the time. The first major shift of philosophical practice is to Stage 2 — recognizing that the disturbance is internally generated. This stage often produces secondary suffering: *I caused this. I should have known better. Why am I like this?* Self-blame replaces external blame, which is a real advance but is itself a trap.
+
+Stage 3 is the dissolution of the blame frame altogether. The disturbance is examined as information, not as a wrong to be assigned to someone. The user notices the judgment, examines it, adjusts it, and moves on. No one is blamed because no one needs to be blamed. The disturbance was a symptom of a misalignment between the user's judgments and reality. The judgment can be corrected.
+
+The Coach's job over time is to help the user move through these stages — first from 1 to 2 (locating cause internally), then from 2 to 3 (dropping the blame frame entirely).
+
+### Connection to Doc 2 (Aurelius)
+
+Aurelius's "Today I escaped anxiety — or rather, I discarded it, because it was within me, in my own perceptions" (Doc 2) is the personal-journal version of Epictetus's systematic teaching. Aurelius was a student of Epictetus's tradition (he credits Epictetus by name in *Meditations* 1.7). The two passages cover the same operational territory:
+
+- Epictetus gives the principle ("disturbance comes from judgments, not events")
+- Aurelius gives the practice ("today I discarded the anxiety once I located its actual source")
+
+The Coach uses both depending on what the user needs. Epictetus's version is more systematic — useful for users wanting the structural claim and the three-stage map. Aurelius's version is more personal — useful for users wanting to see what the practice looks like in a daily life.
+
+### The Importance of "Disturbed"
+
+A subtle but important translation note: Epictetus's verb (*ταράσσω* — *tarassō*) means specifically "to disturb, agitate, throw into confusion." It is not the verb for ordinary emotion or response. The Stoics did not believe humans could or should eliminate all emotion. They believed in eliminating *disturbance* — the secondary layer of agitation that gets added on top of natural responses through faulty judgment.
+
+A modern parallel: the Stoic does not aim to feel nothing when a parent dies. The Stoic aims to feel grief without the additional layer of *this is unbearable, this is unfair, this should not be happening, I cannot survive this.* The grief itself is appropriate. The disturbance about the grief is the work.
+
+This distinction matters because many users (and some critics) read Stoicism as advocating emotional flatness. It doesn't. It advocates the elimination of unnecessary disturbance, which leaves the natural emotional response intact.
+
+## The Application
+
+When responding to users, the Coach uses Enchiridion 5 in three ways:
+
+**1. Reframe "they made me" or "it made me" statements at the source level.**
+
+*"You said your dad's choices made you angry. Epictetus would push back on the grammar. He didn't make you angry — your judgment about his choices produced the anger. This isn't blaming you for the feeling. It's locating the actual lever. The anger lives in the judgment. The judgment is examinable. The judgment can be adjusted. The choices themselves stay in the not-in-your-power column (Doc 8). What's in your power is what you make of them. The Stoic move is to take the energy you've been spending on his behavior and spend it on the interpretation you've been adding."*
+
+**2. Locate the user in the three-stage progression and offer the next move.**
+
+*"You're blaming yourself harshly for getting upset earlier. Epictetus would say you're in Stage 2 — you've correctly located the disturbance inside yourself, which is real progress. But Stage 2 has a trap: replacing external blame with self-blame is still blame, and it produces a second layer of suffering. The third stage is to drop the blame frame entirely. You noticed the disturbance. You located its source in a judgment. The judgment can be examined and adjusted. No one needs to be punished — not your dad, not yourself. The disturbance is information about a misalignment. Treat it that way and the secondary suffering dissolves."*
+
+**3. Use the CBT lineage to anchor the principle for users with therapy backgrounds.**
+
+*"You've done CBT and you know the A-B-C framework. What you may not know is that Albert Ellis built it from this exact Epictetus passage in the 1950s. The most empirically supported psychotherapy in the world is in direct lineage from a freed Roman slave teaching philosophy in 125 CE. The principle was the same then as now: events don't produce emotion; beliefs about events do. The intervention lever is the belief. Whether you encounter it through your therapist or through the *Enchiridion*, the operational move is identical."*
+
+## Aspire Voice Anchor
+
+The Coach can quote or paraphrase:
+
+> "Epictetus wrote it in *Enchiridion* 5: *Men are disturbed not by the things which happen, but by the opinions about the things.* Death is not terrible — Socrates didn't find it so. The terror is in the judgment, not the event. The same applies to almost every disturbance the user reports. Other people, circumstances, events — none of them produce the emotional disturbance directly. The judgment placed on top of them produces it. The lever is the judgment. Modern CBT is built on this exact passage. Albert Ellis credited it constantly. The principle is 2,000 years old and still the cleanest emotional intervention available."
+
+## Related Pillars
+META — applies across all four Foundation pillars as the foundational principle of emotional regulation. Cross-references: Doc 2 (Aurelius / *Today I escaped anxiety*) — the personal-journal parallel; Doc 8 (Epictetus / Dichotomy of Control) — the foundational principle that locates judgments in the first column (what's in our power); Doc 13 (Frankl / Stimulus and Response) — the 20th-century existentialist restatement; Doc 39 (Stoic Dichotomy of Control) — the operational application; Doc 35 (Serenity Pillar Protocol) — the daily practices that build the capacity for judgment examination; Doc 12 (Frankl / Meaning) — the freedom to choose response is identical territory; Doc 20 (Holiday / Obstacle Is The Way) — Holiday's Discipline of Perception draws directly from this passage; Doc 23 (HRV) — chronic emotional disturbance suppresses HRV, so addressing it at the judgment level supports the biological recovery layer.
+
+## Decision Triggers
+
+Pull from this document when a user:
+- Describes being "made" to feel a certain way by someone or something
+- Reports anxiety, anger, grief, or fear in response to an external event
+- Asks about Stoic emotional regulation at the source level
+- Mentions Epictetus, the *Enchiridion*, or *Discourses*
+- Asks about CBT, REBT, Albert Ellis, or Aaron Beck
+- Wants the source under Doc 13 or modern cognitive therapy
+- Blames external situation for their emotional state
+- Reports being "triggered" and asks for the Stoic frame
+- Asks the difference between primary emotion and secondary disturbance
+- Reports self-blame for emotional reactions and wants the framework that moves past it
+- Asks the three-stage progression of Stoic instruction
+- Wants to know why the corpus keeps returning to "the judgment, not the event"
+- Reports a parent or family member "making them feel" something difficult
+- Asks how Stoicism handles intense emotion specifically
+- Mentions trying to control external situations to manage their emotional state — diagnose category confusion
+- Wants the most-quoted Epictetus passage for daily anchor reading

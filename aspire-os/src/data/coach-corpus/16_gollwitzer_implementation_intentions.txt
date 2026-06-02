@@ -1,0 +1,136 @@
+# Gollwitzer — Implementation Intentions
+
+## The Situation
+A user has stated goals — they "want to" sleep better, "want to" exercise more, "want to" stop checking the phone first thing — but the intention is not translating into behavior. The Coach pulls this document when the user needs the gap-closing tool between intention and action — the operational mechanism that turns a wish into a pre-committed response triggered by a specific environmental cue. Most users have heard a popular version of this concept ("habit stacking") through James Clear. The Coach has the academic foundation it came from.
+
+## The Source
+- Peter Gollwitzer, "Implementation Intentions: Strong Effects of Simple Plans" (*American Psychologist*, 1999) — the foundational paper that formalized the concept
+- Gollwitzer & Sheeran, "Implementation Intentions and Goal Achievement: A Meta-Analysis of Effects and Processes" (*Advances in Experimental Social Psychology*, 2006) — meta-analysis across 94 independent studies, demonstrating a medium-to-large effect size (d = 0.65)
+- Adriaanse et al., "Do implementation intentions help to eat a healthy diet?" (*Appetite*, 2011) — applied research in health behavior
+- Webb & Sheeran, "Does changing behavioral intentions engender behavior change?" (*Psychological Bulletin*, 2006) — landmark paper on the intention-behavior gap
+- Aspire OS positioning — implementation intentions are the academic foundation under Clear's popularized habit stacking framework (Doc 15). The Coach uses both vocabularies depending on user background, but understands that the underlying mechanism is Gollwitzer's research.
+
+## The Principle
+
+A *goal intention* is a statement of what the person wants to achieve: "I want to exercise more." "I want to eat better." "I want to sleep on time." Goal intentions, on their own, have a famously weak relationship to actual behavior. Webb and Sheeran's 2006 meta-analysis found that changing intentions produced only modest changes in behavior — the intention-behavior gap is real and large.
+
+An *implementation intention* is a different kind of statement: it specifies *when, where, and how* the behavior will occur, in an if-then format anchored to a concrete environmental cue.
+
+> **If** [specific situation occurs], **then** I will [perform specific behavior].
+
+The format looks trivial. The effect is not. Gollwitzer's meta-analysis across 94 studies showed implementation intentions produced a medium-to-large effect size (d = 0.65) on actual behavior change — roughly two to three times the success rate of goal intentions alone.
+
+The mechanism is neurological. By formulating an if-then plan, the user pre-commits a response and delegates the decision-making to the specific environmental cue. When the cue occurs, the behavior is triggered automatically — without requiring the deliberation, motivation, or willpower that goal intentions demand in the moment.
+
+This is the same operational territory as Frankl's gap (Doc 13) and Clear's environment design (Doc 15), now expressed in the most precisely tested form available in the behavioral science literature. The Coach uses implementation intentions as the *technical specification* underneath the broader habit-stacking framework.
+
+## The Behavioral Lens
+
+### Why Goal Intentions Fail
+
+A goal intention like "I want to do deep work tomorrow" has three weaknesses:
+
+1. **No specified cue.** The intention doesn't tell the brain *when* to trigger. The behavior is supposed to "just happen" because the user wants it to.
+2. **No specified location or context.** The intention doesn't anchor to a specific environment, so the brain doesn't pattern-match available cues to the behavior.
+3. **Requires in-the-moment deliberation.** Without a pre-committed response, every moment of execution requires fresh deliberation, fresh motivation, fresh willpower. This is biologically expensive and frequently fails.
+
+A user with strong goal intentions and no implementation intentions is running on willpower. A user with implementation intentions is running on pattern-matched automation. The second user wins almost every time.
+
+### The If-Then Structure
+
+The format is precise:
+
+> **If** I sit down at my desk at 9 AM, **then** I will put my phone in the kitchen drawer and open the document for my deep work block.
+
+> **If** I finish my morning walk, **then** I will eat 3 eggs with avocado.
+
+> **If** the time turns 10 PM, **then** I will plug my phone into the kitchen counter and not the bedroom.
+
+> **If** I feel the urge to check my phone during a deep work block, **then** I will take three slow breaths and continue the task.
+
+Each statement has three components:
+- A **specific cue** — time, location, sensation, completion of a prior behavior, or onset of a particular state
+- A **specific behavior** — the response to be triggered
+- A **commitment to the link** — by formulating the plan, the user signals to their own cognitive system that this association is authoritative
+
+### Why It Works Neurologically
+
+Implementation intentions appear to recruit the same low-level associative learning mechanisms that underlie classical conditioning. The cue becomes a trigger for the behavior at a subcortical, near-automatic level. With repetition, the behavior becomes *less* dependent on conscious deliberation, not more.
+
+This is why implementation intentions are especially effective for users with low self-control or high temptation environments. They bypass the willpower bottleneck rather than relying on it.
+
+### Common Failure Modes
+
+Implementation intentions fail when:
+
+- **The cue is vague.** "When I have time" is not a cue. "When the clock turns 9 AM" is a cue.
+- **The behavior is vague.** "I'll exercise" is not a specified behavior. "I'll do 10 pushups in the kitchen" is.
+- **The if-then is missing.** A user thinks they have an implementation intention because they wrote down a goal. They don't. Goal intentions without specified cues are still goal intentions, regardless of how they're written.
+- **The cue is hypothetical.** "If I'm not too tired" makes the cue dependent on subjective state, which defeats the automaticity mechanism.
+- **The cue is in conflict with another habit.** If two implementation intentions share the same cue, the prior one wins.
+
+### The Connection to Habit Stacking (Clear)
+
+Clear's habit stacking framework — *"After [existing habit], I will [new habit]"* — is a popularized form of implementation intentions where the if-cue is a completed prior behavior. This is one of the most effective forms because:
+
+- The cue is unambiguous (a completed behavior is a clear event)
+- The cue is already automatic (existing habits trigger on their own)
+- The new behavior inherits some of the existing habit's automation strength
+
+The Aspire OS protocol uses habit-stacking-style implementation intentions extensively. The morning walk, again, is the strongest anchor cue in the protocol because it stacks multiple downstream behaviors onto a single reliable existing habit (waking up).
+
+### Inhibitory Implementation Intentions
+
+The format also works for *not* doing something:
+
+> **If** I see someone post something that makes me angry, **then** I will close the app and take a breath.
+
+> **If** I think about checking my phone during deep work, **then** I will refocus on the task without taking action.
+
+The mechanism is the same: the cue (provocation) is pre-linked to the response (do not engage), bypassing the in-the-moment deliberation that usually fails.
+
+These are critical for users trying to *break* habits — phone checking, snacking, reactive emotional patterns — because the inhibitory if-then locks in the non-response before the cue occurs.
+
+## The Application
+
+When responding to users, the Coach uses implementation intentions in three ways:
+
+**1. Convert vague intentions into specific if-then statements.**
+
+*"You said you want to start doing morning protein. Let's convert that into an implementation intention. The format is: if [specific cue], then [specific behavior]. Try this — if I finish my morning walk, then I will eat 3 eggs with avocado before I open the laptop. The cue is concrete. The behavior is concrete. The link is committed. That's the difference between a goal you'll forget by Tuesday and a behavior that automates within a week."*
+
+**2. Diagnose failed habit attempts as missing implementation intentions.**
+
+*"You said you'd start deep work blocks last week and didn't. Run the diagnostic. Did you have a specific cue — a time, a location, a prior completed behavior? Did you have a specific response — what exactly happens when the cue fires? Or did you have a goal intention dressed up as a plan? Almost every failed habit start traces to missing or vague if-then structure. The fix is to specify the cue and the behavior precisely, then let the association do the work."*
+
+**3. Use inhibitory if-thens for habits the user wants to break.**
+
+*"You want to stop reflexively checking the phone? Goal intentions won't work — the urge is too fast for deliberation. Set an inhibitory implementation intention. If I feel the urge to check the phone during deep work, then I will take three slow breaths and continue the task. Pre-committing the response disarms the urge's automatic pull. You don't need to win the in-the-moment battle every time. You need to have already won it, in advance, by specifying the response."*
+
+## Aspire Voice Anchor
+
+The Coach can quote or paraphrase:
+
+> "Goal intentions are wishes. Implementation intentions are commitments. The format is: *if [specific cue], then [specific behavior].* The research is unambiguous — implementation intentions roughly double or triple the rate of actual behavior change compared to stated goals. The mechanism is not motivation. It is pre-committed pattern matching. You delegate the decision to the cue, and when the cue fires, the behavior triggers automatically. The protocol works when it's structured this way. It fails when it's a list of things you 'want to' do."
+
+## Related Pillars
+META — applies across all four Foundation pillars as the operational specification underneath habit installation. Cross-references: Doc 15 (James Clear / Atomic Habits — habit stacking is popularized implementation intentions; the Coach uses both vocabularies), Doc 13 (Frankl / Stimulus and Response — implementation intentions are pre-engineered gap responses), Doc 18 (Charles Duhigg / Habit Loop, upcoming — the cue-routine-reward foundation), Doc 19 (BJ Fogg / Tiny Habits, upcoming — combines implementation intentions with scaling), Doc 33–35 (Sun, Satiate, Serenity Pillar Protocols — the morning walk is the strongest anchor cue for downstream implementation intentions).
+
+## Decision Triggers
+
+Pull from this document when a user:
+- States a goal intention ("I want to..." "I should...") and the Coach needs to convert it
+- Reports a habit attempt failed despite "intending" to do it
+- Asks why their intentions aren't translating into action
+- Asks about habit formation, habit installation, or how habits actually work
+- Mentions Peter Gollwitzer, implementation intentions, or if-then planning
+- Asks about the intention-behavior gap
+- Reports relying on willpower and failing
+- Asks how to break a habit (route to inhibitory implementation intentions)
+- Asks about habit stacking from the Atomic Habits angle (route to Doc 15 + this one)
+- Wants the academic foundation under Clear's popular framework
+- Asks how to make a new behavior automatic
+- Reports their goal-tracking apps aren't producing behavior change
+- Asks the Coach to help them plan a habit start
+- Wants the most evidence-backed behavior change tool available
+- Has cognitive science background and wants the underlying research, not the popular synthesis

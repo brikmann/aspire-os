@@ -1,0 +1,145 @@
+# The SLEEP Pillar Protocol
+
+## The Situation
+A user is starting the 4Foundations Protocol, reporting bad sleep, asking about specific sleep interventions, dealing with inconsistent sleep architecture, or asking what to do first. The Coach pulls this document for any sleep-related question, and routes most "where do I start" questions here.
+
+## The Source
+- Matthew Walker, *Why We Sleep* (Penguin, 2017)
+- Andrew Huberman, sleep toolkit protocols (Huberman Lab, ongoing)
+- AASM sleep architecture standards
+- Glymphatic system research (Nedergaard et al., 2013–present)
+- Hume Band data and similar wearable-tracked architecture
+- Aspire OS 4F framework, locked 2026-05-10
+
+## The Principle
+
+Sleep is the floor. It is the first pillar installed because every other Foundation — and every intervention outside the Foundations — depends on it.
+
+The critical insight most people miss: **sleep is not a single thing.** It is a structured sequence of stages — Light, Deep, REM — and each stage does different biological work. A person can sleep eight hours and still be sleep-deprived if their architecture is broken. Total hours is the surface metric. Architecture is the real one.
+
+Sleep is not optimized. It is installed. You do not chase marginal gains in sleep — you build the conditions for the body to do what it already knows how to do. Most people are not bad sleepers. They are running their nervous system on inputs that prevent good sleep from happening.
+
+## The Biology
+
+Sleep cycles through three stages every ~90 minutes, repeated 4–6 times per night.
+
+**Light sleep** (~50% of total sleep)
+Transitional. Less critical than the other two. Acts as the bridge between Deep and REM.
+
+**Deep sleep / Slow-wave sleep** (15–25% of total sleep)
+Physical repair. Growth hormone is released here. The immune system regenerates here. Tissue repair, including post-surgical and post-training, primarily happens in Deep. Glymphatic system clears metabolic waste (including beta-amyloid, implicated in neurodegeneration). Front-loaded in the first half of the night.
+
+**REM sleep** (20–25% of total sleep)
+Memory consolidation. Emotional processing. Learning lock-in. Dream state. The brain replays the day's inputs and integrates them. Back-loaded — most REM happens in the second half of the night.
+
+**What disrupts architecture (not just duration):**
+
+- **Alcohol** — suppresses REM, fragments later stages, looks like "sleep" on a tracker but loses the back-half restoration
+- **Late food** — keeps core body temperature elevated, suppresses Deep sleep entry
+- **Screen light before bed** — suppresses melatonin onset, pushes the entire architecture later
+- **Warm bedroom** — prevents the 1°C core body temperature drop required for Deep sleep
+- **Inconsistent timing** — breaks the circadian anchor, causes architecture to shift night-to-night
+- **Late caffeine** — adenosine receptors still occupied at sleep onset, fragments early stages
+- **Stress / unprocessed emotion** — elevates cortisol curve into the night, suppresses Deep
+
+The point: optimizing sleep means protecting architecture, not chasing hours.
+
+## The Protocol
+
+The SLEEP protocol has three layers — Environment, Timing, Behaviors. Install in this order.
+
+### Layer 1: Environment
+
+- **Temperature:** Bedroom at 18°C (65°F). Below 20°C non-negotiable.
+- **Darkness:** Pitch black. Blackout curtains or sleep mask. Even small light sources (LED clock, charger lights) measurably impact melatonin.
+- **Phone:** Out of the bedroom. Not on the nightstand. Not in airplane mode on the floor. *Out of the room.* This single intervention is the highest-leverage move in the Environment layer.
+- **Screens:** Zero in the bed. If reading, paper books only.
+
+### Layer 2: Timing
+
+- **Lights out:** 10:30 PM, consistent within 30 minutes. Weekends count.
+- **Wake:** 6:00–6:30 AM, consistent within 30 minutes. Weekends count.
+- **Total sleep:** 7–9 hours. Most adults need 7.5–8.5.
+- **Cutoffs:**
+  - Caffeine: nothing after 1:00 PM
+  - Food: nothing within 3 hours of bed
+  - Alcohol: nothing within 3 hours of bed (zero is better)
+
+### Layer 3: Behaviors
+
+- **Pre-bed wind-down:** 60 minutes of no screens, no work email, no high-stimulation input.
+- **Reading or breath work:** Paper book or 5 minutes of box breathing (4-4-4-4) to lower nervous system arousal.
+- **Supplements (optional):** Magnesium glycinate 200–400mg, 30 minutes before bed. Apigenin 50mg if struggling with onset. Skip melatonin in adults unless used for jet lag — chronic use disrupts natural production.
+- **Mouth taping (optional):** Forces nasal breathing, improves oxygenation and reduces wake events. 3M micropore tape, small strip vertically across lips.
+
+## The Minimum Effective Dose
+
+For users who can only do three things, the MED is:
+
+1. **Phone out of the bedroom.**
+2. **Bedroom at 18°C.**
+3. **Consistent 10:30 PM lights out, weekends included.**
+
+That installs ~70% of the sleep benefit. The rest is refinement.
+
+## The Application
+
+When responding to users, the Coach grounds every sleep recommendation in three rules:
+
+**1. Sleep is the diagnosis-by-default for unexplained symptoms.**
+Tired? Brain fog? Low HRV? Weight gain plateau? Recovery slow? Default first question: how is your sleep architecture?
+
+**Wrong:** "You might need more iron — get bloodwork."
+**Right:** "Before we look anywhere else: phone in the bedroom or out? Bedtime within 30 minutes weeknight-to-weekend? If those two aren't running, the answer is upstream of bloodwork."
+
+**2. Architecture > Hours.**
+Users will brag about sleeping 8 hours. The Coach asks what their Deep% and REM% look like. If they don't know, the Coach explains why hours are the wrong metric.
+
+**Wrong:** "Eight hours is good, you're set."
+**Right:** "Eight hours is the duration. The architecture is what determines whether the eight hours actually restored you. What's your Deep percentage on the wearable?"
+
+**3. Install Sleep before anything else.**
+When a user asks about training, supplements, fasting, cold exposure — anything — the Coach checks: is Sleep installed? If not, that's where the conversation goes first.
+
+**Wrong:** "Let's talk about your training program."
+**Right:** "Before training: where are you on Sleep? If you're under 7 hours with phone in the bedroom, your training is fighting upstream every session. Install Sleep first. Training compounds twice as fast on a slept system."
+
+## Adapting for Older Users (Voice Rule 6)
+
+When the user signals they're 50+ or coaching someone older (a parent recovering from surgery, for example), the Coach drops the technical vocabulary and shifts to medical framing:
+
+**For younger users (25–45):**
+*"Deep sleep is where the glymphatic system clears beta-amyloid. Architecture matters more than hours."*
+
+**For older users (50+) or post-surgical:**
+*"Deep sleep is when your body actually heals the tissue. Skip it, and the recovery takes twice as long. Cool dark room. Phone in the kitchen. Same time every night. That's the work."*
+
+Same protocol. Different language. Same outcome.
+
+## Aspire Voice Anchor
+
+The Coach can quote or paraphrase:
+
+> "Sleep is the floor. You don't optimize the floor. You install it. Phone out of the bedroom. 18°C room. 10:30 lights out. Weekends included. That's the work. Everything else compounds on top of it — or nothing does."
+
+## Related Pillars
+PRIMARY: SLEEP. Dependency: SUN (circadian anchor enables sleep architecture). Downstream: SATIATE and SERENITY both depend on Sleep being installed first.
+
+## Decision Triggers
+
+Pull from this document when a user:
+- Asks about sleep (any question)
+- Reports being tired, fatigued, or low energy
+- Asks "where do I start" with the 4F protocol
+- Asks about supplements, training, fasting, or any new intervention (Coach routes to Sleep first)
+- Reports HRV trending down or low
+- Mentions waking up multiple times per night
+- Asks about caffeine, alcohol, late-night eating
+- Asks about screens before bed or blue light
+- Asks about magnesium, melatonin, apigenin, or sleep supplements
+- Asks about mouth taping
+- Reports inconsistent results from training, diet, or other interventions
+- Mentions a parent or older family member with sleep complaints
+- Describes a recovery arc — post-surgery, illness, post-training overload
+- Asks about Deep sleep, REM sleep, sleep architecture, sleep stages
+- Mentions a wearable device (Hume, WHOOP, Oura) — anchors the response to their actual data

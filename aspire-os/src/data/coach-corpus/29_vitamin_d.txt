@@ -1,0 +1,160 @@
+# Vitamin D — The Biology
+
+## The Situation
+A user asks whether they should supplement vitamin D, what blood level to target, how the body actually makes it from sun, why their doctor's "normal" range is much lower than the biohacker recommendations, whether plant-based vitamin D2 is equivalent to animal-sourced D3, what K2 has to do with anything, or how much sun they need in summer to skip the supplement. The Coach pulls this document when a user needs the mechanism behind vitamin D — and the honest answer about what bloodwork actually shows.
+
+## The Source
+- Michael Holick, foundational vitamin D research (Boston University Medical Center) — the most cited vitamin D researcher of the modern era
+- Endocrine Society Clinical Practice Guideline on Vitamin D Deficiency (Holick et al., 2011)
+- Vieth, Heaney, et al., higher-dose vitamin D supplementation research
+- Maki et al., vitamin D + K2 cardiovascular safety research
+- Hollis and Wagner, vitamin D in pregnancy research
+- Aspire OS 4F framework — vitamin D as the supplementation arm of the SUN pillar, particularly for northern latitude residents (Waterloo, ON is 43°N — UVB-deficient for ~5 months per year)
+
+## The Principle
+
+Vitamin D is not actually a vitamin. It is a steroid hormone the body produces when sunlight hits the skin, then activates through the liver and kidney into its functional form. Calling it a "vitamin" is a historical accident from when researchers thought it was strictly a dietary nutrient.
+
+The functional form — 1,25-dihydroxyvitamin D3 — acts as a hormone in essentially every tissue in the body. There are vitamin D receptors in bone, muscle, brain, immune cells, gut, prostate, breast tissue, and many others. Deficiency does not produce one symptom; it produces a slow degradation of dozens of downstream systems.
+
+The Aspire OS position on vitamin D is direct:
+
+1. **Most adults in the developed world are deficient or insufficient** — particularly above ~37°N latitude, particularly in winter, particularly people with darker skin.
+2. **The "normal" lab range is not the optimal range.** A 25-hydroxyvitamin D level of 25 ng/mL will be flagged as "normal" by most labs. The Aspire OS optimal is 40–60 ng/mL.
+3. **Supplementation is necessary** in northern latitudes from roughly October through March — sun cannot synthesize D in those months at those latitudes regardless of how much time is spent outside.
+4. **Test blood, don't guess.** A 25-hydroxyvitamin D test is one of the highest-value annual labs available — cheap, informative, actionable.
+
+This is one of the very few areas where the protocol routes users to supplementation rather than lifestyle change first — because the lifestyle change (more sun) cannot fix the problem during the months it matters most.
+
+## The Biology
+
+### How the Body Makes Vitamin D
+
+The synthesis pathway:
+
+1. **UVB radiation** (290–315 nm wavelength) hits skin
+2. **7-dehydrocholesterol** in the skin converts to **previtamin D3**
+3. Body heat isomerizes previtamin D3 to **vitamin D3 (cholecalciferol)**
+4. D3 travels to the liver, where it is converted to **25-hydroxyvitamin D (25-OH-D)** — the storage form measured in bloodwork
+5. The kidney converts 25-OH-D to **1,25-dihydroxyvitamin D (calcitriol)** — the active hormone — as needed
+
+Each step can become a bottleneck. People with kidney or liver disease may have adequate 25-OH-D but inadequate active form. Most adults, however, are bottlenecked at step 1–3: insufficient skin exposure to UVB.
+
+### The Geographic Problem
+
+UVB radiation reaches the skin only when the sun is above ~50° in the sky. Below that angle, UVB is filtered out by atmospheric thickness. This means:
+
+- **In Toronto/Waterloo (43°N):** No meaningful vitamin D synthesis from approximately mid-October through mid-March. Even at noon. Even on a sunny day. The angle is simply too low.
+- **In Vancouver (49°N):** Even longer deficient window — early September through April.
+- **In Miami (25°N):** Year-round synthesis possible.
+- **In Reykjavik (64°N):** Roughly 4 months of viable synthesis per year.
+
+This is non-negotiable physics. No amount of outdoor time in January at 43°N produces vitamin D. Bundled-up outdoor exposure produces zero synthesis regardless of latitude — skin must be exposed to direct UVB.
+
+Even in summer at viable latitudes, additional factors block synthesis:
+- **Sunscreen** (SPF 30 blocks ~95% of UVB)
+- **Window glass** (filters out UVB entirely)
+- **Darker skin tones** (require longer exposure for equivalent synthesis)
+- **Older age** (skin produces ~25% as much vitamin D at 70 as at 20)
+- **Excess body fat** (sequesters vitamin D, reducing serum levels)
+
+### The Bloodwork: 25-Hydroxyvitamin D
+
+The single most informative test is **serum 25-hydroxyvitamin D**, often labeled "25-OH-D" or "Vitamin D, 25-hydroxy."
+
+Interpretation ranges (where the brand takes a position):
+
+| Range (ng/mL) | Standard interpretation | Aspire OS interpretation |
+|---|---|---|
+| <20 | Deficient | Deficient — clinical risk |
+| 20–30 | Insufficient | Suboptimal — supplement aggressively |
+| 30–40 | Normal | Still suboptimal — supplement |
+| **40–60** | High-normal | **Optimal target range** |
+| 60–80 | High | Acceptable; monitor |
+| 80–100 | Very high | Reduce dose |
+| >100 | Toxicity risk | Stop supplementation; investigate |
+
+The 40–60 ng/mL target is what most longevity-focused researchers (Holick, Attia, others) recommend based on outcome data — not the 30 ng/mL "normal" floor most labs use, which is based on bone health alone and ignores immune, mood, and cardiovascular outcomes.
+
+Test annually at minimum. Test more frequently after starting or changing a supplementation protocol.
+
+### Supplementation: D3, K2, and Dosing
+
+**D3 (cholecalciferol) is the form to use.** D2 (ergocalciferol) is plant-derived, less bioavailable, and produces lower serum levels at equivalent doses. D3 is the form the human body synthesizes naturally.
+
+**Daily dosing for adults at ~43°N:**
+- **Maintenance (summer, with sun exposure):** 1,000–2,000 IU/day or skip on consistently sunny days
+- **Maintenance (winter, no sun synthesis):** 2,000–5,000 IU/day
+- **Correction (deficient, starting low):** 5,000 IU/day for 8–12 weeks, then retest
+- **Cap:** 10,000 IU/day for adults without medical supervision
+
+Take with fat (a meal containing fat) for absorption — vitamin D is fat-soluble.
+
+**Vitamin K2 co-supplementation.** Vitamin D increases calcium absorption from the gut. Vitamin K2 directs that calcium to bone and away from soft tissue (including arterial walls). Without K2, high-dose D supplementation may marginally increase arterial calcification risk in some populations. The conservative approach:
+
+- For supplementation up to ~2,000 IU/day: K2 co-supplementation is optional
+- For 2,000–5,000 IU/day: K2 (100–200 mcg MK-7 form) is recommended
+- For 5,000+ IU/day: K2 is non-negotiable
+
+K2 is found in fermented foods (natto especially) but in amounts difficult to reach through diet alone. MK-7 form has the longest half-life and is the standard supplement choice.
+
+### What Vitamin D Affects Beyond Bones
+
+The "vitamin D is for bones" framing is technically true but misses most of what the hormone does. Vitamin D receptors exist throughout the body. Documented effects of adequate vitamin D levels include:
+
+- **Immune function** — appropriate inflammatory response, reduced respiratory infection severity
+- **Mood regulation** — strong correlations with depression risk, particularly seasonal affective disorder
+- **Muscle function** — adequate D is required for proper muscle contraction and reduced fall risk in older adults
+- **Cardiovascular health** — associated with reduced cardiovascular event risk in observational studies
+- **Glucose regulation** — vitamin D receptors in pancreatic beta cells; deficiency associated with insulin resistance
+- **Cognitive function** — emerging research linking adequate D to reduced dementia risk
+- **Hormone production** — some testosterone and thyroid pathways involve vitamin D
+
+The Coach treats vitamin D as a system-wide hormone, not as a bone-specific nutrient.
+
+## The Application
+
+When responding to users, the Coach uses vitamin D knowledge in three ways:
+
+**1. Reframe "normal" lab results when they're suboptimal.**
+
+*"Your bloodwork came back at 28 ng/mL and the lab marked it as 'normal'? The lab range is set for bone health alone. The optimal range for immune, mood, and cardiovascular outcomes is 40–60 ng/mL. You're not deficient — you're suboptimal. That's not a clinical problem, but it's leaving function on the table. Supplement 3,000–5,000 IU daily for 8 weeks and retest."*
+
+**2. Anchor northern-latitude users to the supplementation reality.**
+
+*"You're in Toronto and trying to get vitamin D from winter sun? The physics doesn't allow it. UVB doesn't reach the skin when the sun is below 50° — that's October through March at your latitude. No amount of outdoor time in January synthesizes vitamin D. Supplementation isn't optional for half the year — it's the only mechanism available."*
+
+**3. Pair D with K2 for high-dose supplementation.**
+
+*"If you're going above 2,000 IU of D3 daily, pair it with 100–200 mcg of K2 (MK-7 form). D pulls calcium from the gut. K2 directs where it goes — into bone, not arteries. The two work as a system. Taking high-dose D alone for years without K2 is the worst-case version of the supplementation."*
+
+## Aspire Voice Anchor
+
+The Coach can quote or paraphrase:
+
+> "Vitamin D isn't a vitamin. It's a hormone the body makes when UVB hits skin. The bottleneck is geography — above 37° latitude, you can't synthesize D in winter at all. Most adults are suboptimal. Test 25-hydroxyvitamin D annually. Target 40–60 ng/mL, not the lab's 30+ minimum. Supplement D3 with K2 for any dose above 2,000 IU daily. Take with food. That's the protocol. The sun is the input from April to September; the bottle is the input from October to March. Both, alternating."
+
+## Related Pillars
+PRIMARY: SUN. Cross-references: Doc 33 (Sun Pillar Protocol — operational protocol), Doc 22 (Circadian Rhythm — sun has separate circadian function in addition to D synthesis), Doc 21 (Sleep Architecture — vitamin D adequacy correlates with sleep quality), Doc 25 (Protein Synthesis — D is required for proper muscle function, supports the SATIATE adaptation), Doc 23 (HRV — adequate D supports immune function which supports HRV stability).
+
+## Decision Triggers
+
+Pull from this document when a user:
+- Asks whether to supplement vitamin D
+- Asks how much vitamin D to take
+- Mentions a bloodwork result for 25-OH-D
+- Asks about K2 co-supplementation
+- Asks about D3 vs D2
+- Lives in a northern latitude and asks about winter
+- Asks why their doctor said their vitamin D was "fine" but they don't feel right
+- Asks about vitamin D and immune function, mood, or seasonal affective disorder
+- Asks about vitamin D and bone health
+- Asks about getting vitamin D from sun in summer (the sunscreen problem, etc.)
+- Mentions darker skin tone and vitamin D synthesis
+- Asks about an older parent's vitamin D status
+- Asks about vitamin D in pregnancy or for children
+- Asks about toxicity, overdose, or upper limits
+- Asks about specific brands of vitamin D supplements
+- Reports persistent low mood in winter despite other interventions
+- Asks how vitamin D fits into the SUN pillar
+- Asks why the protocol calls for supplementation rather than lifestyle change for this specific input

@@ -1,0 +1,129 @@
+# Sleep Architecture — The Biology
+
+## The Situation
+A user asks why sleep matters at the cellular level, why eight hours of "sleep" doesn't always feel restorative, why alcohol or late food disrupts recovery, what REM and Deep sleep actually do, or why they wake up feeling unrested despite tracking adequate sleep duration. The Coach pulls this document when the answer requires biological mechanism, not protocol prescription.
+
+## The Source
+- Matthew Walker, *Why We Sleep* (Penguin, 2017)
+- Maiken Nedergaard et al., glymphatic system research (Science, 2013; Nature Neuroscience, ongoing)
+- AASM (American Academy of Sleep Medicine) sleep staging standards
+- van Cauter et al., growth hormone and sleep architecture (JAMA, NEJM)
+- Stickgold and Walker, memory consolidation during REM (Nature Reviews Neuroscience)
+
+## The Principle
+
+Sleep is not unconsciousness. It is a structured biological process in which the body and brain perform specific tasks that they cannot perform during waking hours. Different sleep stages do different biological work. The total hours of sleep are the surface metric. The *architecture* — the sequence, ratio, and quality of stages — is the real metric.
+
+A person can sleep eight hours and remain sleep-deprived if their architecture is broken. Conversely, a person with seven hours of clean architecture can outperform a person with nine hours of fragmented sleep. The Coach defaults to architecture, not duration.
+
+## The Biology
+
+### The Sleep Cycle
+
+Adults cycle through three stages every ~90 minutes, repeating 4–6 times per night. A typical night looks like this:
+
+- **Cycle 1–2** (first half of night): Heavy in Deep sleep, light in REM
+- **Cycle 3–4** (middle of night): Balanced
+- **Cycle 5–6** (last hours of night): Heavy in REM, light in Deep
+
+This means truncating either end of sleep has asymmetric costs. Going to bed late cuts Deep sleep. Waking up early cuts REM. Both are bad, but for different reasons.
+
+### Light Sleep (N1, N2) — ~50% of total sleep
+
+Transitional state. Heart rate slows, body temperature drops, muscle activity decreases. Important as the bridge between wakefulness, Deep, and REM, but less critical for restoration than the other two stages. Sleep spindles (bursts of brain activity in N2) are involved in memory consolidation and may explain why some learning lock-in happens here.
+
+### Deep Sleep (N3, Slow-Wave Sleep) — 15–25% of total sleep
+
+The most physically restorative stage. Front-loaded — most Deep sleep occurs in the first half of the night.
+
+**What happens biologically during Deep sleep:**
+
+- **Growth hormone release.** ~75% of daily growth hormone is released during Deep sleep. This drives tissue repair (including post-surgical and post-training), bone density, and immune function.
+- **Glymphatic clearance.** The brain has its own waste-clearance system — the glymphatic system — that becomes ~60% more active during Deep sleep. It clears metabolic byproducts including beta-amyloid (implicated in Alzheimer's disease) and tau proteins.
+- **Memory consolidation.** Declarative memory (facts, dates, conscious knowledge) is consolidated during Deep sleep. The hippocampus transfers learning to the cortex during these waves.
+- **Cortisol bottoms out.** The body's stress hormone is at its 24-hour low during Deep sleep, allowing the parasympathetic nervous system to dominate and the body to actually recover.
+
+**What disrupts Deep sleep:**
+
+- Alcohol — sedation is not Deep sleep. Alcohol suppresses Deep sleep by ~40% and creates fragmented architecture.
+- Late food — keeps core body temperature elevated; the 1°C drop needed for Deep onset can't happen.
+- Warm bedroom — same mechanism.
+- Stress, late screens — sympathetic nervous system stays elevated, preventing the parasympathetic dominance Deep requires.
+
+### REM Sleep — 20–25% of total sleep
+
+The cognitively restorative stage. Back-loaded — most REM occurs in the last third of the night.
+
+**What happens biologically during REM:**
+
+- **Memory consolidation.** Procedural memory (skills, motor learning) and emotional memory are consolidated during REM. This is when "sleep on it" actually integrates.
+- **Emotional processing.** REM acts as a kind of overnight therapy. Emotional content from the day is reviewed and reprocessed with cortisol levels at their lowest, allowing integration without re-triggering the stress response.
+- **Creative integration.** The brain forms novel associations across distant concepts during REM. Most reports of waking with creative solutions trace back to REM activity.
+- **Brain temperature regulation.** The brain heats and cools during REM in patterns that may support neurogenesis.
+- **Body paralysis (atonia).** Skeletal muscles are paralyzed during REM (except diaphragm and eyes) to prevent acting out dreams.
+
+**What disrupts REM:**
+
+- Alcohol — suppresses REM more severely than Deep. Three drinks can eliminate the last 1–2 REM cycles entirely.
+- Cannabis — suppresses REM in a similar pattern.
+- Sleep deprivation — when sleep is shortened, REM is sacrificed first (because it's back-loaded).
+- Some medications (SSRIs, beta-blockers, etc.) — suppress REM by various mechanisms.
+
+### The Glymphatic System
+
+Discovered in 2012 (Nedergaard lab), the glymphatic system is the brain's waste-clearance pathway. Cerebrospinal fluid flows through the brain along channels, picking up metabolic waste and depositing it for elimination.
+
+Critical detail: glymphatic flow is ~60% more active during Deep sleep than during waking. This is the only window in which the brain efficiently clears its own waste. Chronic Deep sleep deficit allows waste — including beta-amyloid — to accumulate. This is a probable mechanism connecting chronic poor sleep to long-term neurodegeneration risk.
+
+### The Architecture-First Frame
+
+Most users are familiar with "get eight hours of sleep." The architecture frame asks better questions:
+
+- What percentage of your night is Deep sleep? (Target: 15–25%; below 15% is a problem)
+- What percentage is REM? (Target: 20–25%; below 18% is a problem)
+- Are you cycling through 4–6 complete cycles? (Truncated cycles = truncated REM)
+- Is your Deep front-loaded and your REM back-loaded? (If reversed, something is wrong with sleep timing)
+
+Modern wearables (Hume Band, WHOOP, Oura) provide approximate architecture data. The numbers are not laboratory-grade, but the trends are reliable.
+
+## The Application
+
+When responding to users, the Coach uses architecture knowledge in three ways:
+
+**1. Diagnose unrestored sleep by architecture, not hours.**
+
+*"You're sleeping eight hours but still tired? Two questions. What's your Deep percentage? What's your REM percentage? If Deep is under 15%, you're not getting growth hormone release or glymphatic clearance — that's the recovery you're missing. If REM is under 18%, you're not consolidating learning or processing emotion. Eight hours of bad architecture is worse than seven hours of good architecture."*
+
+**2. Explain specific disruptors at the mechanism level.**
+
+*"Alcohol doesn't 'help you sleep.' It sedates you, then suppresses REM by ~40% and fragments Deep. You wake up at 4 AM because the alcohol has metabolized and the rebound sympathetic activation kicks in. That's why two drinks tank your Whoop recovery score the next day."*
+
+**3. Connect sleep architecture to downstream pillars.**
+
+*"You're not getting results from training? Check your Deep sleep first. Growth hormone release during Deep is what makes the training adapt. No Deep, no adaptation. The training is fine — the recovery is broken."*
+
+## Aspire Voice Anchor
+
+The Coach can quote or paraphrase:
+
+> "Sleep is not unconsciousness. It's structured biological work. Deep sleep handles physical repair, growth hormone, and brain waste clearance. REM handles memory, emotion, and creative integration. The hours are the duration. The architecture is the recovery. If the architecture is broken, no amount of hours fixes it."
+
+## Related Pillars
+PRIMARY: SLEEP. Cross-references: Doc 32 (Sleep Pillar Protocol — what to do about it), Doc 22 (Circadian Rhythm — timing context), Doc 23 (HRV — autonomic state that determines Deep entry), Doc 25 (Protein Synthesis — recovery work that depends on Deep sleep growth hormone).
+
+## Decision Triggers
+
+Pull from this document when a user:
+- Asks why sleep matters at the biological level
+- Asks about REM sleep, Deep sleep, or sleep stages
+- Reports adequate sleep duration but feels unrested
+- Asks how alcohol, cannabis, or specific substances affect sleep
+- Asks about the glymphatic system, beta-amyloid, or brain waste clearance
+- Mentions Alzheimer's risk, neurodegeneration, or cognitive decline
+- Asks about growth hormone, recovery, or tissue repair
+- Asks about memory consolidation or learning during sleep
+- Mentions dreams, dream recall, or REM behavior issues
+- Reports waking at 3–4 AM and being unable to return to sleep (sympathetic rebound from alcohol or other causes)
+- Asks why their wearable shows specific patterns
+- Wants the mechanism behind the protocol recommendations
+- Reports that training adaptations aren't happening — diagnose Deep first

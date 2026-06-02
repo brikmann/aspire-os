@@ -1,0 +1,129 @@
+# BJ Fogg — Tiny Habits
+
+## The Situation
+A user wants to install a new habit but motivation is unreliable, the protocol feels overwhelming, or previous habit attempts have failed because they scaled too aggressively. Or a user understands the cue-routine-reward loop (Doc 18) and the if-then format (Doc 16) but still can't get behaviors to stick — because the *behavior* they're asking themselves to do is too large. The Coach pulls this document when the user needs the most aggressive scaling-down framework available: the principle that the behavior should be so small that it cannot fail, and the emotional-reinforcement mechanism that locks in the small behavior so it can grow.
+
+## The Source
+- BJ Fogg, *Tiny Habits: The Small Changes That Change Everything* (Houghton Mifflin Harcourt, 2019) — the popular synthesis of two decades of Fogg's research
+- Stanford Behavior Design Lab — Fogg's longtime academic home (founded 1998), where the Fogg Behavior Model was developed
+- Fogg, "A Behavior Model for Persuasive Design" (CHI conference, 2009) — the foundational academic paper on B=MAP
+- Aspire OS positioning — Fogg is the framework the Coach pulls when the issue is *scale*, not *cue specification* or *identity*. Where Clear (Doc 15) gives the architecture, Gollwitzer (Doc 16) gives the cue specification, and Duhigg (Doc 18) gives the underlying loop, Fogg gives the dose. The Aspire OS contribution is integrating all four with the philosophical layer (Docs 11–14) and the brand voice (Doc 38).
+
+## The Principle
+
+Fogg's Behavior Model expresses the determinants of any behavior as a simple multiplicative equation:
+
+> **B = MAP**
+> **Behavior = Motivation × Ability × Prompt**
+
+A behavior happens when motivation, ability, and a prompt converge at sufficient levels at the same moment. Remove any one and the behavior does not occur. Multiply two and the third can be very small. The equation is not metaphor — it is the operational decomposition that Fogg uses to diagnose every failed habit.
+
+Most habit-change attempts fail at the *Ability* axis. The user has motivation. The prompt arrives. But the behavior they're asking themselves to do is too large for the moment — too tiring, too long, too cognitively expensive — and motivation is insufficient to bridge the ability gap. The behavior doesn't happen, the user labels themselves "undisciplined," and the habit-change attempt collapses.
+
+Fogg's response is the most aggressive scaling-down framework in the behavior science literature: **shrink the behavior until it cannot fail.** Not "make it small." Not "start with the easy version." *Shrink it until the behavior is so small that any moment of motivation, however weak, combined with any prompt, however quiet, will produce the behavior.*
+
+The deeper insight is that *consistency builds identity, and identity scales the behavior.* A user who flosses one tooth every night for a year becomes "a person who flosses." Once that identity locks, scaling to flossing all teeth happens almost automatically. The user who tried to floss all teeth from day one quit within a week because the dose was too large for the early motivation level to sustain.
+
+This is one of the few habit-change frameworks honest enough to admit that motivation is *unreliable*, that willpower is *finite*, and that the only durable solution is to engineer the behavior so small that neither is required.
+
+## The Behavioral Lens
+
+### The B=MAP Equation
+
+**Motivation.** How much the user wants to do the behavior in the specific moment. Motivation fluctuates wildly — by time of day, sleep status, glucose state, emotional context, social environment. Designing a habit *around* motivation is designing on quicksand. The implication: assume motivation is low and design for that case.
+
+**Ability.** How easy the behavior is to perform in the specific moment. Ability is a function of time required, physical effort, cognitive effort, social acceptability, financial cost, and routine disruption. Of these six factors, the most impactful for habit formation is time — behaviors under 30 seconds require almost no ability to execute and survive even low-motivation moments.
+
+**Prompt.** The trigger that initiates the behavior. Without a prompt, no behavior occurs regardless of motivation or ability. Prompts can be:
+- External (alarm, notification, sticky note)
+- Action prompts (after I do X, I do Y — Doc 18's habit stacking)
+- Internal prompts (emotional state, time of day)
+
+The most reliable prompt category is *action prompts* — anchoring new behaviors to existing automatic behaviors. The morning walk anchored to waking up. The protein anchored to the end of the morning walk. The deep work anchored to finishing breakfast. The cue is already automatic; the new behavior inherits the automation.
+
+### The Anchor-Behavior-Celebration Method
+
+Fogg's operational formula for installing a new habit:
+
+> **After I [existing anchor habit], I will [tiny new behavior]. Then I will celebrate.**
+
+The three components:
+
+**1. The Anchor.** An existing, reliable behavior the user already does automatically. Brushing teeth. Sitting down at the desk. Closing the laptop. Walking through the front door. The anchor must be specific (not "in the morning" — "right after I take my first sip of coffee").
+
+**2. The Behavior.** The new behavior, *scaled aggressively small.* Not "do 20 pushups" — "do 2 pushups." Not "meditate for 10 minutes" — "take 3 slow breaths." Not "write for an hour" — "open the document and write one sentence." The behavior should be so small that on a worst-case-motivation day, it still happens.
+
+**3. The Celebration.** This is Fogg's most distinctive contribution and the part missing from Clear, Duhigg, and most other habit frameworks. Immediately after performing the tiny behavior, the user produces a deliberate positive emotion — a fist pump, an internal "yes!", a brief smile, a "good job" out loud. The celebration triggers a small dopamine release, which is what the brain encodes as the reward in the cue-routine-reward loop.
+
+The behavior is small. The emotion is real. The combination installs the habit faster than either alone. Fogg's research suggests celebration is the *single most underused* component in habit change because most users feel ridiculous doing it and skip the step that does the actual neurological work.
+
+### The Three Levers When Motivation Is Low
+
+When a habit isn't sticking, the B=MAP equation gives three diagnostic levers, in order of efficacy:
+
+**1. Reduce the Ability requirement (shrink the behavior).** This is almost always the right first move. Most failed habits are too large for the user's reliable motivation floor. Shrink the behavior until the floor is irrelevant.
+
+**2. Find a better Prompt.** If the prompt is unreliable (vague timing, weak cue, no anchor habit), the behavior won't trigger regardless of motivation or ability. Anchor the prompt to a reliable existing habit.
+
+**3. Increase Motivation.** This is the lever most users reach for *first* and it is the least durable. Motivation can be temporarily boosted (vision boards, accountability, dramatic stakes) but it will regress. Designing around motivation is the strategy of last resort.
+
+The Coach defaults to Lever 1 (shrink the behavior) whenever a user reports a habit failing. Lever 2 if shrinking doesn't help. Lever 3 only when both have been exhausted.
+
+### The Identity Tail
+
+Fogg argues — paralleling Doc 15 (Clear) and Doc 37 (The "I Aspire" Thesis) — that the deepest payoff of tiny habits is not the behavior itself but the identity shift that follows from consistent execution. A user who does 2 pushups daily for 90 days is not "doing 2 pushups." They are *becoming a person who exercises every day.* The behavior is small; the identity is large.
+
+Once the identity locks, the behavior naturally expands. The 2-pushup user starts doing 5, then 10, then a full workout — not because they decided to push harder, but because the identity now wants behaviors consistent with it.
+
+This is the Aspire OS protocol's deepest mechanism for sustained change. The 4Foundations aren't installed by force. They're installed by becoming a person who does them.
+
+## The Application
+
+When responding to users, the Coach uses Fogg's framework in three ways:
+
+**1. Shrink the behavior aggressively when motivation reports are unreliable.**
+
+*"You said you'd start morning protein last week and it didn't stick. Run the diagnostic: was it Ability, Prompt, or Motivation? Almost certainly Ability — 30 grams of protein cooked from scratch is a big ask on a low-motivation Monday morning. Shrink it. New version: after you finish your morning walk, eat one hard-boiled egg you prepped Sunday night. That's it. One egg. The behavior is impossible to fail. After 30 days of one egg, you become a person who eats protein in the morning — and from that identity, scaling to a full meal is almost automatic. Stop trying to install the full version. Install the tiny version first."*
+
+**2. Use the Anchor-Behavior-Celebration format when a user is starting a new habit.**
+
+*"You want to start the deep work habit. Format it Fogg's way:*
+
+*Anchor — after you finish your morning walk and breakfast.*
+
+*Behavior — sit at your desk and open the document. That's the tiny version. Not 'write for 90 minutes' — just open the document. The block extends if it does; if it doesn't, opening the document still counts.*
+
+*Celebration — when the document is open and you're seated, take one deliberate breath and say 'good' out loud. Yes, really. The brain encodes this as the reward in the loop. Without the celebration, the loop installs more slowly."*
+
+**3. Defend the celebration step against user resistance.**
+
+*"You think the celebration step is silly? Most users do. Skip it and the habit installs over 4-6 weeks. Include it and the habit installs in 2-3 weeks. The brain doesn't care if you feel silly. It cares whether a dopamine signal arrives at the end of the loop. The celebration produces the dopamine signal. Fogg's research on this is unambiguous — it is the most-skipped step in habit change and the one with the largest underused impact. Feel silly. Do it anyway."*
+
+## Aspire Voice Anchor
+
+The Coach can quote or paraphrase:
+
+> "Behavior happens when motivation, ability, and prompt converge. Motivation is unreliable — by hour, by sleep, by mood. The only durable solution is to design behaviors so small that motivation doesn't need to be high. Shrink the behavior until it cannot fail. Anchor it to an existing habit. Celebrate it immediately. The behavior is tiny. The identity it builds is not. After 90 days of one egg, you become a person who eats protein in the morning. From that identity, the full meal scales on its own. This is how the 4Foundations install — not by force, but by becoming someone for whom the Foundations are obvious."
+
+## Related Pillars
+META — applies across all four Foundation pillars. Cross-references: Doc 15 (Clear / Atomic Habits — the 2-Minute Rule is Clear's popularized version of Fogg's tiny-behavior principle), Doc 16 (Gollwitzer / Implementation Intentions — the academic specification of the Anchor → Behavior structure), Doc 18 (Duhigg / Habit Loop — the underlying cue-routine-reward mechanism; celebration produces the reward Duhigg's loop requires), Doc 37 (The "I Aspire" Thesis — the identity payoff that tiny habits compound into), Doc 13 (Frankl / Stimulus and Response — the celebration step is engineered emotional reinforcement that closes the loop deliberately), Doc 33–35 (Sun, Satiate, Serenity Pillar Protocols — the MED sections of each pillar doc are Fogg's "shrink the behavior" principle applied to the 4Foundations).
+
+## Decision Triggers
+
+Pull from this document when a user:
+- Reports motivation is unreliable or fluctuates wildly
+- Says they "can't stick to" a habit despite multiple attempts
+- Asks about BJ Fogg, *Tiny Habits*, or behavior design
+- Mentions the B=MAP equation, Fogg Behavior Model, or Stanford Behavior Design Lab
+- Reports a habit failing and wants to diagnose why
+- Asks the Coach to help them install a new habit
+- Feels overwhelmed by the scope of the protocol and asks where to start (route to MED + Fogg shrinking)
+- Asks the difference between Fogg, Clear, Duhigg, and Gollwitzer
+- Mentions tiny habits, micro-habits, or "start small"
+- Asks about anchoring or habit stacking specifically
+- Asks the Coach about the celebration step or emotional reinforcement
+- Reports skipping the celebration because it feels silly (defend it explicitly)
+- Asks why motivation isn't enough for behavior change
+- Wants the most aggressive scaling-down framework available
+- Has tried Clear's Atomic Habits framework and still struggles — diagnose at the ability axis
+- Asks the Coach to walk them through diagnosing a stalled habit using B=MAP

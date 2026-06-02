@@ -1,0 +1,148 @@
+# The SUN Pillar Protocol
+
+## The Situation
+A user is installing the second Foundation, asking about circadian rhythm, struggling with morning energy or evening sleep onset, asking about Vitamin D, dealing with winter / shift work / jet lag, or reporting that Sleep is installed but still feeling "off."
+
+## The Source
+- Andrew Huberman, morning light and circadian protocols (Huberman Lab, ongoing)
+- Satchin Panda, *The Circadian Code* (Rodale, 2018)
+- Vitamin D research synthesis (Hollick, Holick et al., NEJM and Endocrine Reviews)
+- Cortisol Awakening Response literature (Clow et al.)
+- Aspire OS 4F framework, locked 2026-05-10
+
+## The Principle
+
+Sun is the master clock.
+
+Sleep installs first because it is the foundation. Sun installs second because it is the signal that times sleep. Without Sun, the circadian rhythm drifts — and a drifted circadian rhythm means sleep architecture cannot stabilize, regardless of how perfect the bedroom is.
+
+The body has a biological clock — the suprachiasmatic nucleus in the hypothalamus — that needs daily resetting. The reset signal is light, and the dominant signal is morning sunlight. Not "outside time." Not "daylight." *Morning* sunlight, hitting the eye directly, within the first hour of waking.
+
+Most people treat sun as optional. The biology treats it as required. A user with installed Sleep but no Sun will report better sleep on Day 7 and worse sleep on Day 21 — because the circadian rhythm has drifted, and the architecture starts unraveling.
+
+The other half of the Sun pillar is Vitamin D and the broader benefits of being outside — mood, BDNF release, vagal tone, walking. But the *primary* function of Sun is the circadian anchor. Everything else is bonus.
+
+## The Biology
+
+### The Master Clock and the Cortisol Awakening Response
+
+The suprachiasmatic nucleus runs on a roughly 24-hour cycle but drifts without external cues. The strongest cue is photic input — light hitting specialized cells in the retina (melanopsin-containing ipRGCs) that signal "this is morning" or "this is night" to the rest of the system.
+
+When morning light hits the eye:
+- Cortisol Awakening Response is triggered — cortisol spikes 50-160% in the first 30-45 minutes, then declines through the day
+- Melatonin production is suppressed
+- Body temperature begins to rise
+- Alertness and motor function come online
+
+This sets a 16-hour countdown clock. Melatonin will start rising again 14-16 hours after that morning light exposure. Skip the morning signal, and melatonin onset gets delayed, pushing sleep onset later, fragmenting architecture.
+
+### Light Intensity Matters
+
+Indoor light: 100-500 lux. Office: 300-500 lux. Cloudy day outside: 1,000-10,000 lux. Direct sunlight: 50,000-100,000 lux.
+
+The biological signal requires *outdoor* light intensity. Sitting by a window does not produce the same effect — window glass attenuates the spectrum and the intensity drops sharply. The exposure must happen *outside*, eye-level, looking toward (not directly at) the sun.
+
+### Vitamin D Synthesis
+
+Separate biology from the circadian function. UVB radiation hits the skin and converts 7-dehydrocholesterol to Vitamin D3. This requires:
+- UVB exposure (not blocked by glass)
+- Sufficient sun angle (varies by latitude and season)
+- Adequate skin exposure (arms, face, legs)
+
+In Canada's latitude (Waterloo, Toronto), UVB is functionally unavailable from late October through mid-March. Vitamin D supplementation is necessary during these months. 2,000-5,000 IU daily is the standard range; check 25-hydroxyvitamin D bloodwork annually.
+
+### Why Sunglasses Block the Signal
+
+Polarized or dark sunglasses block the photic signal to the ipRGCs. Morning sun exposure with sunglasses is largely wasted for circadian purposes. The first 10 minutes of morning light should be sunglass-free.
+
+### Evening Light
+
+The inverse rule applies at night. Bright light after sunset suppresses melatonin and shifts the circadian rhythm later. The protocol calls for dim, warm light in the 2-3 hours before bed. Overhead lighting at 5 PM is fine; overhead lighting at 10 PM is a circadian disruptor.
+
+## The Protocol
+
+### Layer 1: Environment
+
+- **Morning access:** A door, balcony, or yard that lets you step directly outside within 20 minutes of waking. If you live somewhere without easy outdoor access, a window that opens directly to the sky (not facing a wall) is the workaround.
+- **Sunglass discipline:** Sunglasses off for the first 10 minutes of morning exposure. After that, wear them as needed.
+- **Evening lighting:** Replace overhead lights with warm, low-color-temperature lamps after 8 PM. Smart bulbs with warm presets help. Candlelight is the ideal.
+- **Winter equipment (Oct–Mar in northern latitudes):** 10,000 lux light therapy box. 20-30 minutes within an hour of waking. Used on overcast days or before sunrise.
+
+### Layer 2: Timing
+
+- **Morning sun:** 10-20 minutes of outdoor light within 20 minutes of waking. Sunglass-free for at least the first 10 minutes.
+- **Midday sun:** 10-15 minutes of additional outdoor exposure between 11 AM and 2 PM if possible. Reinforces the circadian anchor and provides peak UVB for Vitamin D.
+- **Evening dim:** Bright overhead lights off by 8 PM. Lamp-only light from 8 PM to bedtime.
+- **Total daily outdoor time:** 30-60 minutes minimum. More is better up to a point.
+
+### Layer 3: Behaviors
+
+- **Walk + sun stack:** Combine morning sun with a 10-minute walk. Solves two pillars at once — circadian anchoring (Sun) and morning movement (Satiate, the next pillar). Aspire OS calls this the most efficient single Foundation behavior in the entire protocol.
+- **No phone during the first 20 minutes outside:** The dopamine reward loop of scrolling overrides the calm cortisol curve that morning sun creates. The morning sun walk is phone-free.
+- **Vitamin D supplementation (winter):** 2,000-5,000 IU daily from October through March in northern latitudes. Take with fat for absorption.
+- **Sun on the skin (summer):** 10-30 minutes of skin exposure (face, arms, legs) without sunscreen for Vitamin D synthesis, then sunscreen if staying out longer.
+
+## The Minimum Effective Dose
+
+For users who can only do three things, the MED is:
+
+1. **10 minutes of outdoor morning light, sunglass-free, within 20 minutes of waking.**
+2. **Vitamin D 3,000 IU daily, October through March.**
+3. **Overhead lights off by 9 PM.**
+
+That installs ~70% of the Sun benefit. Walking, midday exposure, and skin synthesis are refinements on top.
+
+## The Application
+
+When responding to users, the Coach grounds every Sun recommendation in three rules:
+
+**1. Sun is the circadian anchor — frame it that way, not as "Vitamin D."**
+
+**Wrong:** "Get more sun for Vitamin D."
+**Right:** "Sun isn't primarily about Vitamin D. The main job is the master clock. 10 minutes outside in the morning sets the cortisol curve that determines whether you fall asleep on time tonight. The Vitamin D is secondary."
+
+**2. When users report Sleep is "installed" but still feeling off, default to Sun.**
+
+**Wrong:** "Maybe try a sleep supplement."
+**Right:** "If Sleep is in place but architecture is unstable, the next layer is Sun. The circadian anchor times your sleep. How much morning outdoor light are you getting in the first hour after waking?"
+
+**3. Walking outside in the morning is the highest-leverage Foundation behavior — recommend it constantly.**
+
+**Wrong:** "You should walk more for cardio."
+**Right:** "The morning walk solves three things at once. Sun (circadian). Movement (mitochondrial). Serenity (phone-free deliberate time). It's the most efficient single thing in the protocol. Ten minutes, outdoor, before work."
+
+## Adapting for Older Users (Voice Rule 6)
+
+**For younger users (25–45):**
+*"Morning light hits the ipRGCs, triggers the Cortisol Awakening Response, and sets the melatonin curve 16 hours out. Skip it and the architecture starts drifting by week 3."*
+
+**For older users (50+) or post-surgical:**
+*"Walking outside in the morning sun is the cheapest, most effective thing you can do for your sleep, your mood, and the bones around your hip. Ten minutes, every day, before you sit down for the day. That's it."*
+
+Same protocol. Different language. Same outcome.
+
+## Aspire Voice Anchor
+
+The Coach can quote or paraphrase:
+
+> "Sun is the master clock. Ten minutes of outdoor morning light within 20 minutes of waking. Sunglass-free for the first ten. That single behavior anchors your sleep tonight, your mood today, and your circadian rhythm for the next month. The most underrated Foundation in the protocol."
+
+## Related Pillars
+PRIMARY: SUN. Upstream: SLEEP (Sun anchors the architecture Sleep depends on). Downstream: SATIATE (the morning walk stacks Sun + movement) and SERENITY (phone-free morning exposure is also Serenity training). The morning walk is the single most cross-pillar behavior in the entire 4F system.
+
+## Decision Triggers
+
+Pull from this document when a user:
+- Asks about morning light, morning routines, or circadian rhythm
+- Reports Sleep is installed but still feeling tired or off
+- Asks about Vitamin D, sunlight, or skin exposure
+- Mentions winter blues, seasonal affective patterns, or low energy in dark months
+- Asks about sunglasses, blue light blockers, or light therapy boxes
+- Mentions shift work, jet lag, or travel disruption
+- Asks about walking, outdoor time, or movement
+- Lives in northern latitudes (above ~40°N) and asks about supplementation
+- Reports melatonin onset issues — can't fall asleep at the right time
+- Asks why morning energy is low despite "enough" sleep
+- Mentions HRV variability that doesn't correlate with bedtime
+- Asks about the relationship between Sleep and Sun
+- Asks about the most efficient single Foundation behavior — answer is the morning walk

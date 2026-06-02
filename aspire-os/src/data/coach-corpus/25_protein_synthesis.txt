@@ -1,0 +1,172 @@
+# Protein Synthesis — The Biology
+
+## The Situation
+A user asks why protein matters so much in the protocol, what "30g per meal" is based on, why morning protein is treated as non-negotiable, what happens to muscle as people age, how much protein is actually needed, or why whey vs plant proteins matter. The Coach pulls this document when a user needs the mechanism behind the SATIATE protein protocol — the *why* of the savory start, the morning anchor, and the 0.8–1.0g per pound bodyweight target.
+
+## The Source
+- Stuart Phillips (McMaster University), the foundational body of work on muscle protein synthesis (MPS), protein distribution, and the leucine threshold
+- Layne Norton, applied protein and resistance training research
+- Robert Wolfe et al., protein timing and metabolic flexibility research
+- ISSN Position Stand on Protein and Exercise (Jäger et al., 2017)
+- WHO and Health Canada Dietary Reference Intakes (the official targets — which Aspire OS considers inadequate for active adults)
+- Aspire OS 4F framework — protein is the central biological mechanism of the SATIATE pillar's nutritional protocol
+
+## The Principle
+
+Muscle is not just for aesthetics. Muscle is the largest endocrine organ in the body, the primary site of glucose disposal, the reservoir of amino acids the body draws on during illness or injury, and one of the strongest correlates of healthspan after age 40. Maintaining muscle is metabolic, immunological, and longevity work — not vanity work.
+
+The body is constantly breaking down and rebuilding muscle protein. The balance between breakdown (proteolysis) and synthesis (MPS) determines whether you gain, maintain, or lose muscle over time. After roughly age 30, the default balance tips slightly toward breakdown — slowly, then accelerating after 60. This is sarcopenia, and it is the single biggest threat to healthspan that most adults underestimate.
+
+The Aspire OS view of protein is unambiguous: protein is non-negotiable while carbs and fats are conditional. The body needs adequate carbs and fats, but it has flexibility in how it sources them. The body has no flexibility on protein — without sufficient daily intake distributed across meals, muscle protein synthesis cannot occur at the rate required to maintain lean mass.
+
+## The Biology
+
+### What Muscle Protein Synthesis Is
+
+Muscle protein synthesis is the process by which the body builds new muscle tissue from amino acids. It is triggered by three primary signals:
+
+1. **Sufficient amino acid availability** in the bloodstream — especially the essential amino acids, and specifically leucine
+2. **Mechanical loading** of muscle tissue (resistance training)
+3. **Anabolic hormone signaling** — testosterone, growth hormone, IGF-1, insulin
+
+When all three signals are present, MPS runs at high rates. When any one is missing or insufficient, MPS is suppressed.
+
+The opposite process — proteolysis (muscle breakdown) — is ongoing and constant. Muscle is in a constant state of remodeling. The question is not whether you're breaking down muscle today (you are), but whether your synthesis rate matches or exceeds your breakdown rate.
+
+### The Leucine Threshold
+
+Leucine is one of the nine essential amino acids and the single most important trigger for MPS. It activates the mTOR pathway, which signals the cell to begin protein synthesis.
+
+But leucine has a threshold effect: below ~2.5–3 grams of leucine in a single meal, MPS is not maximally triggered. Above that threshold, the response is strong. This is why **distribution matters as much as total intake.**
+
+A person eating 100g of protein per day in a single large dinner meal will have only one MPS-triggering event in 24 hours. A person eating the same 100g distributed across 3–4 meals will have 3–4 MPS-triggering events. Same total. Different outcomes.
+
+The leucine threshold of 2.5–3g requires roughly:
+
+- 25–30g of whey protein
+- 30–40g of animal protein (chicken, beef, fish, eggs)
+- 40–50g of high-quality plant protein (soy, hemp, blended sources)
+
+This is the origin of the "30g per meal" rule that shows up in the SATIATE protocol. It is not arbitrary. It is the dose required to cross the leucine threshold.
+
+### Why Morning Protein Matters
+
+After ~10–12 hours of overnight fast, MPS rates are suppressed. Blood amino acid levels are low. The body has been in net catabolic state since dinner.
+
+Morning protein does three things:
+
+1. **Breaks the fasted state** and restores amino acid availability
+2. **Triggers the first MPS event of the day** — front-loading the anabolic signal
+3. **Stabilizes glucose response** for the entire morning (cross-reference Doc 24)
+
+This is why "savory start" is one of the highest-leverage SATIATE behaviors. A morning that begins with refined carbs (granola, oatmeal, toast, smoothie) keeps the body in suppressed-MPS state for hours longer and produces glucose volatility on top of it. A morning that begins with 30g of protein activates the system immediately.
+
+### Daily Protein Targets
+
+Government RDI guidelines (0.36g per pound bodyweight, or 0.8g/kg) are designed to prevent overt deficiency in sedentary adults. They are inadequate for active adults, anyone over 40, or anyone training for muscle preservation.
+
+The Aspire OS target, drawn from current research consensus:
+
+- **0.7–1.0g per pound of bodyweight per day** (1.6–2.2g/kg) for active adults
+- **Higher end of the range (0.9–1.0g)** for adults over 50, athletes, and those in muscle-building phases
+- **Distributed across 3–4 meals**, each crossing the leucine threshold
+- **Front-loaded toward morning** when possible
+
+For a 160-pound adult: ~120–160g per day, split into 30–40g meals.
+
+For most people new to tracking protein, this number feels enormous. It is double or triple what they're currently eating. This is the gap that explains why most adults are slowly losing muscle without realizing it.
+
+### Sarcopenia and the Aging Curve
+
+After age 30, adults lose ~3–8% of muscle mass per decade, accelerating after 60. By age 80, the average sedentary adult has lost 30–40% of their peak muscle mass. This is sarcopenia.
+
+Sarcopenia is not aesthetic. It is:
+
+- **The leading cause of falls and fractures** in older adults
+- **A primary driver of insulin resistance** (muscle is the main site of glucose disposal)
+- **Associated with cognitive decline** independently of other risk factors
+- **A predictor of mortality** stronger than most blood biomarkers
+
+Sarcopenia is largely preventable. The recipe is well-established:
+
+1. Adequate daily protein, distributed across meals
+2. Resistance training 2–3x per week
+3. Sufficient sleep for growth hormone release (cross-reference Doc 21)
+4. Avoiding the catabolic state that comes with chronic illness, undernutrition, or extreme dieting
+
+The window matters. Building muscle in your 20s and 30s is much easier than rebuilding it in your 60s. Maintaining it requires less effort than rebuilding it. This is the prevention thesis applied directly to muscle: do the work now while the cost is low, or pay 5–10x the cost later.
+
+### Protein Quality (DIAAS)
+
+Not all proteins are biologically equivalent. The Digestible Indispensable Amino Acid Score (DIAAS) measures how well a protein source provides all essential amino acids in the ratios the body needs.
+
+**Highest-quality protein sources (DIAAS > 1.0):**
+- Whey protein
+- Eggs (especially the whites)
+- Milk
+- Beef
+- Whey isolate
+
+**High-quality (DIAAS 0.9–1.0):**
+- Chicken, turkey
+- Fish
+- Pork
+- Greek yogurt
+- Soy protein (the only plant source in this tier)
+
+**Lower-quality (DIAAS 0.6–0.9):**
+- Most plant proteins (rice, pea, hemp, oats)
+- These are still useful, but require larger total intake to hit the leucine threshold
+
+For users on plant-based diets, the protocol still works — it requires more total grams and strategic blending (e.g., pea + rice protein blends, which have complementary amino acid profiles).
+
+### The Resistance Training Multiplier
+
+Adequate protein without resistance training produces only modest MPS gains. Resistance training without adequate protein produces only modest gains as well. Together, they multiply. The combination is what builds and maintains muscle.
+
+A single resistance training session sensitizes muscle to MPS for ~24–48 hours. During this window, protein meals trigger stronger MPS responses than they otherwise would. This is why **training 2–3 times per week** is more effective than one weekly session — the sensitization window stays open more days per week.
+
+## The Application
+
+When responding to users, the Coach uses protein knowledge in three ways:
+
+**1. Reframe protein from "for gym people" to "for adult biology."**
+
+*"Protein isn't a fitness thing. It's an adult biology thing. After 30, you lose muscle by default unless you actively eat and train to keep it. By 60, that loss is the primary driver of frailty, falls, insulin resistance, and cognitive decline. The 30g-per-meal target isn't for bodybuilding. It's for staying functional at 70."*
+
+**2. Diagnose insufficient protein as the upstream cause of plateaus.**
+
+*"You're training consistently but not seeing results? Check protein first. Most adults eat 0.4g per pound — half of what's needed for muscle to actually adapt to training. If you're under 0.7g per pound distributed across 3 meals, your body literally cannot synthesize muscle fast enough to match the breakdown. The training isn't broken. The fuel is."*
+
+**3. Use the leucine threshold to explain why distribution matters.**
+
+*"Eating 90g of protein at dinner and 10g at breakfast is not the same as eating 50g at each meal. The leucine threshold is a switch — you either trigger MPS or you don't. One huge meal triggers MPS once. Three moderate meals trigger MPS three times. Same total grams. Triple the muscle-building events."*
+
+## Aspire Voice Anchor
+
+The Coach can quote or paraphrase:
+
+> "Protein is the only non-negotiable input in the SATIATE pillar. Muscle is metabolic, immunological, and longevity infrastructure — not aesthetics. After 30 you lose it by default. The protocol: 0.8 grams per pound of bodyweight, daily, distributed across 3–4 meals that each cross the leucine threshold. Start with 30g in the first 60 minutes of the day. That's the most important meal you eat."
+
+## Related Pillars
+PRIMARY: SATIATE. Cross-references: Doc 34 (Satiate Pillar Protocol — what to do about it), Doc 24 (Glucose Regulation — protein blunts glucose spikes), Doc 21 (Sleep Architecture — Deep sleep growth hormone is required for MPS), Doc 26 (Zone 2 Cardio — the recovery pillar that complements resistance training), Doc 35 (Serenity — adequate protein supports neurotransmitter synthesis and cognitive output).
+
+## Decision Triggers
+
+Pull from this document when a user:
+- Asks how much protein they need
+- Asks why morning protein matters
+- Asks about the leucine threshold or what triggers muscle synthesis
+- Reports training without results — diagnose protein intake first
+- Asks about whey vs plant protein
+- Asks about protein timing — pre-workout, post-workout, before bed
+- Asks about sarcopenia or age-related muscle loss
+- Mentions a parent or older family member losing strength
+- Asks about protein for vegetarian or vegan diets
+- Asks why the protocol calls for protein at every meal, not just one big meal
+- Asks about creatine, BCAAs, or protein supplements
+- Reports feeling weak, tired, or "thin" despite eating enough calories
+- Asks about the relationship between protein, glucose, and insulin
+- Mentions frailty, falls, or strength decline in older adults
+- Asks about the relationship between protein and longevity
+- Compares the Aspire OS target to government RDI (the gap matters)

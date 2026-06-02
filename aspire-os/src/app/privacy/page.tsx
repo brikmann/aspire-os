@@ -24,7 +24,7 @@ export default function PrivacyPage() {
           Privacy Policy
         </h1>
         <p className="font-sans text-[14px] text-silver-dim mb-12">
-          Last updated May 30, 2026 (revised)
+          Last updated June 1, 2026 (revised)
         </p>
 
         <div className="space-y-10 font-sans text-[16px] leading-[1.75] text-silver">
@@ -73,6 +73,12 @@ export default function PrivacyPage() {
               and duration. We never read, list, or modify any other content in your Notion
               workspace. Notion tokens do not expire; you can revoke access at any time
               from the dashboard or from Notion&rsquo;s integration settings.
+            </p>
+            <p className="mt-4">
+              When you chat with 4F (the conversational coach within the Dashboard),
+              your messages and the protocol context are sent to Anthropic&rsquo;s Claude
+              API to generate responses. Conversations are not stored — they exist only in
+              your browser session and clear on page refresh.
             </p>
             <p className="mt-4">
               We set a single first-party session cookie (<code className="text-silver-bright text-[14px] bg-midnight-light px-1.5 py-0.5 rounded">cadence_session</code>)
