@@ -129,7 +129,7 @@ export default function FourFChat({ cadenceContext }: Props) {
   return (
     <div className="bg-midnight-light/30 rounded-2xl p-6 border border-midnight-edge">
 
-      <p className="text-xs font-medium uppercase tracking-[1.5px] text-cobalt-soft mb-1">ASK 4F</p>
+      <p className="text-xs font-medium uppercase tracking-[1.5px] text-cobalt-soft mb-1">ASK CADENCE</p>
       <p className="text-sm text-silver-muted mb-6 leading-relaxed">
         Conversational coach for sleep, sun, nutrition, stress. Has full context from today&apos;s Cadence.
       </p>
@@ -205,7 +205,7 @@ export default function FourFChat({ cadenceContext }: Props) {
           onChange={e => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           rows={1}
-          placeholder="Ask 4F anything about today's protocol…"
+          placeholder="Ask Cadence anything about today's protocol…"
           disabled={isLoading}
           className="flex-1 bg-midnight border border-midnight-edge text-silver-bright rounded-lg px-4 py-3 text-sm placeholder:text-silver-muted focus:outline-none focus:ring-2 focus:ring-cobalt focus:border-cobalt resize-none transition-colors disabled:opacity-50"
           style={{ maxHeight: '96px', overflowY: 'auto' }}
