@@ -25,6 +25,16 @@ html {
   --color-paper-edge:     #E5E9EF;
   --color-ink:            #1A2433;
   --color-ink-soft:       #4A5468;
+
+  /* Quantum tier — violet */
+  --color-quantum:        #8B5CF6;
+  --color-quantum-dark:   #7C3AED;
+  --color-quantum-soft:   #A78BFA;
+  --color-quantum-dim:    rgba(139, 92, 246, 0.12);
+
+  /* Semantic — error and success used only for inline feedback states */
+  --color-error:          #E5534B;
+  --color-success:        #2EA84B;
 }
 
 @theme inline {
@@ -38,5 +48,72 @@ html {
 }
 
 .animate-answer {
-  animation: answer-in 0.45s ease-out both;
+  animation: answer-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes typing-pulse {
+  0%, 60%, 100% { transform: scale(0.55); opacity: 0.35; }
+  30%            { transform: scale(1);    opacity: 1; }
+}
+
+.animate-typing-dot {
+  animation: typing-pulse 1.2s infinite ease-in-out;
+}
+
+@layer utilities {
+  .divider-gradient {
+    border-top: 1px solid transparent;
+    border-image: linear-gradient(to right, transparent, var(--color-midnight-edge) 50%, transparent) 1;
+  }
+}
+
+/* Hero ambient background */
+.hero-bg {
+  background:
+    radial-gradient(ellipse 110% 55% at 50% -5%, rgba(44, 107, 224, 0.18) 0%, transparent 65%),
+    radial-gradient(circle at 1px 1px, rgba(46, 59, 85, 0.45) 1px, transparent 0);
+  background-size: 100% 100%, 28px 28px;
+}
+
+/* Live badge pulse dot */
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.5); }
+  60%       { opacity: 0.85; transform: scale(0.9); box-shadow: 0 0 0 5px rgba(74, 222, 128, 0); }
+}
+.live-dot {
+  animation: live-pulse 2.2s ease-in-out infinite;
+}
+
+/* Gentle float for the product preview card */
+@keyframes card-float {
+  0%, 100% { transform: translateY(0px) rotate(-0.5deg); }
+  50%       { transform: translateY(-10px) rotate(0.5deg); }
+}
+.card-float {
+  animation: card-float 6s ease-in-out infinite;
+}
+
+/* CTA button shimmer sweep */
+@keyframes shimmer {
+  0%   { transform: translateX(-100%) skewX(-12deg); }
+  100% { transform: translateX(250%) skewX(-12deg); }
+}
+.btn-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+  transform: translateX(-100%) skewX(-12deg);
+  animation: shimmer 3s 1.5s ease-in-out infinite;
+}
+
+/* Step number glow */
+.step-glow {
+  text-shadow: 0 0 28px rgba(44, 107, 224, 0.6);
+}
+
+/* Cursor blink for CadenceDemo */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
 }

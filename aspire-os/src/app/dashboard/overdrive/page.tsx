@@ -8,17 +8,10 @@ import type { CadenceOutput } from '@/lib/cadence-schema';
 
 type ProtocolItem = CadenceOutput['protocol'][number];
 
-type CalEvent = {
-  start: string;
-  end: string;
-  summary: string;
-  duration_min: number;
-};
-
 type OverclockState =
   | { kind: 'idle' }
-  | { kind: 'generating'; window: string; items: ProtocolItem[] }
-  | { kind: 'complete'; window: string; cadence: CadenceOutput }
+  | { kind: 'generating'; items: ProtocolItem[] }
+  | { kind: 'complete'; cadence: CadenceOutput }
   | { kind: 'error'; message: string };
 
 // ── Streaming helpers ──────────────────────────────────────────────────────
@@ -80,6 +73,24 @@ function FlameIcon({ size = 32, className = '' }: { size?: number; className?: s
   );
 }
 
+function SpinnerIcon() {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      className="animate-spin"
+      aria-hidden="true"
+    >
+      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+    </svg>
+  );
+}
+
 function LayersIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -114,8 +125,6 @@ const INPUT_BASE =
   'w-full bg-midnight border border-midnight-edge text-silver-bright rounded-lg px-3 py-2.5 text-sm ' +
   'placeholder:text-silver-muted focus:outline-none focus:ring-2 focus:ring-cobalt focus:border-cobalt ' +
   'transition-colors';
-
-const LABEL_BASE = 'block text-xs font-medium text-silver-muted uppercase tracking-wide mb-1.5';
 
 const CATEGORY_EMOJI: Record<string, string> = {
   work: '💻', recovery: '🌱', meeting: '🗓', meal: '🍽', sleep: '😴',
@@ -202,33 +211,13 @@ function ComingSoonCard({
 
 export default function OverdrivePage() {
 
-  // ── Modal ────────────────────────────────────────────────────────────
-  const [modalOpen, setModalOpen]       = useState(false);
-  const [windowInput, setWindowInput]   = useState('');
-  const [selectedEvent, setSelectedEvent] = useState('');
-  const [calEvents, setCalEvents]       = useState<CalEvent[]>([]);
-  const [calLoading, setCalLoading]     = useState(false);
-
   // ── Overclock ────────────────────────────────────────────────────────
-  const [overclock, setOverclock]       = useState<OverclockState>({ kind: 'idle' });
-  const resultRef                       = useRef<HTMLDivElement>(null);
+  const [overclock, setOverclock] = useState<OverclockState>({ kind: 'idle' });
+  const resultRef = useRef<HTMLDivElement>(null);
 
   // ── Notify ───────────────────────────────────────────────────────────
   const [notifyEmail, setNotifyEmail]   = useState('');
   const [notifyStatus, setNotifyStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
-
-  // ── Fetch calendar events when modal opens ────────────────────────────
-  useEffect(() => {
-    if (!modalOpen) return;
-    setCalLoading(true);
-    fetch('/api/auth/google-calendar/data')
-      .then(r => r.json())
-      .then(json => {
-        if (json.connected && Array.isArray(json.events)) setCalEvents(json.events);
-      })
-      .catch(() => {})
-      .finally(() => setCalLoading(false));
-  }, [modalOpen]);
 
   // ── Scroll result into view on generation start ───────────────────────
   useEffect(() => {
@@ -237,21 +226,15 @@ export default function OverdrivePage() {
     }
   }, [overclock.kind]);
 
-  // ── Event dropdown handler ────────────────────────────────────────────
-  function handleEventSelect(val: string) {
-    setSelectedEvent(val);
-    if (val) setWindowInput(val);
-  }
-
-  // ── Streaming handler ─────────────────────────────────────────────────
-  const activateOverclock = useCallback(async (win: string) => {
-    setOverclock({ kind: 'generating', window: win, items: [] });
+  // ── Streaming ─────────────────────────────────────────────────────────
+  const activateOverclock = useCallback(async () => {
+    setOverclock({ kind: 'generating', items: [] });
 
     try {
       const res = await fetch('/api/cadence/overclock', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ window: win }),
+        body: JSON.stringify({ window: 'the full day' }),
       });
       if (!res.ok || !res.body) {
         throw new Error((await res.text().catch(() => '')) || 'Request failed');
@@ -269,7 +252,7 @@ export default function OverdrivePage() {
         if (!complete) {
           try {
             const parsed = JSON.parse(accumulated) as CadenceOutput;
-            setOverclock({ kind: 'complete', window: win, cadence: parsed });
+            setOverclock({ kind: 'complete', cadence: parsed });
             complete = true;
           } catch {
             const items = extractStreamingProtocol(accumulated);
@@ -285,7 +268,7 @@ export default function OverdrivePage() {
       if (!complete) {
         try {
           const parsed = JSON.parse(accumulated) as CadenceOutput;
-          setOverclock({ kind: 'complete', window: win, cadence: parsed });
+          setOverclock({ kind: 'complete', cadence: parsed });
         } catch {
           throw new Error('Response was not valid JSON — please retry.');
         }
@@ -298,18 +281,7 @@ export default function OverdrivePage() {
     }
   }, []);
 
-  // ── Modal submit ──────────────────────────────────────────────────────
-  function handleModalSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const win = windowInput.trim();
-    if (!win) return;
-    setModalOpen(false);
-    setWindowInput('');
-    setSelectedEvent('');
-    activateOverclock(win);
-  }
-
-  // ── Notify submit ──────────────────────────────────────────────────────
+  // ── Notify submit ─────────────────────────────────────────────────────
   async function handleNotify(e: React.FormEvent) {
     e.preventDefault();
     if (!notifyEmail.includes('@')) return;
@@ -333,11 +305,6 @@ export default function OverdrivePage() {
       : overclock.kind === 'generating'
         ? overclock.items
         : [];
-
-  const overclockWindow =
-    overclock.kind === 'generating' ? overclock.window
-    : overclock.kind === 'complete' ? overclock.window
-    : '';
 
   // ── Render ────────────────────────────────────────────────────────────
   return (
@@ -368,44 +335,38 @@ export default function OverdrivePage() {
         </header>
 
         {/* ── Overclock Mode ───────────────────────────────────────────── */}
-        <section className="border-t border-midnight-edge py-10 sm:py-14">
-          <p className="text-xs font-medium uppercase tracking-[1.5px] text-cobalt mb-4">
-            OVERCLOCK MODE
+        <section className="border-t border-midnight-edge py-8 sm:py-10">
+          <button
+            type="button"
+            onClick={activateOverclock}
+            disabled={overclock.kind === 'generating'}
+            className="w-full py-5 rounded-2xl bg-cobalt hover:bg-cobalt-dark disabled:opacity-60 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-3 group focus:outline-none focus:ring-2 focus:ring-cobalt focus:ring-offset-2 focus:ring-offset-midnight"
+          >
+            {overclock.kind === 'generating' ? (
+              <>
+                <SpinnerIcon />
+                <span className="text-[17px] font-medium text-white">Generating…</span>
+              </>
+            ) : (
+              <>
+                <FlameIcon size={22} className="text-white/80 group-hover:text-white transition-colors" />
+                <span className="text-[17px] font-medium text-white">Overclock My Day</span>
+              </>
+            )}
+          </button>
+          <p className="text-xs text-silver-dim text-center mt-3">
+            5 activations per month on Overdrive · 10 on Quantum
           </p>
-          <h2 className="font-serif text-2xl sm:text-[28px] font-normal text-silver-bright mb-10">
-            For days when output is non-negotiable.
-          </h2>
 
-          <div className="flex flex-col items-center gap-4">
-            <button
-              type="button"
-              onClick={() => setModalOpen(true)}
-              aria-label="Activate Overclock Mode"
-              className="w-[120px] h-[120px] rounded-full bg-midnight-light border-2 border-midnight-edge hover:border-cobalt/60 hover:bg-midnight-light flex items-center justify-center transition-all duration-200 group focus:outline-none focus:ring-2 focus:ring-cobalt focus:ring-offset-2 focus:ring-offset-midnight"
-            >
-              <FlameIcon
-                size={44}
-                className="text-cobalt group-hover:text-cobalt-soft transition-colors"
-              />
-            </button>
-            <p className="text-xs text-silver-dim text-center">
-              5 activations per month on Overdrive · 10 on Quantum
-            </p>
-          </div>
-
-          {/* ── Overclocked Cadence result ──────────────────────────── */}
+          {/* ── Result ───────────────────────────────────────────────── */}
           {overclock.kind !== 'idle' && (
-            <div ref={resultRef} className="mt-12">
-              <div className="flex items-center gap-2 mb-2">
-                <FlameIcon size={16} className="text-cobalt-soft" />
-                <p className="text-sm font-medium text-silver-bright">Overclocked Cadence</p>
-              </div>
-
-              {(overclock.kind === 'generating' || overclock.kind === 'complete') && (
-                <p className="text-[11px] font-medium uppercase tracking-[1.5px] text-cobalt-soft mb-5">
-                  OVERCLOCKED · {overclockWindow}
+            <div ref={resultRef} className="mt-10">
+              <div className="flex items-center gap-2 mb-5">
+                <FlameIcon size={15} className="text-cobalt-soft" />
+                <p className="text-[11px] font-medium uppercase tracking-[1.5px] text-cobalt-soft">
+                  OVERCLOCKED CADENCE
                 </p>
-              )}
+              </div>
 
               {overclock.kind === 'complete' && (
                 <div className="bg-midnight-light/40 rounded-xl p-4 border border-cobalt/20 mb-5 animate-answer">
@@ -532,92 +493,6 @@ export default function OverdrivePage() {
         </footer>
 
       </div>
-
-      {/* ── Overclock Modal ───────────────────────────────────────────────── */}
-      {modalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-midnight-deep/80 backdrop-blur-sm"
-          onClick={e => { if (e.target === e.currentTarget) setModalOpen(false); }}
-        >
-          <div className="bg-midnight-light w-full max-w-md rounded-2xl border border-midnight-edge p-6 shadow-2xl animate-answer">
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center gap-2">
-                <FlameIcon size={18} className="text-cobalt-soft" />
-                <h3 className="text-base font-medium text-silver-bright">
-                  What&apos;s the high-stakes window today?
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setModalOpen(false)}
-                aria-label="Close"
-                className="text-silver-dim hover:text-silver transition-colors"
-              >
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
-              </button>
-            </div>
-
-            <form onSubmit={handleModalSubmit} className="space-y-4">
-              {calLoading ? (
-                <div className="h-10 bg-midnight-edge/40 rounded-lg animate-pulse" />
-              ) : calEvents.length > 0 ? (
-                <div>
-                  <label className={LABEL_BASE}>Pick from today&apos;s calendar</label>
-                  <div className="relative">
-                    <select
-                      value={selectedEvent}
-                      onChange={e => handleEventSelect(e.target.value)}
-                      className={`${INPUT_BASE} appearance-none pr-8 cursor-pointer`}
-                    >
-                      <option value="">— Select an event —</option>
-                      {calEvents.map((ev, i) => (
-                        <option
-                          key={i}
-                          value={`${ev.summary} ${ev.start}–${ev.end}`}
-                        >
-                          {ev.summary} · {ev.start}–{ev.end}
-                        </option>
-                      ))}
-                    </select>
-                    <svg
-                      className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-silver-muted"
-                      width="14" height="14" viewBox="0 0 14 14" fill="none"
-                    >
-                      <path d="M3 5l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </div>
-                </div>
-              ) : null}
-
-              <div>
-                <label className={LABEL_BASE}>
-                  {calEvents.length > 0 ? 'Or describe it yourself' : 'Describe the window'}
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g., investor pitch 2–4pm"
-                  value={windowInput}
-                  onChange={e => setWindowInput(e.target.value)}
-                  required
-                  autoFocus={calEvents.length === 0}
-                  className={INPUT_BASE}
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={!windowInput.trim()}
-                className="w-full py-2.5 bg-cobalt text-white text-sm font-medium rounded-lg hover:bg-cobalt-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                <FlameIcon size={15} className="text-white/80" />
-                Activate Overclock
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
     </main>
   );
 }

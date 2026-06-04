@@ -33,6 +33,8 @@ function LinkArrowIcon() {
   );
 }
 
+const FOCUS_RING = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cobalt focus-visible:ring-offset-2 focus-visible:ring-offset-midnight';
+
 export default function IntegrationCard({
   name,
   description,
@@ -46,9 +48,15 @@ export default function IntegrationCard({
 }: Props) {
   if (status === 'loading') {
     return (
-      <div className="flex items-center gap-2 text-xs text-silver-muted animate-pulse px-1">
-        <span className="w-3 h-3 rounded-full bg-midnight-edge flex-shrink-0" />
-        Checking {name}…
+      <div className="flex items-center justify-between rounded-2xl px-4 py-3 bg-midnight-light/30 border border-midnight-edge/50 animate-pulse" aria-label={`Checking ${name}`} aria-busy="true">
+        <div className="flex items-center gap-3">
+          <div className="w-3 h-3 rounded-full bg-midnight-edge flex-shrink-0" />
+          <div className="space-y-1.5">
+            <div className="h-3.5 bg-midnight-edge/60 rounded w-28" />
+            <div className="h-2.5 bg-midnight-edge/40 rounded w-48" />
+          </div>
+        </div>
+        <div className="h-3 w-14 bg-midnight-edge/40 rounded flex-shrink-0" />
       </div>
     );
   }
@@ -57,8 +65,7 @@ export default function IntegrationCard({
     return (
       <motion.div
         className="flex items-center justify-between bg-midnight-edge/40 rounded-2xl px-4 py-3"
-        whileHover={{ scale: 1.005 }}
-        transition={{ duration: 0.2, ease: 'easeOut' }}
+        whileHover={{ scale: 1.015, y: -1, transition: { type: 'spring', stiffness: 500, damping: 22 } }}
       >
         <div>
           <p className="text-sm text-silver-bright font-medium">{name}</p>
@@ -67,7 +74,7 @@ export default function IntegrationCard({
         {(reconnectHref ?? connectHref) && (
           <a
             href={reconnectHref ?? connectHref}
-            className="text-xs font-semibold text-cobalt hover:text-cobalt-soft transition-colors flex-shrink-0 ml-4"
+            className={`text-xs font-semibold text-cobalt hover:text-cobalt-soft transition-colors flex-shrink-0 ml-4 min-h-[44px] flex items-center rounded ${FOCUS_RING}`}
           >
             Reconnect →
           </a>
@@ -80,8 +87,7 @@ export default function IntegrationCard({
     return (
       <motion.div
         className="flex items-center justify-between bg-cobalt/10 border border-cobalt/20 rounded-2xl px-4 py-3"
-        whileHover={{ scale: 1.005 }}
-        transition={{ duration: 0.2, ease: 'easeOut' }}
+        whileHover={{ scale: 1.015, y: -1, transition: { type: 'spring', stiffness: 500, damping: 22 } }}
       >
         <div className="flex items-center gap-2 text-sm flex-wrap">
           <CheckIcon />
@@ -94,7 +100,8 @@ export default function IntegrationCard({
           <button
             type="button"
             onClick={onDisconnect}
-            className="text-xs text-silver-muted hover:text-silver transition-colors ml-3 flex-shrink-0"
+            aria-label={`Disconnect ${name}`}
+            className={`text-xs text-silver-muted hover:text-silver transition-colors ml-3 flex-shrink-0 min-h-[44px] px-1 flex items-center rounded active:scale-[0.98] ${FOCUS_RING}`}
           >
             Disconnect
           </button>
@@ -107,13 +114,13 @@ export default function IntegrationCard({
   return (
     <div>
       {errorMessage && (
-        <p className="text-xs text-red-400 mb-2">{errorMessage}</p>
+        <p className="text-xs text-red-400 mb-2" role="alert">{errorMessage}</p>
       )}
       <motion.a
         href={connectHref}
-        className="flex items-center justify-between w-full rounded-2xl py-3 px-4 bg-midnight-light border border-midnight-edge hover:border-cobalt/40 hover:bg-midnight-light/80 transition-colors group"
-        whileHover={{ scale: 1.005 }}
-        transition={{ duration: 0.2, ease: 'easeOut' }}
+        className={`flex items-center justify-between w-full rounded-2xl py-3 px-4 bg-midnight-light border border-midnight-edge hover:border-cobalt/40 hover:bg-midnight-light/80 transition-colors group ${FOCUS_RING}`}
+        whileHover={{ scale: 1.015, y: -1, transition: { type: 'spring', stiffness: 500, damping: 22 } }}
+        aria-label={`${connectLabel} ${name}`}
       >
         <div className="min-w-0">
           <p className="text-sm font-medium text-silver-bright group-hover:text-cobalt-soft transition-colors">

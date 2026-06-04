@@ -94,9 +94,9 @@ export async function POST(req: Request) {
     return new Response('Bad request', { status: 400 });
   }
 
-  console.log('4F request:', {
+  console.log('[4F route] request:', {
     messageCount: messages.length,
-    lastUserMessage: messages[messages.length - 1]?.content?.slice(0, 50),
+    messages: messages.map(m => ({ role: m.role, contentLen: m.content?.length })),
     hasContext: !!cadenceContext,
   });
 
@@ -137,11 +137,11 @@ export async function POST(req: Request) {
           for await (const chunk of textStream) {
             controller.enqueue(encoder.encode(chunk));
           }
+          controller.close();
         } catch (err) {
           console.error('[4f] Stream error:', err);
           controller.error(err);
         }
-        controller.close();
       },
     });
 

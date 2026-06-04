@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence, type Variants, type Transition } from 'framer-motion';
+import { motion, AnimatePresence, MotionConfig, type Variants } from 'framer-motion';
 import { type CadenceOutput } from '@/lib/cadence-schema';
 import ConnectionBadge from '@/components/ConnectionBadge';
 import IntegrationCard from '@/components/IntegrationCard';
@@ -15,12 +15,32 @@ import CadenceWidget, {
 } from '@/components/CadenceWidget';
 import FourFChat from '@/components/FourFChat';
 
-const reveal: Variants = {
-  hidden: { opacity: 0, y: 12 },
-  visible: { opacity: 1, y: 0 },
+// Page-level stagger — parent fires children 0.12s apart
+const page: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.12, delayChildren: 0.06 } },
 };
 
-const revealTransition: Transition = { duration: 0.4, ease: 'easeOut' };
+// Each section enters with a spring: snappy without bounce
+const section: Variants = {
+  hidden: { opacity: 0, y: 28 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: 'spring', stiffness: 280, damping: 26, mass: 0.9 },
+  },
+};
+
+// The conditionally-rendered 4F section needs its own exit
+const chatSection: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: 'spring', stiffness: 280, damping: 26, mass: 0.9 },
+  },
+  exit: { opacity: 0, y: -10, transition: { duration: 0.2 } },
+};
 
 // ── Main component ─────────────────────────────────────────────────────────
 
@@ -185,30 +205,26 @@ export default function DashboardPage() {
   // ── Render ────────────────────────────────────────────────────────────
 
   return (
+    <MotionConfig reducedMotion="user">
+    {/* motion.main is the stagger container — children enter in cascade */}
     <motion.main
       className="min-h-screen bg-midnight"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
+      variants={page}
+      initial="hidden"
+      animate="visible"
     >
       <div className="max-w-[680px] mx-auto px-4 sm:px-6">
 
         {/* ── Section A: Header ────────────────────────────────────────── */}
-        <motion.header
-          className="py-12 sm:py-16"
-          variants={reveal}
-          initial="hidden"
-          animate="visible"
-          transition={{ ...revealTransition, delay: 0.05 }}
-        >
+        <motion.header className="py-12 sm:py-16" variants={section}>
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="font-sans font-medium text-2xl text-silver-bright leading-none">ASPIRE OS</p>
-              <p className="font-sans text-sm text-silver-muted mt-2">Dashboard</p>
+              <p className="font-mono text-[10px] font-medium uppercase tracking-[4px] text-silver-dim leading-none">Aspire OS</p>
+              <p className="font-sans font-semibold text-2xl text-silver-bright tracking-tight leading-tight mt-2">Dashboard</p>
             </div>
-            <div className="flex items-center gap-4 pt-1 flex-wrap justify-end">
+            <div className="flex items-center gap-3 pt-1 flex-wrap justify-end">
               <ConnectionBadge
-                label="Google Health"
+                label="Health"
                 connected={healthStatus === 'connected'}
                 loading={healthStatus === 'loading'}
               />
@@ -222,35 +238,35 @@ export default function DashboardPage() {
         </motion.header>
 
         {/* ── Section B: Integrations ───────────────────────────────────── */}
-        <motion.section
-          className="border-t border-midnight-edge py-8 sm:py-12"
-          variants={reveal}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-50px' }}
-          transition={revealTransition}
-        >
+        <motion.section className="divider-gradient py-8 sm:py-12" variants={section}>
           <p className="text-xs font-medium uppercase tracking-[1.5px] text-cobalt mb-6">
             INTEGRATIONS
           </p>
 
-          <div className="space-y-3">
-            {/* Google Health */}
-            <IntegrationCard
-              name="Google Health"
-              description="Connects Fitbit, Wear OS, Pixel Watch, and Health Connect — auto-fills HRV, sleep, and heart rate."
-              status={healthStatus}
-              connectHref="/api/auth/google-health"
-              connectLabel="Connect"
-              reconnectHref="/api/auth/google-health"
-              connectedSummary={healthSummary}
-              onDisconnect={handleHealthDisconnect}
-              errorMessage={healthError || undefined}
-            />
+          {/* Cards stagger within the section */}
+          <motion.div
+            className="space-y-3"
+            variants={{ visible: { transition: { staggerChildren: 0.09 } } }}
+          >
+            <motion.div variants={section}>
+              <IntegrationCard
+                name="Google Health"
+                description="Connects Fitbit, Wear OS, Pixel Watch, and Health Connect — auto-fills HRV, sleep, and heart rate."
+                status={healthStatus}
+                connectHref="/api/auth/google-health"
+                connectLabel="Connect"
+                reconnectHref="/api/auth/google-health"
+                connectedSummary={healthSummary}
+                onDisconnect={handleHealthDisconnect}
+                errorMessage={healthError || undefined}
+              />
+            </motion.div>
 
-            {/* Google Fit — legacy only, no connect button */}
             {fitStatus === 'connected' && (
-              <div className="flex items-center justify-between bg-cobalt/10 border border-cobalt/20 rounded-2xl px-4 py-3">
+              <motion.div
+                variants={section}
+                className="flex items-center justify-between bg-cobalt/10 border border-cobalt/20 rounded-2xl px-4 py-3"
+              >
                 <div className="flex items-center gap-2 text-sm">
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                     <circle cx="7" cy="7" r="6" stroke="#2C6BE0" strokeWidth="1.5" />
@@ -263,38 +279,32 @@ export default function DashboardPage() {
                 <button
                   type="button"
                   onClick={handleFitDisconnect}
-                  className="text-xs text-silver-muted hover:text-silver transition-colors"
+                  aria-label="Disconnect Google Fit"
+                  className="text-xs text-silver-muted hover:text-silver transition-colors min-h-[44px] px-1 flex items-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cobalt focus-visible:ring-offset-2 focus-visible:ring-offset-midnight"
                 >
                   Disconnect
                 </button>
-              </div>
+              </motion.div>
             )}
 
-            {/* Google Calendar */}
-            <IntegrationCard
-              name="Google Calendar"
-              description="Auto-fills today's meetings so Cadence can schedule around them."
-              status={calStatus}
-              connectHref="/api/auth/google-calendar"
-              connectLabel="Connect"
-              reconnectHref="/api/auth/google-calendar"
-              connectedSummary={calSummary}
-              onDisconnect={handleCalDisconnect}
-              errorMessage={calError || undefined}
-            />
-
-          </div>
+            <motion.div variants={section}>
+              <IntegrationCard
+                name="Google Calendar"
+                description="Auto-fills today's meetings so Cadence can schedule around them."
+                status={calStatus}
+                connectHref="/api/auth/google-calendar"
+                connectLabel="Connect"
+                reconnectHref="/api/auth/google-calendar"
+                connectedSummary={calSummary}
+                onDisconnect={handleCalDisconnect}
+                errorMessage={calError || undefined}
+              />
+            </motion.div>
+          </motion.div>
         </motion.section>
 
         {/* ── Section C: Daily Protocol ─────────────────────────────────── */}
-        <motion.section
-          className="border-t border-midnight-edge py-8 sm:py-12"
-          variants={reveal}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-50px' }}
-          transition={revealTransition}
-        >
+        <motion.section className="divider-gradient py-8 sm:py-12" variants={section}>
           <p className="text-xs font-medium uppercase tracking-[1.5px] text-cobalt mb-6">
             DAILY PROTOCOL
           </p>
@@ -318,12 +328,11 @@ export default function DashboardPage() {
         <AnimatePresence>
           {cadenceReady && currentCadence && (
             <motion.section
-              className="border-t border-midnight-edge py-8 sm:py-12"
-              variants={reveal}
+              className="divider-gradient py-8 sm:py-12"
+              variants={chatSection}
               initial="hidden"
               animate="visible"
-              exit={{ opacity: 0, y: -8 }}
-              transition={revealTransition}
+              exit="exit"
             >
               <FourFChat cadenceContext={currentCadence} />
             </motion.section>
@@ -331,13 +340,14 @@ export default function DashboardPage() {
         </AnimatePresence>
 
         {/* ── Footer ───────────────────────────────────────────────────── */}
-        <footer className="border-t border-midnight-edge py-8 text-center">
-          <a href="/privacy" className="font-sans text-xs text-silver-dim hover:text-silver-muted transition-colors">
+        <footer className="divider-gradient py-8 text-center">
+          <a href="/privacy" className="font-sans text-xs text-silver-dim hover:text-silver-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cobalt rounded">
             Privacy Policy
           </a>
         </footer>
 
       </div>
     </motion.main>
+    </MotionConfig>
   );
 }
