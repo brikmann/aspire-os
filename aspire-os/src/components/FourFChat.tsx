@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { type CadenceOutput } from '@/lib/cadence-schema';
 
 type Message = {
@@ -34,6 +35,12 @@ export default function FourFChat({ cadenceContext }: Props) {
   const cadenceRef = useRef(cadenceContext);
   useEffect(() => { cadenceRef.current = cadenceContext; }, [cadenceContext]);
 
+  // Ref ensures sendMessage always reads the latest messages without stale-closure issues.
+  // Without this, useCallback([messages]) captures an intermediate snapshot during streaming
+  // (e.g. the empty assistant placeholder) which gets sent as history on the follow-up turn.
+  const messagesRef = useRef<Message[]>([]);
+  useEffect(() => { messagesRef.current = messages; }, [messages]);
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -50,7 +57,7 @@ export default function FourFChat({ cadenceContext }: Props) {
     setIsLoading(true);
 
     const history: ApiMessage[] = [
-      ...messages.map(m => ({ role: m.role, content: m.content })),
+      ...messagesRef.current.map(m => ({ role: m.role, content: m.content })),
       { role: 'user', content: userText.trim() },
     ];
 
@@ -87,6 +94,14 @@ export default function FourFChat({ cadenceContext }: Props) {
           )
         );
       }
+      // Flush any bytes buffered by the streaming TextDecoder.
+      const tail = decoder.decode();
+      if (tail) {
+        accumulated += tail;
+        setMessages(prev =>
+          prev.map(m => m.id === assistantId ? { ...m, content: accumulated } : m)
+        );
+      }
     } catch {
       setMessages(prev =>
         prev.map(m => m.id === assistantId
@@ -97,7 +112,7 @@ export default function FourFChat({ cadenceContext }: Props) {
     } finally {
       setIsLoading(false);
     }
-  }, [messages, isLoading]);
+  }, [isLoading]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -123,15 +138,18 @@ export default function FourFChat({ cadenceContext }: Props) {
       {messages.length === 0 && (
         <div className="flex flex-wrap gap-2 mb-6">
           {SUGGESTED_PROMPTS.map(prompt => (
-            <button
+            <motion.button
               key={prompt}
               type="button"
               onClick={() => sendMessage(prompt)}
               disabled={isLoading}
-              className="text-[13px] text-cobalt border border-cobalt/30 rounded-full px-4 py-2 hover:bg-cobalt/10 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-sm text-cobalt border border-cobalt/30 rounded-full px-4 py-2 hover:bg-cobalt/10 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.15, ease: 'easeOut' }}
             >
               {prompt}
-            </button>
+            </motion.button>
           ))}
         </div>
       )}
@@ -139,31 +157,42 @@ export default function FourFChat({ cadenceContext }: Props) {
       {/* Chat thread */}
       {messages.length > 0 && (
         <div className="space-y-4 mb-6 max-h-[520px] overflow-y-auto pr-1">
-          {messages.map(m => (
-            <div
-              key={m.id}
-              className={`flex animate-answer ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                  m.role === 'user'
-                    ? 'bg-paper-warm text-ink'
-                    : 'bg-midnight-light text-silver'
-                }`}
-              >
-                {m.content
-                  ? <p className="text-sm leading-relaxed whitespace-pre-wrap">{m.content}</p>
-                  : (
-                    <div className="flex gap-1.5 items-center h-5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-silver-muted animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-silver-muted animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-silver-muted animate-bounce" style={{ animationDelay: '300ms' }} />
-                    </div>
-                  )
+          <AnimatePresence initial={false}>
+            {messages.map(m => (
+              <motion.div
+                key={m.id}
+                className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                initial={m.role === 'user'
+                  ? { opacity: 0, x: 16 }
+                  : { opacity: 0 }
                 }
-              </div>
-            </div>
-          ))}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{
+                  duration: m.role === 'user' ? 0.25 : 0.3,
+                  ease: 'easeOut',
+                }}
+              >
+                <div
+                  className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                    m.role === 'user'
+                      ? 'bg-paper-warm text-ink'
+                      : 'bg-midnight-light text-silver'
+                  }`}
+                >
+                  {m.content
+                    ? <p className="text-sm leading-relaxed whitespace-pre-wrap">{m.content}</p>
+                    : (
+                      <div className="flex gap-1.5 items-center h-5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-silver-muted animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <span className="w-1.5 h-1.5 rounded-full bg-silver-muted animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <span className="w-1.5 h-1.5 rounded-full bg-silver-muted animate-bounce" style={{ animationDelay: '300ms' }} />
+                      </div>
+                    )
+                  }
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
           <div ref={bottomRef} />
         </div>
       )}
@@ -178,16 +207,18 @@ export default function FourFChat({ cadenceContext }: Props) {
           rows={1}
           placeholder="Ask 4F anything about today's protocol…"
           disabled={isLoading}
-          className="flex-1 bg-midnight border border-midnight-edge text-silver-bright rounded-xl px-4 py-3 text-sm placeholder:text-silver-muted focus:outline-none focus:ring-2 focus:ring-cobalt focus:border-cobalt resize-none transition-colors disabled:opacity-50"
+          className="flex-1 bg-midnight border border-midnight-edge text-silver-bright rounded-lg px-4 py-3 text-sm placeholder:text-silver-muted focus:outline-none focus:ring-2 focus:ring-cobalt focus:border-cobalt resize-none transition-colors disabled:opacity-50"
           style={{ maxHeight: '96px', overflowY: 'auto' }}
         />
-        <button
+        <motion.button
           type="submit"
           disabled={isLoading || !input.trim()}
-          className="flex-shrink-0 bg-cobalt hover:bg-cobalt-soft disabled:bg-midnight-edge disabled:text-silver-dim text-silver-bright font-semibold text-sm px-5 py-3 rounded-xl transition-all disabled:cursor-not-allowed"
+          className="flex-shrink-0 bg-cobalt hover:bg-cobalt-dark disabled:bg-midnight-edge disabled:text-silver-dim text-silver-bright font-semibold text-sm px-5 py-3 rounded-lg transition-colors disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-cobalt focus:ring-offset-2 focus:ring-offset-midnight"
+          whileTap={{ scale: 0.98 }}
+          transition={{ duration: 0.1 }}
         >
           {isLoading ? '…' : 'Send'}
-        </button>
+        </motion.button>
       </form>
 
     </div>

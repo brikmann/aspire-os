@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { type CadenceOutput } from '@/lib/cadence-schema';
 
 // ── Types ─────────────────────────────────────────────────────────────────
@@ -101,12 +102,12 @@ function extractStreamingProtocol(accumulated: string): ProtocolItem[] {
 // ── UI constants ───────────────────────────────────────────────────────────
 
 const INPUT_BASE =
-  'w-full bg-midnight border border-midnight-edge text-silver-bright rounded-lg px-3 py-2.5 text-sm ' +
+  'w-full bg-midnight border border-midnight-edge text-silver-bright rounded-lg px-3 py-2 text-sm ' +
   'placeholder:text-silver-muted focus:outline-none focus:ring-2 focus:ring-cobalt focus:border-cobalt ' +
   'transition-colors';
-const LABEL_BASE = 'block text-xs font-medium text-silver-muted uppercase tracking-wide mb-1.5';
+const LABEL_BASE = 'block text-xs font-medium text-silver-muted uppercase tracking-wide mb-2';
 const CARD_BASE = 'bg-midnight-light/50 rounded-2xl p-6 border border-midnight-edge';
-const EYEBROW = 'text-xs font-medium uppercase tracking-[1.5px] text-cobalt-soft mb-3';
+const EYEBROW = 'text-xs font-medium uppercase tracking-[1.5px] text-cobalt-soft mb-4';
 
 const CATEGORY_EMOJI: Record<string, string> = {
   work: '💻', recovery: '🌱', meeting: '🗓', meal: '🍽', sleep: '😴',
@@ -117,16 +118,16 @@ const CATEGORY_EMOJI: Record<string, string> = {
 function CardSkeleton() {
   return (
     <div className="space-y-3">
-      <div className="h-6 bg-midnight-edge/60 rounded-md animate-pulse w-3/4" />
-      <div className="h-4 bg-midnight-edge/40 rounded-md animate-pulse w-full" />
-      <div className="h-4 bg-midnight-edge/40 rounded-md animate-pulse w-5/6" />
+      <div className="h-6 bg-midnight-edge/60 rounded animate-pulse w-3/4" />
+      <div className="h-4 bg-midnight-edge/40 rounded animate-pulse w-full" />
+      <div className="h-4 bg-midnight-edge/40 rounded animate-pulse w-5/6" />
     </div>
   );
 }
 
 function SkeletonProtocolCard() {
   return (
-    <div className="flex bg-midnight-light/30 rounded-xl p-4 border border-midnight-edge/50 animate-pulse">
+    <div className="flex bg-midnight-light/30 rounded-2xl p-4 border border-midnight-edge/50 animate-pulse">
       <div className="w-16 flex-shrink-0">
         <div className="h-5 bg-midnight-edge/60 rounded w-10 mb-1" />
         <div className="h-3 bg-midnight-edge/40 rounded w-6" />
@@ -142,7 +143,7 @@ function SkeletonProtocolCard() {
 function WearableBadge({ source }: { source: 'health' | 'fit' }) {
   const label = source === 'health' ? 'Google Health' : 'Google Fit';
   return (
-    <span className="inline-flex items-center gap-1 ml-2 text-[10px] font-medium text-cobalt-soft normal-case tracking-normal">
+    <span className="inline-flex items-center gap-1 ml-2 text-xs font-medium text-cobalt-soft normal-case tracking-normal">
       <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
         <path d="M5 1.5A3.5 3.5 0 1 1 1.5 5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
         <path d="M1.5 2.5V5H4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
@@ -165,12 +166,15 @@ function ProtocolCard({ item, index }: { item: ProtocolItem; index: number }) {
   const [timeNum, timePeriod] = item.time.split(' ');
   const emoji = CATEGORY_EMOJI[item.category] ?? '·';
   return (
-    <div
-      className="flex bg-midnight-light/30 rounded-xl p-4 border border-midnight-edge/50 animate-answer"
-      style={{ animationDelay: `${index * 0.06}s` }}
+    <motion.div
+      className="flex bg-midnight-light/30 rounded-2xl p-4 border border-midnight-edge/50"
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: 'easeOut', delay: index * 0.05 }}
+      whileHover={{ scale: 1.005, transition: { duration: 0.2, ease: 'easeOut' } }}
     >
       <div className="w-16 flex-shrink-0 pt-0.5">
-        <p className="font-mono text-lg font-semibold text-cobalt-soft leading-none">{timeNum}</p>
+        <p className="font-mono text-base font-semibold text-cobalt-soft leading-none">{timeNum}</p>
         <p className="font-mono text-xs text-cobalt-soft/60 mt-0.5">{timePeriod}</p>
       </div>
       <div className="flex-1 pl-4 border-l border-midnight-edge">
@@ -183,14 +187,14 @@ function ProtocolCard({ item, index }: { item: ProtocolItem; index: number }) {
           </p>
           <div className="flex items-center gap-1.5 flex-shrink-0 pt-0.5">
             {item.is_from_calendar && (
-              <span className="text-[10px] uppercase tracking-wider text-cobalt-soft">From Calendar</span>
+              <span className="text-xs uppercase tracking-wider text-cobalt-soft">From Calendar</span>
             )}
             <span className="text-base leading-none">{emoji}</span>
           </div>
         </div>
         <p className="text-sm text-silver leading-relaxed mt-1">{item.rationale}</p>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -433,7 +437,7 @@ export default function CadenceWidget({
       {/* ── INPUT VIEW ─────────────────────────────────────────────────── */}
       {view === 'input' && (
         <div className="bg-midnight-light rounded-2xl p-6 sm:p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label htmlFor="wearable" className={LABEL_BASE}>Wearable</label>
@@ -553,7 +557,7 @@ export default function CadenceWidget({
               {calConnected && calEvents.length > 0 ? (
                 <>
                   <p className={LABEL_BASE}>Today&apos;s calendar <span className="text-cobalt-soft normal-case tracking-normal">(Google Calendar)</span></p>
-                  <div className="bg-midnight border border-midnight-edge rounded-lg px-3 py-2.5 space-y-1.5 mb-4">
+                  <div className="bg-midnight border border-midnight-edge rounded-lg px-3 py-2 space-y-2 mb-4">
                     {calEvents.map((ev, i) => (
                       <p key={i} className="text-sm text-silver-bright leading-relaxed">
                         {ev.start} — {ev.summary}
@@ -593,12 +597,14 @@ export default function CadenceWidget({
               <p className="text-sm text-red-400 bg-red-400/10 rounded-lg px-3 py-2">{formError}</p>
             )}
 
-            <button
+            <motion.button
               type="submit"
-              className="w-full rounded-lg py-3 px-6 text-[15px] font-semibold text-silver-bright bg-cobalt hover:bg-cobalt-soft active:scale-[0.99] cursor-pointer transition-all"
+              className="w-full rounded-lg py-3 px-6 text-base font-semibold text-silver-bright bg-cobalt hover:bg-cobalt-dark cursor-pointer focus:outline-none focus:ring-2 focus:ring-cobalt focus:ring-offset-2 focus:ring-offset-midnight transition-colors"
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.1 }}
             >
               Generate today&apos;s Cadence →
-            </button>
+            </motion.button>
           </form>
         </div>
       )}
@@ -626,7 +632,7 @@ export default function CadenceWidget({
 
           {/* Hero cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className={CARD_BASE}>
+            <motion.div className={CARD_BASE} whileHover={{ scale: 1.005 }} transition={{ duration: 0.2, ease: 'easeOut' }}>
               <p className={EYEBROW}>State</p>
               {isGenerating && !cadence?.verdict ? <CardSkeleton /> : (
                 <>
@@ -634,8 +640,8 @@ export default function CadenceWidget({
                   <p className="text-sm text-silver leading-relaxed">{cadence?.verdict?.summary}</p>
                 </>
               )}
-            </div>
-            <div className={CARD_BASE}>
+            </motion.div>
+            <motion.div className={CARD_BASE} whileHover={{ scale: 1.005 }} transition={{ duration: 0.2, ease: 'easeOut' }}>
               <p className={EYEBROW}>Peak Window</p>
               {isGenerating && !cadence?.windows?.peak?.start ? <CardSkeleton /> : (
                 <>
@@ -645,8 +651,8 @@ export default function CadenceWidget({
                   <p className="text-sm text-silver leading-relaxed">{cadence?.windows?.peak?.rationale}</p>
                 </>
               )}
-            </div>
-            <div className={CARD_BASE}>
+            </motion.div>
+            <motion.div className={CARD_BASE} whileHover={{ scale: 1.005 }} transition={{ duration: 0.2, ease: 'easeOut' }}>
               <p className={EYEBROW}>Crash Window</p>
               {isGenerating && !cadence?.windows?.crash?.start ? <CardSkeleton /> : (
                 <>
@@ -656,7 +662,7 @@ export default function CadenceWidget({
                   <p className="text-sm text-silver leading-relaxed">{cadence?.windows?.crash?.rationale}</p>
                 </>
               )}
-            </div>
+            </motion.div>
           </div>
 
           {/* Protocol timeline */}
@@ -675,29 +681,29 @@ export default function CadenceWidget({
 
           {/* Protect cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-midnight-light/50 rounded-2xl p-6 border-l-4 border-cobalt">
+            <motion.div className="bg-midnight-light/50 rounded-2xl p-6 border-l-4 border-cobalt" whileHover={{ scale: 1.005 }} transition={{ duration: 0.2, ease: 'easeOut' }}>
               <p className={`${EYEBROW} text-cobalt`}>Protect Today</p>
               {isGenerating && !cadence?.protect?.today ? <CardSkeleton /> : (
                 <p className="font-serif text-base italic text-silver-bright leading-relaxed">
                   {cadence?.protect?.today}
                 </p>
               )}
-            </div>
-            <div className="bg-midnight-light/50 rounded-2xl p-6 border-l-4 border-cobalt-soft">
+            </motion.div>
+            <motion.div className="bg-midnight-light/50 rounded-2xl p-6 border-l-4 border-cobalt-soft" whileHover={{ scale: 1.005 }} transition={{ duration: 0.2, ease: 'easeOut' }}>
               <p className={`${EYEBROW} text-cobalt-soft`}>Protect Tomorrow</p>
               {isGenerating && !cadence?.protect?.tomorrow ? <CardSkeleton /> : (
                 <p className="font-serif text-base italic text-silver-bright leading-relaxed">
                   {cadence?.protect?.tomorrow}
                 </p>
               )}
-            </div>
+            </motion.div>
           </div>
 
           {/* Export Protocol */}
           {!isGenerating && cadence && (
             <div className="flex flex-col gap-3">
               <p className={EYEBROW}>Export Protocol</p>
-              <div className="flex items-center justify-between bg-midnight-light/30 rounded-xl px-4 py-3 border border-midnight-edge">
+              <div className="flex items-center justify-between bg-midnight-light/30 rounded-2xl px-4 py-3 border border-midnight-edge">
                 <div className="text-sm">
                   {notionStatus === 'connected'
                     ? <span className="text-silver-muted">{notionWorkspace || 'Notion'}</span>
@@ -713,7 +719,7 @@ export default function CadenceWidget({
                   onClick={notionStatus === 'connected' ? handlePushToNotion : undefined}
                   disabled={notionStatus !== 'connected' || pushState === 'pushing'}
                   title={notionStatus !== 'connected' ? 'Connect Notion to push' : undefined}
-                  className={`text-sm font-semibold px-4 py-1.5 rounded-lg transition-all ${
+                  className={`text-sm font-semibold px-4 py-2 rounded-lg transition-all ${
                     notionStatus === 'connected' && pushState !== 'pushing'
                       ? 'bg-cobalt text-silver-bright hover:bg-cobalt-soft cursor-pointer'
                       : 'bg-midnight-edge text-silver-dim cursor-not-allowed'
@@ -724,7 +730,7 @@ export default function CadenceWidget({
               </div>
 
               {pushState === 'success' && pushResult && (
-                <div className="bg-green-400/10 border border-green-400/20 rounded-xl px-4 py-3 space-y-1.5">
+                <div className="bg-green-400/10 border border-green-400/20 rounded-2xl px-4 py-3 space-y-1.5">
                   <p className="text-sm text-green-400 font-medium">
                     ✓ Pushed {pushResult.count} item{pushResult.count !== 1 ? 's' : ''} to Notion
                     {' — '}
@@ -744,7 +750,7 @@ export default function CadenceWidget({
               )}
 
               {pushState === 'error' && pushError && (
-                <div className="bg-red-400/10 rounded-xl px-4 py-3 flex items-center justify-between gap-4">
+                <div className="bg-red-400/10 rounded-2xl px-4 py-3 flex items-center justify-between gap-4">
                   <p className="text-sm text-red-400">{pushError}</p>
                   <button
                     type="button"
@@ -763,7 +769,7 @@ export default function CadenceWidget({
             <p className="text-xs text-silver-muted text-center pt-1">Generated at {generatedAt}</p>
           )}
           {genError && (
-            <div className="bg-red-400/10 rounded-xl px-4 py-3 flex items-center justify-between gap-4">
+            <div className="bg-red-400/10 rounded-2xl px-4 py-3 flex items-center justify-between gap-4">
               <p className="text-sm text-red-400">{genError}</p>
               <button
                 type="button"

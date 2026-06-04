@@ -1,5 +1,7 @@
 'use client';
 
+import { motion } from 'framer-motion';
+
 export type IntegrationStatus = 'loading' | 'disconnected' | 'connected' | 'reconnect-needed';
 
 type Props = {
@@ -53,10 +55,14 @@ export default function IntegrationCard({
 
   if (status === 'reconnect-needed') {
     return (
-      <div className="flex items-center justify-between bg-midnight-edge/40 rounded-xl px-4 py-3">
+      <motion.div
+        className="flex items-center justify-between bg-midnight-edge/40 rounded-2xl px-4 py-3"
+        whileHover={{ scale: 1.005 }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
+      >
         <div>
           <p className="text-sm text-silver-bright font-medium">{name}</p>
-          <p className="text-xs text-silver-muted mt-0.5">Session expired — reconnect to restore data sync</p>
+          <p className="text-xs text-silver-muted mt-1">Session expired — reconnect to restore data sync</p>
         </div>
         {(reconnectHref ?? connectHref) && (
           <a
@@ -66,13 +72,17 @@ export default function IntegrationCard({
             Reconnect →
           </a>
         )}
-      </div>
+      </motion.div>
     );
   }
 
   if (status === 'connected') {
     return (
-      <div className="flex items-center justify-between bg-cobalt/10 border border-cobalt/20 rounded-xl px-4 py-3">
+      <motion.div
+        className="flex items-center justify-between bg-cobalt/10 border border-cobalt/20 rounded-2xl px-4 py-3"
+        whileHover={{ scale: 1.005 }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
+      >
         <div className="flex items-center gap-2 text-sm flex-wrap">
           <CheckIcon />
           <span className="text-silver-bright font-medium">{name}</span>
@@ -89,7 +99,7 @@ export default function IntegrationCard({
             Disconnect
           </button>
         )}
-      </div>
+      </motion.div>
     );
   }
 
@@ -99,21 +109,23 @@ export default function IntegrationCard({
       {errorMessage && (
         <p className="text-xs text-red-400 mb-2">{errorMessage}</p>
       )}
-      <a
+      <motion.a
         href={connectHref}
-        className="flex items-center justify-between w-full rounded-xl py-3 px-4 bg-midnight-light border border-midnight-edge hover:border-cobalt/40 hover:bg-midnight-light/80 transition-all group"
+        className="flex items-center justify-between w-full rounded-2xl py-3 px-4 bg-midnight-light border border-midnight-edge hover:border-cobalt/40 hover:bg-midnight-light/80 transition-colors group"
+        whileHover={{ scale: 1.005 }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
       >
         <div className="min-w-0">
           <p className="text-sm font-medium text-silver-bright group-hover:text-cobalt-soft transition-colors">
             {name}
           </p>
-          <p className="text-xs text-silver-muted mt-0.5 leading-relaxed">{description}</p>
+          <p className="text-xs text-silver-muted mt-1 leading-relaxed">{description}</p>
         </div>
         <div className="flex items-center gap-1.5 text-cobalt text-xs font-semibold flex-shrink-0 ml-4">
           <LinkArrowIcon />
           {connectLabel}
         </div>
-      </a>
+      </motion.a>
     </div>
   );
 }

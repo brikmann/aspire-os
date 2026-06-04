@@ -96,6 +96,12 @@ export async function POST(req: Request) {
     return new Response('Bad request', { status: 400 });
   }
 
+  console.log('4F request:', {
+    messageCount: messages.length,
+    lastUserMessage: messages[messages.length - 1]?.content?.slice(0, 50),
+    hasContext: !!cadenceContext,
+  });
+
   const SYSTEM_PROMPT = loadSystemPrompt();
   const contextSummary = formatCadenceContext(cadenceContext);
 

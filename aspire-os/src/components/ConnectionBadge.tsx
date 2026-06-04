@@ -12,11 +12,11 @@ export default function ConnectionBadge({ label, connected, loading }: Props) {
           loading
             ? 'bg-midnight-edge animate-pulse'
             : connected
-            ? 'bg-emerald-400'
+            ? 'bg-cobalt'
             : 'bg-midnight-edge'
         }`}
       />
-      <span className="text-[11px] text-silver-muted whitespace-nowrap">{label}</span>
+      <span className="text-xs text-silver-muted whitespace-nowrap">{label}</span>
     </div>
   );
 }

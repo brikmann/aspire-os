@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { type CadenceOutput } from '@/lib/cadence-schema';
 import ConnectionBadge from '@/components/ConnectionBadge';
 import IntegrationCard from '@/components/IntegrationCard';
@@ -14,6 +15,11 @@ import CadenceWidget, {
   type CalendarEvent,
 } from '@/components/CadenceWidget';
 import FourFChat from '@/components/FourFChat';
+
+const reveal = {
+  hidden: { opacity: 0, y: 12 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } },
+};
 
 // ── Main component ─────────────────────────────────────────────────────────
 
@@ -203,15 +209,26 @@ export default function DashboardPage() {
   // ── Render ────────────────────────────────────────────────────────────
 
   return (
-    <main className="min-h-screen bg-midnight">
+    <motion.main
+      className="min-h-screen bg-midnight"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
       <div className="max-w-[680px] mx-auto px-4 sm:px-6">
 
         {/* ── Section A: Header ────────────────────────────────────────── */}
-        <header className="py-12 sm:py-16">
+        <motion.header
+          className="py-12 sm:py-16"
+          variants={reveal}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.05 }}
+        >
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="font-sans font-medium text-[22px] text-silver-bright leading-none">ASPIRE OS</p>
-              <p className="font-sans text-[13px] text-silver-muted mt-1.5">Dashboard</p>
+              <p className="font-sans font-medium text-2xl text-silver-bright leading-none">ASPIRE OS</p>
+              <p className="font-sans text-sm text-silver-muted mt-2">Dashboard</p>
             </div>
             <div className="flex items-center gap-4 pt-1 flex-wrap justify-end">
               <ConnectionBadge
@@ -231,10 +248,16 @@ export default function DashboardPage() {
               />
             </div>
           </div>
-        </header>
+        </motion.header>
 
         {/* ── Section B: Integrations ───────────────────────────────────── */}
-        <section className="border-t border-midnight-edge py-8 sm:py-12">
+        <motion.section
+          className="border-t border-midnight-edge py-8 sm:py-12"
+          variants={reveal}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-50px' }}
+        >
           <p className="text-xs font-medium uppercase tracking-[1.5px] text-cobalt mb-6">
             INTEGRATIONS
           </p>
@@ -255,7 +278,7 @@ export default function DashboardPage() {
 
             {/* Google Fit — legacy only, no connect button */}
             {fitStatus === 'connected' && (
-              <div className="flex items-center justify-between bg-cobalt/10 border border-cobalt/20 rounded-xl px-4 py-3">
+              <div className="flex items-center justify-between bg-cobalt/10 border border-cobalt/20 rounded-2xl px-4 py-3">
                 <div className="flex items-center gap-2 text-sm">
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                     <circle cx="7" cy="7" r="6" stroke="#2C6BE0" strokeWidth="1.5" />
@@ -300,10 +323,16 @@ export default function DashboardPage() {
               errorMessage={notionError || undefined}
             />
           </div>
-        </section>
+        </motion.section>
 
         {/* ── Section C: Daily Protocol ─────────────────────────────────── */}
-        <section className="border-t border-midnight-edge py-8 sm:py-12">
+        <motion.section
+          className="border-t border-midnight-edge py-8 sm:py-12"
+          variants={reveal}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-50px' }}
+        >
           <p className="text-xs font-medium uppercase tracking-[1.5px] text-cobalt mb-6">
             DAILY PROTOCOL
           </p>
@@ -323,23 +352,31 @@ export default function DashboardPage() {
               setCadenceReady(true);
             }}
           />
-        </section>
+        </motion.section>
 
         {/* ── Section D: 4F Chat ────────────────────────────────────────── */}
-        {cadenceReady && currentCadence && (
-          <section className="border-t border-midnight-edge py-8 sm:py-12">
-            <FourFChat cadenceContext={currentCadence} />
-          </section>
-        )}
+        <AnimatePresence>
+          {cadenceReady && currentCadence && (
+            <motion.section
+              className="border-t border-midnight-edge py-8 sm:py-12"
+              variants={reveal}
+              initial="hidden"
+              animate="visible"
+              exit={{ opacity: 0, y: -8, transition: { duration: 0.2 } }}
+            >
+              <FourFChat cadenceContext={currentCadence} />
+            </motion.section>
+          )}
+        </AnimatePresence>
 
         {/* ── Footer ───────────────────────────────────────────────────── */}
         <footer className="border-t border-midnight-edge py-8 text-center">
-          <a href="/privacy" className="font-sans text-[12px] text-silver-dim hover:text-silver-muted transition-colors">
+          <a href="/privacy" className="font-sans text-xs text-silver-dim hover:text-silver-muted transition-colors">
             Privacy Policy
           </a>
         </footer>
 
       </div>
-    </main>
+    </motion.main>
   );
 }
