@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, type Variants, type Transition } from 'framer-motion';
 import { type CadenceOutput } from '@/lib/cadence-schema';
 import ConnectionBadge from '@/components/ConnectionBadge';
 import IntegrationCard from '@/components/IntegrationCard';
@@ -16,10 +16,12 @@ import CadenceWidget, {
 } from '@/components/CadenceWidget';
 import FourFChat from '@/components/FourFChat';
 
-const reveal = {
+const reveal: Variants = {
   hidden: { opacity: 0, y: 12 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } },
+  visible: { opacity: 1, y: 0 },
 };
+
+const revealTransition: Transition = { duration: 0.4, ease: 'easeOut' };
 
 // ── Main component ─────────────────────────────────────────────────────────
 
@@ -206,6 +208,10 @@ export default function DashboardPage() {
     ? `${calEvents.length} event${calEvents.length !== 1 ? 's' : ''} today`
     : undefined;
 
+  const allLoaded = healthStatus !== 'loading' && fitStatus !== 'loading' && calStatus !== 'loading';
+  const hasWearable = healthStatus === 'connected' || fitStatus === 'connected';
+  const autoTrigger = allLoaded && hasWearable && calStatus === 'connected';
+
   // ── Render ────────────────────────────────────────────────────────────
 
   return (
@@ -223,7 +229,7 @@ export default function DashboardPage() {
           variants={reveal}
           initial="hidden"
           animate="visible"
-          transition={{ delay: 0.05 }}
+          transition={{ ...revealTransition, delay: 0.05 }}
         >
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -257,6 +263,7 @@ export default function DashboardPage() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-50px' }}
+          transition={revealTransition}
         >
           <p className="text-xs font-medium uppercase tracking-[1.5px] text-cobalt mb-6">
             INTEGRATIONS
@@ -332,6 +339,7 @@ export default function DashboardPage() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-50px' }}
+          transition={revealTransition}
         >
           <p className="text-xs font-medium uppercase tracking-[1.5px] text-cobalt mb-6">
             DAILY PROTOCOL
@@ -351,6 +359,7 @@ export default function DashboardPage() {
               setCurrentCadence(cadence);
               setCadenceReady(true);
             }}
+            autoTrigger={autoTrigger}
           />
         </motion.section>
 
@@ -362,7 +371,8 @@ export default function DashboardPage() {
               variants={reveal}
               initial="hidden"
               animate="visible"
-              exit={{ opacity: 0, y: -8, transition: { duration: 0.2 } }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={revealTransition}
             >
               <FourFChat cadenceContext={currentCadence} />
             </motion.section>
