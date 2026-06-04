@@ -4,7 +4,7 @@ import { getGoogleHealthAuthUrl } from '@/lib/google-health';
 
 export async function GET(req: NextRequest) {
   // Reuse existing session cookie so Fit + Calendar tokens remain accessible
-  const baseUrl = new URL(req.url).origin;
+  const baseUrl = new URL(req.url).origin.replace(/^https:\/\/www\./, 'https://');
   const existing = req.cookies.get('cadence_session')?.value;
   const sessionId = existing ?? randomUUID();
   const authUrl = getGoogleHealthAuthUrl(sessionId, baseUrl);

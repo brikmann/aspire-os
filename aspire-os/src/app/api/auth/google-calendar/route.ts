@@ -4,7 +4,7 @@ import { getCalendarAuthUrl } from '@/lib/google-calendar';
 
 export async function GET(req: NextRequest) {
   // Reuse existing session cookie if present, otherwise create new one
-  const baseUrl = new URL(req.url).origin;
+  const baseUrl = new URL(req.url).origin.replace(/^https:\/\/www\./, 'https://');
   const existing = req.cookies.get('cadence_session')?.value;
   const sessionId = existing ?? randomUUID();
   const authUrl = getCalendarAuthUrl(sessionId, baseUrl);

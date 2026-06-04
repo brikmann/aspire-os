@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto';
 import { getNotionAuthUrl } from '@/lib/notion';
 
 export async function GET(req: NextRequest) {
-  const baseUrl = new URL(req.url).origin;
+  const baseUrl = new URL(req.url).origin.replace(/^https:\/\/www\./, 'https://');
   const existing = req.cookies.get('cadence_session')?.value;
   const sessionId = existing ?? randomUUID();
   const authUrl = getNotionAuthUrl(sessionId, baseUrl);
