@@ -41,7 +41,21 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${lora.variable} antialiased`}
     >
-      <body className="min-h-screen flex flex-col bg-midnight">{children}</body>
+      <body className="min-h-screen flex flex-col bg-midnight">
+        {children}
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: 'var(--color-midnight-light)',
+              border: '1px solid var(--color-midnight-edge)',
+              color: 'var(--color-silver-bright)',
+              borderRadius: '16px',
+            },
+          }}
+        />
+      </body>
     </html>
   );
 }
