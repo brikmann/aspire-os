@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    await exchangeGoogleHealthCode(code, sessionId);
+    await exchangeGoogleHealthCode(code, sessionId, new URL(req.url).origin);
   } catch (err) {
     console.error('Google Health callback error:', err);
     return NextResponse.redirect(new URL('/dashboard?error=health_auth_failed', req.url));

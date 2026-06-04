@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    await exchangeCalendarCode(code, sessionId);
+    await exchangeCalendarCode(code, sessionId, new URL(req.url).origin);
   } catch (err) {
     console.error('Google Calendar callback error:', err);
     return NextResponse.redirect(new URL('/dashboard?error=calendar_auth_failed', req.url));

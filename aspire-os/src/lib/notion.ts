@@ -4,9 +4,9 @@ import { encryptToken, decryptToken } from './crypto';
 
 // ── OAuth ─────────────────────────────────────────────────────────────────
 
-export function getNotionAuthUrl(sessionId: string): string {
+export function getNotionAuthUrl(sessionId: string, baseUrl?: string): string {
   const clientId = process.env.NOTION_CLIENT_ID!;
-  const base = process.env.APP_URL ?? 'http://localhost:3000';
+  const base = baseUrl ?? process.env.APP_URL ?? 'http://localhost:3000';
   const redirectUri = encodeURIComponent(`${base}/api/auth/notion/callback`);
   return (
     `https://api.notion.com/v1/oauth/authorize` +
@@ -26,10 +26,10 @@ type NotionTokenResponse = {
   owner: unknown;
 };
 
-export async function exchangeNotionCode(code: string): Promise<NotionTokenResponse> {
+export async function exchangeNotionCode(code: string, baseUrl?: string): Promise<NotionTokenResponse> {
   const clientId = process.env.NOTION_CLIENT_ID!;
   const clientSecret = process.env.NOTION_CLIENT_SECRET!;
-  const base = process.env.APP_URL ?? 'http://localhost:3000';
+  const base = baseUrl ?? process.env.APP_URL ?? 'http://localhost:3000';
   const redirectUri = `${base}/api/auth/notion/callback`;
 
   const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');

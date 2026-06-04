@@ -16,8 +16,8 @@ const HEALTH_BASE = 'https://health.googleapis.com/v4/users/me';
 
 // ── OAuth ─────────────────────────────────────────────────────────────────
 
-export function getGoogleHealthAuthUrl(sessionId: string): string {
-  return makeGoogleHealthClient(CALLBACK).generateAuthUrl({
+export function getGoogleHealthAuthUrl(sessionId: string, baseUrl?: string): string {
+  return makeGoogleHealthClient(CALLBACK, baseUrl).generateAuthUrl({
     access_type: 'offline',
     prompt: 'consent',
     scope: SCOPES,
@@ -25,8 +25,8 @@ export function getGoogleHealthAuthUrl(sessionId: string): string {
   });
 }
 
-export async function exchangeGoogleHealthCode(code: string, sessionId: string): Promise<void> {
-  const client = makeGoogleHealthClient(CALLBACK);
+export async function exchangeGoogleHealthCode(code: string, sessionId: string, baseUrl?: string): Promise<void> {
+  const client = makeGoogleHealthClient(CALLBACK, baseUrl);
   const { tokens } = await client.getToken(code);
 
   await supabase.from('user_oauth').upsert(

@@ -4,9 +4,10 @@ import { getGoogleHealthAuthUrl } from '@/lib/google-health';
 
 export async function GET(req: NextRequest) {
   // Reuse existing session cookie so Fit + Calendar tokens remain accessible
+  const baseUrl = new URL(req.url).origin;
   const existing = req.cookies.get('cadence_session')?.value;
   const sessionId = existing ?? randomUUID();
-  const authUrl = getGoogleHealthAuthUrl(sessionId);
+  const authUrl = getGoogleHealthAuthUrl(sessionId, baseUrl);
 
   const res = NextResponse.redirect(authUrl);
   if (!existing) {

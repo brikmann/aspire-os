@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const tokens = await exchangeNotionCode(code);
+    const tokens = await exchangeNotionCode(code, new URL(req.url).origin);
 
     // Find the first page the user granted access to — this becomes the parent
     // for the auto-created "Cadence Protocol" database.

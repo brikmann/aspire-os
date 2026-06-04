@@ -7,8 +7,8 @@ const SCOPES = ['https://www.googleapis.com/auth/calendar.readonly'];
 
 const CALLBACK = '/api/auth/google-calendar/callback';
 
-export function getCalendarAuthUrl(sessionId: string): string {
-  return makeGoogleClient(CALLBACK).generateAuthUrl({
+export function getCalendarAuthUrl(sessionId: string, baseUrl?: string): string {
+  return makeGoogleClient(CALLBACK, baseUrl).generateAuthUrl({
     access_type: 'offline',
     prompt: 'consent',
     scope: SCOPES,
@@ -16,8 +16,8 @@ export function getCalendarAuthUrl(sessionId: string): string {
   });
 }
 
-export async function exchangeCalendarCode(code: string, sessionId: string): Promise<void> {
-  const client = makeGoogleClient(CALLBACK);
+export async function exchangeCalendarCode(code: string, sessionId: string, baseUrl?: string): Promise<void> {
+  const client = makeGoogleClient(CALLBACK, baseUrl);
   const { tokens } = await client.getToken(code);
 
   await supabase.from('user_oauth').upsert(
