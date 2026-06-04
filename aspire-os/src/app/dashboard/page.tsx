@@ -9,7 +9,6 @@ import CadenceWidget, {
   type HealthStatus,
   type FitStatus,
   type CalStatus,
-  type NotionStatus,
   type HealthData,
   type FitData,
   type CalendarEvent,
@@ -40,10 +39,6 @@ export default function DashboardPage() {
   const [calEvents,    setCalEvents]      = useState<CalendarEvent[]>([]);
   const [calError,     setCalError]       = useState('');
 
-  const [notionStatus,    setNotionStatus]    = useState<NotionStatus>('loading');
-  const [notionWorkspace, setNotionWorkspace] = useState('');
-  const [notionError,     setNotionError]     = useState('');
-
   // ── 4F chat state ────────────────────────────────────────────────────
 
   const [cadenceReady, setCadenceReady]       = useState(false);
@@ -57,16 +52,11 @@ export default function DashboardPage() {
       params.has('connected') ||
       params.has('calendar_connected') ||
       params.has('health_connected') ||
-      params.has('notion_connected') ||
       params.get('error')
     ) {
       window.history.replaceState({}, '', '/dashboard');
     }
 
-    if (params.get('error') === 'notion_auth_failed') {
-      setNotionError('Notion authorisation failed — please try again.');
-      setNotionStatus('disconnected');
-    }
     if (params.get('error') === 'health_auth_failed') {
       setHealthError('Google Health authorisation failed — please try again.');
       setHealthStatus('disconnected');
@@ -82,7 +72,6 @@ export default function DashboardPage() {
     fetchHealth();
     fetchFit();
     fetchCalendar();
-    fetchNotion();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -146,19 +135,6 @@ export default function DashboardPage() {
     }
   }
 
-  async function fetchNotion() {
-    setNotionStatus('loading');
-    try {
-      const res  = await fetch('/api/auth/notion/data');
-      const json = await res.json();
-      if (!json.connected) { setNotionStatus('disconnected'); return; }
-      setNotionStatus('connected');
-      setNotionWorkspace(json.workspace_name ?? '');
-    } catch {
-      setNotionStatus('disconnected');
-    }
-  }
-
   // ── Disconnect handlers ──────────────────────────────────────────────
 
   async function handleHealthDisconnect() {
@@ -178,12 +154,6 @@ export default function DashboardPage() {
     await fetch('/api/auth/google-calendar/disconnect', { method: 'POST' });
     setCalStatus('disconnected');
     setCalEvents([]);
-  }
-
-  async function handleNotionDisconnect() {
-    await fetch('/api/auth/notion/disconnect', { method: 'POST' });
-    setNotionStatus('disconnected');
-    setNotionWorkspace('');
   }
 
   // ── Derived ──────────────────────────────────────────────────────────
@@ -246,11 +216,6 @@ export default function DashboardPage() {
                 label="Calendar"
                 connected={calStatus === 'connected'}
                 loading={calStatus === 'loading'}
-              />
-              <ConnectionBadge
-                label="Notion"
-                connected={notionStatus === 'connected'}
-                loading={notionStatus === 'loading'}
               />
             </div>
           </div>
@@ -318,17 +283,6 @@ export default function DashboardPage() {
               errorMessage={calError || undefined}
             />
 
-            {/* Notion */}
-            <IntegrationCard
-              name="Notion"
-              description="Push your daily protocol to a Notion database — one click from the protocol output."
-              status={notionStatus}
-              connectHref="/api/auth/notion"
-              connectLabel="Connect"
-              connectedSummary={notionWorkspace || undefined}
-              onDisconnect={handleNotionDisconnect}
-              errorMessage={notionError || undefined}
-            />
           </div>
         </motion.section>
 
@@ -352,9 +306,6 @@ export default function DashboardPage() {
             fitData={fitData}
             calStatus={calStatus}
             calEvents={calEvents}
-            notionStatus={notionStatus}
-            notionWorkspace={notionWorkspace}
-            onNotionDisconnect={handleNotionDisconnect}
             onCadenceGenerated={(cadence) => {
               setCurrentCadence(cadence);
               setCadenceReady(true);
