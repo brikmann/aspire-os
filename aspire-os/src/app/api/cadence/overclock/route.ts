@@ -3,11 +3,8 @@ import { anthropic } from '@ai-sdk/anthropic';
 import { z } from 'zod';
 import { NextRequest } from 'next/server';
 import { cadenceSchema, type CadenceOutput } from '@/lib/cadence-schema';
-import { getRefreshedTokens, fetchTodaysHealthData } from '@/lib/google-fit';
 import { getRefreshedCalendarTokens, fetchTodaysCalendarEvents, type CalendarEvent } from '@/lib/google-calendar';
 import { getRefreshedGoogleHealthTokens, fetchTodaysGoogleHealthData, type HealthData } from '@/lib/google-health';
-
-type FitData = { steps: number | null; sleepHours: number | null; restingHr: number | null; fetchedAt: string };
 
 const inputSchema = z.object({
   window: z.string().min(1),
@@ -59,7 +56,6 @@ function buildPrompt(
   win: string,
   existing: CadenceOutput | null | undefined,
   health: HealthData | null,
-  fit: FitData | null,
   cal: CalendarEvent[] | null,
 ): string {
   const lines: string[] = [`OVERCLOCK MODE ACTIVATED`, `High-stakes window: "${win}"`, ''];
@@ -92,19 +88,12 @@ function buildPrompt(
   }
 
   if (health && (health.steps !== null || health.sleepHours !== null || health.restingHr !== null || health.hrv !== null)) {
-    const sources = health.sourceDevices.length > 0 ? health.sourceDevices.join(' + ') : 'Google Health';
     lines.push('');
-    lines.push(`WEARABLE DATA (${sources}, as of ${fmt(health.fetchedAt)}):`);
+    lines.push(`WEARABLE DATA (Google Health, as of ${fmt(health.fetchedAt)}):`);
     if (health.steps !== null) lines.push(`- Steps today: ${health.steps.toLocaleString()}`);
     if (health.sleepHours !== null) lines.push(`- Sleep last night: ${health.sleepHours}h`);
     if (health.restingHr !== null) lines.push(`- Resting HR: ${health.restingHr} bpm`);
     if (health.hrv !== null) lines.push(`- HRV (RMSSD): ${health.hrv} ms`);
-  } else if (fit && (fit.steps !== null || fit.sleepHours !== null || fit.restingHr !== null)) {
-    lines.push('');
-    lines.push(`WEARABLE DATA (Google Fit, as of ${fmt(fit.fetchedAt)}):`);
-    if (fit.steps !== null) lines.push(`- Steps today: ${fit.steps.toLocaleString()}`);
-    if (fit.sleepHours !== null) lines.push(`- Sleep last night: ${fit.sleepHours}h`);
-    if (fit.restingHr !== null) lines.push(`- Resting HR: ${fit.restingHr} bpm`);
   }
 
   return lines.join('\n');
@@ -125,21 +114,13 @@ export async function POST(req: NextRequest) {
   const existing = (data.existingCadence ?? null) as CadenceOutput | null;
   const sessionId = req.cookies.get('cadence_session')?.value;
 
-  const [health, fit, cal] = await Promise.all([
+  const [health, cal] = await Promise.all([
     (async (): Promise<HealthData | null> => {
       if (!sessionId) return null;
       try {
         const t = await getRefreshedGoogleHealthTokens(sessionId);
         if (!t.ok) return null;
         return await fetchTodaysGoogleHealthData(t.token);
-      } catch { return null; }
-    })(),
-    (async (): Promise<FitData | null> => {
-      if (!sessionId) return null;
-      try {
-        const t = await getRefreshedTokens(sessionId);
-        if (!t.ok) return null;
-        return await fetchTodaysHealthData(t.token);
       } catch { return null; }
     })(),
     (async (): Promise<CalendarEvent[] | null> => {
@@ -156,7 +137,7 @@ export async function POST(req: NextRequest) {
     model: anthropic('claude-sonnet-4-6'),
     schema: cadenceSchema,
     system: buildSystemPrompt(data.window),
-    prompt: buildPrompt(data.window, existing, health, fit, cal),
+    prompt: buildPrompt(data.window, existing, health, cal),
   });
 
   return result.toTextStreamResponse();

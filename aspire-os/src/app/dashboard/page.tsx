@@ -7,10 +7,8 @@ import ConnectionBadge from '@/components/ConnectionBadge';
 import IntegrationCard from '@/components/IntegrationCard';
 import CadenceWidget, {
   type HealthStatus,
-  type FitStatus,
   type CalStatus,
   type HealthData,
-  type FitData,
   type CalendarEvent,
 } from '@/components/CadenceWidget';
 import FourFChat from '@/components/FourFChat';
@@ -52,9 +50,6 @@ export default function DashboardPage() {
   const [healthData,   setHealthData]     = useState<HealthData | null>(null);
   const [healthError,  setHealthError]    = useState('');
 
-  const [fitStatus, setFitStatus]         = useState<FitStatus>('loading');
-  const [fitData,   setFitData]           = useState<FitData | null>(null);
-
   const [calStatus,    setCalStatus]      = useState<CalStatus>('loading');
   const [calEvents,    setCalEvents]      = useState<CalendarEvent[]>([]);
   const [calError,     setCalError]       = useState('');
@@ -81,16 +76,12 @@ export default function DashboardPage() {
       setHealthError('Google Health authorisation failed — please try again.');
       setHealthStatus('disconnected');
     }
-    if (params.get('error') === 'auth_failed') {
-      setFitStatus('disconnected');
-    }
     if (params.get('error') === 'calendar_auth_failed') {
       setCalError('Google Calendar authorisation failed — please try again.');
       setCalStatus('disconnected');
     }
 
     fetchHealth();
-    fetchFit();
     fetchCalendar();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -119,26 +110,6 @@ export default function DashboardPage() {
     }
   }
 
-  async function fetchFit() {
-    setFitStatus('loading');
-    try {
-      const res  = await fetch('/api/auth/google-fit/data');
-      const json = await res.json();
-      if (!json.connected) {
-        setFitStatus(json.reconnectNeeded ? 'reconnect-needed' : 'disconnected');
-        return;
-      }
-      setFitStatus('connected');
-      setFitData({
-        sleepHours: json.sleepHours ?? null,
-        restingHr:  json.restingHr  ?? null,
-        steps:      json.steps      ?? null,
-      });
-    } catch {
-      setFitStatus('disconnected');
-    }
-  }
-
   async function fetchCalendar() {
     setCalStatus('loading');
     try {
@@ -161,13 +132,6 @@ export default function DashboardPage() {
     await fetch('/api/auth/google-health/disconnect', { method: 'POST' });
     setHealthStatus('disconnected');
     setHealthData(null);
-    fetchFit(); // re-fetch Fit so it can re-fill form fields
-  }
-
-  async function handleFitDisconnect() {
-    await fetch('/api/auth/google-fit/disconnect', { method: 'POST' });
-    setFitStatus('disconnected');
-    setFitData(null);
   }
 
   async function handleCalDisconnect() {
@@ -187,20 +151,12 @@ export default function DashboardPage() {
     return parts.join(' · ') || undefined;
   })();
 
-  const fitSummary = (() => {
-    if (!fitData) return undefined;
-    return fitData.steps != null
-      ? `${fitData.steps.toLocaleString()} steps today`
-      : undefined;
-  })();
-
   const calSummary = calStatus === 'connected'
     ? `${calEvents.length} event${calEvents.length !== 1 ? 's' : ''} today`
     : undefined;
 
-  const allLoaded = healthStatus !== 'loading' && fitStatus !== 'loading' && calStatus !== 'loading';
-  const hasWearable = healthStatus === 'connected' || fitStatus === 'connected';
-  const autoTrigger = allLoaded && hasWearable && calStatus === 'connected';
+  const allLoaded = healthStatus !== 'loading' && calStatus !== 'loading';
+  const autoTrigger = allLoaded && healthStatus === 'connected' && calStatus === 'connected';
 
   // ── Render ────────────────────────────────────────────────────────────
 
@@ -262,31 +218,6 @@ export default function DashboardPage() {
               />
             </motion.div>
 
-            {fitStatus === 'connected' && (
-              <motion.div
-                variants={section}
-                className="flex items-center justify-between bg-cobalt/10 border border-cobalt/20 rounded-2xl px-4 py-3"
-              >
-                <div className="flex items-center gap-2 text-sm">
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                    <circle cx="7" cy="7" r="6" stroke="#2C6BE0" strokeWidth="1.5" />
-                    <path d="M4.5 7l2 2 3-3" stroke="#2C6BE0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  <span className="text-silver-bright font-medium">Google Fit</span>
-                  <span className="text-xs text-silver-muted">(legacy)</span>
-                  {fitSummary && <span className="text-silver-muted">· {fitSummary}</span>}
-                </div>
-                <button
-                  type="button"
-                  onClick={handleFitDisconnect}
-                  aria-label="Disconnect Google Fit"
-                  className="text-xs text-silver-muted hover:text-silver transition-colors min-h-[44px] px-1 flex items-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cobalt focus-visible:ring-offset-2 focus-visible:ring-offset-midnight"
-                >
-                  Disconnect
-                </button>
-              </motion.div>
-            )}
-
             <motion.div variants={section}>
               <IntegrationCard
                 name="Google Calendar"
@@ -312,8 +243,6 @@ export default function DashboardPage() {
           <CadenceWidget
             healthStatus={healthStatus}
             healthData={healthData}
-            fitStatus={fitStatus}
-            fitData={fitData}
             calStatus={calStatus}
             calEvents={calEvents}
             onCadenceGenerated={(cadence) => {

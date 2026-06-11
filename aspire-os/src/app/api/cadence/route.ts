@@ -2,7 +2,6 @@ import { streamObject } from 'ai';
 import { anthropic } from '@ai-sdk/anthropic';
 import { z } from 'zod';
 import { NextRequest } from 'next/server';
-import { getRefreshedTokens, fetchTodaysHealthData } from '@/lib/google-fit';
 import { getRefreshedCalendarTokens, fetchTodaysCalendarEvents, type CalendarEvent } from '@/lib/google-calendar';
 import { getRefreshedGoogleHealthTokens, fetchTodaysGoogleHealthData, type HealthData } from '@/lib/google-health';
 import { cadenceSchema } from '@/lib/cadence-schema';
@@ -18,8 +17,6 @@ const inputSchema = z.object({
   priorities: z.string(),
   calendar: z.string(),
 });
-
-type FitData = { steps: number | null; sleepHours: number | null; restingHr: number | null; fetchedAt: string };
 
 const SYSTEM_PROMPT = `You are Cadence — the synthesis engine inside Aspire OS. You translate biometric data + a founder's calendar into a structured operational protocol.
 
@@ -68,7 +65,6 @@ function formatTime(iso: string): string {
 function buildUserMessage(
   data: z.infer<typeof inputSchema>,
   healthData: HealthData | null,
-  fitData: FitData | null,
   calEvents: CalendarEvent[] | null,
 ): string {
   const lines: string[] = ['MORNING BIOMETRICS'];
@@ -99,14 +95,10 @@ function buildUserMessage(
     lines.push(data.calendar);
   }
 
-  // DATA SOURCE PREFERENCE: Google Health (primary) > Google Fit (legacy fallback)
   if (healthData && (healthData.steps !== null || healthData.sleepHours !== null || healthData.restingHr !== null || healthData.hrv !== null)) {
     const fetchedTime = formatTime(healthData.fetchedAt);
-    const sources = healthData.sourceDevices.length > 0
-      ? healthData.sourceDevices.join(' + ')
-      : 'Google Health';
     lines.push('');
-    lines.push(`WEARABLE DATA (Google Health, today as of ${fetchedTime}, source: ${sources}):`);
+    lines.push(`WEARABLE DATA (Google Health, today as of ${fetchedTime}):`);
     if (healthData.steps !== null) lines.push(`- Steps so far today: ${healthData.steps.toLocaleString()}`);
     if (healthData.sleepHours !== null) {
       const mins = Math.round(healthData.sleepHours * 60);
@@ -114,16 +106,6 @@ function buildUserMessage(
     }
     if (healthData.restingHr !== null) lines.push(`- Resting HR: ${healthData.restingHr} bpm`);
     if (healthData.hrv !== null) lines.push(`- HRV (RMSSD): ${healthData.hrv} ms`);
-  } else if (fitData && (fitData.steps !== null || fitData.sleepHours !== null || fitData.restingHr !== null)) {
-    const fetchedTime = formatTime(fitData.fetchedAt);
-    lines.push('');
-    lines.push(`WEARABLE DATA (Google Fit legacy, today since midnight, fetched ${fetchedTime}):`);
-    if (fitData.steps !== null) lines.push(`- Steps so far today: ${fitData.steps.toLocaleString()}`);
-    if (fitData.sleepHours !== null) {
-      const mins = Math.round(fitData.sleepHours * 60);
-      lines.push(`- Sleep last night: ${fitData.sleepHours}h (${mins}min)`);
-    }
-    if (fitData.restingHr !== null) lines.push(`- Resting HR (today's reading): ${fitData.restingHr} bpm`);
   }
 
   return lines.join('\n');
@@ -143,23 +125,13 @@ export async function POST(req: NextRequest) {
 
   const sessionId = req.cookies.get('cadence_session')?.value;
 
-  const [healthData, fitData, calEvents] = await Promise.all([
+  const [healthData, calEvents] = await Promise.all([
     (async (): Promise<HealthData | null> => {
       if (!sessionId) return null;
       try {
         const t = await getRefreshedGoogleHealthTokens(sessionId);
         if (!t.ok) return null;
         return await fetchTodaysGoogleHealthData(t.token);
-      } catch {
-        return null;
-      }
-    })(),
-    (async (): Promise<FitData | null> => {
-      if (!sessionId) return null;
-      try {
-        const t = await getRefreshedTokens(sessionId);
-        if (!t.ok) return null;
-        return await fetchTodaysHealthData(t.token);
       } catch {
         return null;
       }
@@ -180,7 +152,7 @@ export async function POST(req: NextRequest) {
     model: anthropic('claude-sonnet-4-5'),
     schema: cadenceSchema,
     system: SYSTEM_PROMPT,
-    prompt: buildUserMessage(data, healthData, fitData, calEvents),
+    prompt: buildUserMessage(data, healthData, calEvents),
   });
 
   return result.toTextStreamResponse();
