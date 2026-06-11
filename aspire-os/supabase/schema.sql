@@ -101,3 +101,30 @@ INSERT INTO public.goals (slug, label, description, pillar, sort_order) VALUES
   ('less-stress',    'Less stress',    'Lower the baseline noise.',               'serenity', 5),
   ('more-strength',  'More strength',  'Build a body that holds up.',             'satiate',  6)
 ON CONFLICT (slug) DO NOTHING;
+
+-- ── user_oauth ────────────────────────────────────────────────────────────────
+-- Stores encrypted OAuth tokens for all third-party integrations.
+-- Keyed by (session_id, provider) — session_id is the cadence_session cookie.
+-- RLS is intentionally disabled: this table is only accessed server-side via
+-- API routes that enforce access through the session cookie.
+CREATE TABLE IF NOT EXISTS public.user_oauth (
+  session_id   TEXT        NOT NULL,
+  provider     TEXT        NOT NULL,
+  access_token TEXT        NOT NULL,
+  refresh_token TEXT,
+  expires_at   TIMESTAMPTZ,
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (session_id, provider)
+);
+
+-- Keep updated_at current automatically
+CREATE OR REPLACE FUNCTION public.set_updated_at()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN NEW.updated_at = NOW(); RETURN NEW; END;
+$$;
+
+DROP TRIGGER IF EXISTS user_oauth_updated_at ON public.user_oauth;
+CREATE TRIGGER user_oauth_updated_at
+  BEFORE UPDATE ON public.user_oauth
+  FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
