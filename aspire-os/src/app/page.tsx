@@ -4,6 +4,7 @@ import CadenceDemo from "@/components/CadenceDemo";
 import WearableConnectWidget from "@/components/WearableConnectWidget";
 import CalendarProtocolWidget from "@/components/CalendarProtocolWidget";
 import FounderNote from "@/components/FounderNote";
+import HeroSignIn from "@/components/HeroSignIn";
 
 // ── How it works steps ────────────────────────────────────────────────────────
 
@@ -137,15 +138,6 @@ export default function Home() {
         <Link href="/" className="font-sans font-medium text-2xl text-silver-bright leading-none tracking-[-0.5px] hover:text-white transition-colors">
           ASPIRE OS
         </Link>
-        <Link
-          href="/dashboard"
-          className="hidden sm:inline-flex items-center gap-2 text-[13px] font-medium text-silver hover:text-silver-bright transition-colors"
-        >
-          Dashboard
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-            <path d="M2.5 7h9M7.5 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </Link>
       </header>
 
       {/* ── Hero ─────────────────────────────────────────────────────── */}
@@ -183,15 +175,7 @@ export default function Home() {
         </FadeIn>
 
         <FadeIn className="mt-10 flex flex-col sm:flex-row items-center gap-4" delay={0.2} load>
-          <Link
-            href="/dashboard"
-            className="btn-shimmer relative overflow-hidden inline-flex items-center gap-2.5 bg-cobalt hover:bg-cobalt-dark active:scale-[0.98] text-white font-semibold text-[17px] px-9 py-4 rounded-xl transition-all duration-200 shadow-[0_4px_32px_rgba(44,107,224,0.35)]"
-          >
-            Open Dashboard
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </Link>
+          <HeroSignIn />
           <a href="#how-it-works" className="text-[15px] font-medium text-silver-muted hover:text-silver transition-colors">
             How it works ↓
           </a>

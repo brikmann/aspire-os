@@ -35,6 +35,14 @@ html {
   /* Semantic — error and success used only for inline feedback states */
   --color-error:          #E5534B;
   --color-success:        #2EA84B;
+
+  /* Auth / onboarding screens — obsidian palette */
+  --color-auth-bg:        #0d0d0d;
+  --color-auth-surface:   #1a1a1a;
+  --color-auth-cobalt:    #1f3a5f;
+  --color-auth-white:     #ffffff;
+  --color-auth-off-white: #f5f5f5;
+  --color-auth-secondary: #cccccc;
 }
 
 @theme inline {
