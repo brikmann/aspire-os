@@ -463,7 +463,7 @@ export default function CadenceWidget({
     try { localStorage.removeItem(todayKey()); } catch { /* ignore */ }
     const sleep = (healthData?.sleepHours ?? parseFloat(form.sleepHours) ?? null) || 7.5;
     generate({
-      wearable: healthData?.sourceDevices?.[0] ?? form.wearable || 'None',
+      wearable: healthData?.sourceDevices?.[0] ?? (form.wearable || 'None'),
       hrv: healthData?.hrv ?? (form.hrv ? parseFloat(form.hrv) : undefined),
       restingHr: healthData?.restingHr ?? (form.restingHr ? parseFloat(form.restingHr) : undefined),
       sleepHours: sleep,
