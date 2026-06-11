@@ -45,6 +45,7 @@ type Props = {
   healthData: HealthData | null;
   calStatus: CalStatus;
   calEvents: CalendarEvent[];
+  calSourceLabel?: string;
   onCadenceGenerated: (cadence: CadenceOutput) => void;
   autoTrigger: boolean;
 };
@@ -255,6 +256,7 @@ export default function CadenceWidget({
   healthData,
   calStatus,
   calEvents,
+  calSourceLabel,
   onCadenceGenerated,
   autoTrigger,
 }: Props) {
@@ -609,7 +611,7 @@ export default function CadenceWidget({
             <div>
               {calConnected && calEvents.length > 0 ? (
                 <>
-                  <p className={LABEL_BASE}>Today&apos;s calendar <span className="text-cobalt-soft normal-case tracking-normal">(Google Calendar)</span></p>
+                  <p className={LABEL_BASE}>Today&apos;s calendar {calSourceLabel && <span className="text-cobalt-soft normal-case tracking-normal">({calSourceLabel})</span>}</p>
                   <div className="bg-midnight border border-midnight-edge rounded-lg px-3 py-2 space-y-2 mb-4">
                     {calEvents.map((ev, i) => (
                       <p key={i} className="text-sm text-silver-bright leading-relaxed">

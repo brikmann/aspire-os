@@ -50,9 +50,13 @@ export default function DashboardPage() {
   const [healthData,   setHealthData]     = useState<HealthData | null>(null);
   const [healthError,  setHealthError]    = useState('');
 
-  const [calStatus,    setCalStatus]      = useState<CalStatus>('loading');
-  const [calEvents,    setCalEvents]      = useState<CalendarEvent[]>([]);
-  const [calError,     setCalError]       = useState('');
+  const [calStatus,      setCalStatus]      = useState<CalStatus>('loading');
+  const [calEvents,      setCalEvents]      = useState<CalendarEvent[]>([]);
+  const [calError,       setCalError]       = useState('');
+
+  const [outlookStatus,  setOutlookStatus]  = useState<CalStatus>('loading');
+  const [outlookEvents,  setOutlookEvents]  = useState<CalendarEvent[]>([]);
+  const [outlookError,   setOutlookError]   = useState('');
 
   // ── 4F chat state ────────────────────────────────────────────────────
 
@@ -63,15 +67,6 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (
-      params.has('connected') ||
-      params.has('calendar_connected') ||
-      params.has('health_connected') ||
-      params.get('error')
-    ) {
-      window.history.replaceState({}, '', '/dashboard');
-    }
-
     if (params.get('error') === 'health_auth_failed') {
       setHealthError('Google Health authorisation failed — please try again.');
       setHealthStatus('disconnected');
@@ -80,9 +75,16 @@ export default function DashboardPage() {
       setCalError('Google Calendar authorisation failed — please try again.');
       setCalStatus('disconnected');
     }
+    if (params.get('error') === 'outlook_auth_failed') {
+      setOutlookError('Outlook authorisation failed — please try again.');
+      setOutlookStatus('disconnected');
+    }
+
+    if (params.toString()) window.history.replaceState({}, '', '/dashboard');
 
     fetchHealth();
     fetchCalendar();
+    fetchOutlook();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -126,6 +128,22 @@ export default function DashboardPage() {
     }
   }
 
+  async function fetchOutlook() {
+    setOutlookStatus('loading');
+    try {
+      const res  = await fetch('/api/auth/outlook/data');
+      const json = await res.json();
+      if (!json.connected) {
+        setOutlookStatus(json.reconnectNeeded ? 'reconnect-needed' : 'disconnected');
+        return;
+      }
+      setOutlookStatus('connected');
+      setOutlookEvents(json.events ?? []);
+    } catch {
+      setOutlookStatus('disconnected');
+    }
+  }
+
   // ── Disconnect handlers ──────────────────────────────────────────────
 
   async function handleHealthDisconnect() {
@@ -138,6 +156,12 @@ export default function DashboardPage() {
     await fetch('/api/auth/google-calendar/disconnect', { method: 'POST' });
     setCalStatus('disconnected');
     setCalEvents([]);
+  }
+
+  async function handleOutlookDisconnect() {
+    await fetch('/api/auth/outlook/disconnect', { method: 'POST' });
+    setOutlookStatus('disconnected');
+    setOutlookEvents([]);
   }
 
   // ── Derived ──────────────────────────────────────────────────────────
@@ -155,8 +179,26 @@ export default function DashboardPage() {
     ? `${calEvents.length} event${calEvents.length !== 1 ? 's' : ''} today`
     : undefined;
 
-  const allLoaded = healthStatus !== 'loading' && calStatus !== 'loading';
-  const autoTrigger = allLoaded && healthStatus === 'connected' && calStatus === 'connected';
+  const outlookSummary = outlookStatus === 'connected'
+    ? `${outlookEvents.length} event${outlookEvents.length !== 1 ? 's' : ''} today`
+    : undefined;
+
+  // Merged calendar data for CadenceWidget
+  const effectiveCalStatus: CalStatus =
+    calStatus === 'connected' || outlookStatus === 'connected' ? 'connected' :
+    calStatus === 'loading'   || outlookStatus === 'loading'   ? 'loading' :
+    calStatus === 'reconnect-needed' || outlookStatus === 'reconnect-needed' ? 'reconnect-needed' :
+    'disconnected';
+
+  const mergedCalEvents = [...calEvents, ...outlookEvents];
+
+  const calSourceLabel = [
+    calStatus === 'connected' ? 'Google Calendar' : null,
+    outlookStatus === 'connected' ? 'Outlook' : null,
+  ].filter(Boolean).join(' + ');
+
+  const allLoaded = healthStatus !== 'loading' && calStatus !== 'loading' && outlookStatus !== 'loading';
+  const autoTrigger = allLoaded && healthStatus === 'connected' && (calStatus === 'connected' || outlookStatus === 'connected');
 
   // ── Render ────────────────────────────────────────────────────────────
 
@@ -231,6 +273,20 @@ export default function DashboardPage() {
                 errorMessage={calError || undefined}
               />
             </motion.div>
+
+            <motion.div variants={section}>
+              <IntegrationCard
+                name="Outlook Calendar"
+                description="Pulls Microsoft 365 or Outlook.com meetings into Cadence alongside Google Calendar."
+                status={outlookStatus}
+                connectHref="/api/auth/outlook"
+                connectLabel="Connect"
+                reconnectHref="/api/auth/outlook"
+                connectedSummary={outlookSummary}
+                onDisconnect={handleOutlookDisconnect}
+                errorMessage={outlookError || undefined}
+              />
+            </motion.div>
           </motion.div>
         </motion.section>
 
@@ -243,8 +299,9 @@ export default function DashboardPage() {
           <CadenceWidget
             healthStatus={healthStatus}
             healthData={healthData}
-            calStatus={calStatus}
-            calEvents={calEvents}
+            calStatus={effectiveCalStatus}
+            calEvents={mergedCalEvents}
+            calSourceLabel={calSourceLabel}
             onCadenceGenerated={(cadence) => {
               setCurrentCadence(cadence);
               setCadenceReady(true);

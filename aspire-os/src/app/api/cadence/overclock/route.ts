@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { NextRequest } from 'next/server';
 import { cadenceSchema, type CadenceOutput } from '@/lib/cadence-schema';
 import { getRefreshedCalendarTokens, fetchTodaysCalendarEvents, type CalendarEvent } from '@/lib/google-calendar';
+import { getRefreshedOutlookTokens, fetchTodaysOutlookEvents } from '@/lib/outlook-calendar';
 import { getRefreshedGoogleHealthTokens, fetchTodaysGoogleHealthData, type HealthData } from '@/lib/google-health';
 
 const inputSchema = z.object({
@@ -114,7 +115,7 @@ export async function POST(req: NextRequest) {
   const existing = (data.existingCadence ?? null) as CadenceOutput | null;
   const sessionId = req.cookies.get('cadence_session')?.value;
 
-  const [health, cal] = await Promise.all([
+  const [health, googleCal, outlookCal] = await Promise.all([
     (async (): Promise<HealthData | null> => {
       if (!sessionId) return null;
       try {
@@ -131,13 +132,23 @@ export async function POST(req: NextRequest) {
         return await fetchTodaysCalendarEvents(t.token);
       } catch { return null; }
     })(),
+    (async (): Promise<CalendarEvent[] | null> => {
+      if (!sessionId) return null;
+      try {
+        const t = await getRefreshedOutlookTokens(sessionId);
+        if (!t.ok) return null;
+        return await fetchTodaysOutlookEvents(t.token);
+      } catch { return null; }
+    })(),
   ]);
+
+  const cal = [...(googleCal ?? []), ...(outlookCal ?? [])];
 
   const result = streamObject({
     model: anthropic('claude-sonnet-4-6'),
     schema: cadenceSchema,
     system: buildSystemPrompt(data.window),
-    prompt: buildPrompt(data.window, existing, health, cal),
+    prompt: buildPrompt(data.window, existing, health, cal.length ? cal : null),
   });
 
   return result.toTextStreamResponse();

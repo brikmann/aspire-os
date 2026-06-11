@@ -3,6 +3,7 @@ import { anthropic } from '@ai-sdk/anthropic';
 import { z } from 'zod';
 import { NextRequest } from 'next/server';
 import { getRefreshedCalendarTokens, fetchTodaysCalendarEvents, type CalendarEvent } from '@/lib/google-calendar';
+import { getRefreshedOutlookTokens, fetchTodaysOutlookEvents } from '@/lib/outlook-calendar';
 import { getRefreshedGoogleHealthTokens, fetchTodaysGoogleHealthData, type HealthData } from '@/lib/google-health';
 import { cadenceSchema } from '@/lib/cadence-schema';
 
@@ -66,6 +67,7 @@ function buildUserMessage(
   data: z.infer<typeof inputSchema>,
   healthData: HealthData | null,
   calEvents: CalendarEvent[] | null,
+  calLabel: string,
 ): string {
   const lines: string[] = ['MORNING BIOMETRICS'];
   lines.push(`- Wearable: ${data.wearable}`);
@@ -80,7 +82,7 @@ function buildUserMessage(
 
   if (calEvents && calEvents.length > 0) {
     lines.push('');
-    lines.push('CALENDAR (Google Calendar, today):');
+    lines.push(`CALENDAR (${calLabel}, today):`);
     for (const ev of calEvents) {
       lines.push(`- ${ev.start} - ${ev.end}: ${ev.summary} (${ev.duration_min} min)`);
     }
@@ -125,7 +127,7 @@ export async function POST(req: NextRequest) {
 
   const sessionId = req.cookies.get('cadence_session')?.value;
 
-  const [healthData, calEvents] = await Promise.all([
+  const [healthData, googleCalEvents, outlookCalEvents] = await Promise.all([
     (async (): Promise<HealthData | null> => {
       if (!sessionId) return null;
       try {
@@ -146,13 +148,29 @@ export async function POST(req: NextRequest) {
         return null;
       }
     })(),
+    (async (): Promise<CalendarEvent[] | null> => {
+      if (!sessionId) return null;
+      try {
+        const t = await getRefreshedOutlookTokens(sessionId);
+        if (!t.ok) return null;
+        return await fetchTodaysOutlookEvents(t.token);
+      } catch {
+        return null;
+      }
+    })(),
   ]);
+
+  const calEvents = [...(googleCalEvents ?? []), ...(outlookCalEvents ?? [])];
+  const calLabel = [
+    googleCalEvents?.length ? 'Google Calendar' : null,
+    outlookCalEvents?.length ? 'Outlook' : null,
+  ].filter(Boolean).join(' + ') || 'Calendar';
 
   const result = streamObject({
     model: anthropic('claude-sonnet-4-5'),
     schema: cadenceSchema,
     system: SYSTEM_PROMPT,
-    prompt: buildUserMessage(data, healthData, calEvents),
+    prompt: buildUserMessage(data, healthData, calEvents.length ? calEvents : null, calLabel),
   });
 
   return result.toTextStreamResponse();
