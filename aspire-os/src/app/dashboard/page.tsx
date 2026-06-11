@@ -5,6 +5,7 @@ import { motion, AnimatePresence, MotionConfig, type Variants } from 'framer-mot
 import { type CadenceOutput } from '@/lib/cadence-schema';
 import ConnectionBadge from '@/components/ConnectionBadge';
 import IntegrationCard from '@/components/IntegrationCard';
+import { getSupabaseBrowser } from '@/lib/supabase-browser';
 import CadenceWidget, {
   type HealthStatus,
   type CalStatus,
@@ -39,6 +40,22 @@ const chatSection: Variants = {
   },
   exit: { opacity: 0, y: -10, transition: { duration: 0.2 } },
 };
+
+function SignOutButton() {
+  async function handleSignOut() {
+    const supabase = getSupabaseBrowser();
+    await supabase.auth.signOut();
+    window.location.href = '/sign-in';
+  }
+  return (
+    <button
+      onClick={handleSignOut}
+      className="font-sans text-xs text-silver-dim hover:text-silver-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cobalt rounded px-2 py-1"
+    >
+      Sign out
+    </button>
+  );
+}
 
 // ── Main component ─────────────────────────────────────────────────────────
 
@@ -76,7 +93,16 @@ export default function DashboardPage() {
       setCalStatus('disconnected');
     }
     if (params.get('error') === 'outlook_auth_failed') {
-      setOutlookError('Outlook authorisation failed — please try again.');
+      const reason = params.get('reason');
+      const detail = params.get('detail');
+      const msg = reason === 'no_cookie' || reason === 'state_mismatch'
+        ? 'Outlook session expired mid-flow — please try connecting again.'
+        : reason === 'token_exchange'
+        ? `Outlook token exchange failed${detail ? `: ${detail}` : ''}`
+        : reason
+        ? `Outlook auth failed: ${reason}`
+        : 'Outlook authorisation failed — please try again.';
+      setOutlookError(msg);
       setOutlookStatus('disconnected');
     }
 
@@ -231,6 +257,7 @@ export default function DashboardPage() {
                 connected={calStatus === 'connected'}
                 loading={calStatus === 'loading'}
               />
+              <SignOutButton />
             </div>
           </div>
         </motion.header>
