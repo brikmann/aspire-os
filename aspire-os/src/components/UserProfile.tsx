@@ -23,8 +23,18 @@ type Props = {
 };
 
 export default function UserProfile({ displayName, xp, onNameSaved }: Props) {
-  const [editing, setEditing] = useState(!displayName);
+  const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(displayName ?? '');
+
+  // When displayName loads from the server, sync local state.
+  useEffect(() => {
+    if (displayName) {
+      setEditing(false);
+      setDraft(displayName);
+    } else {
+      setEditing(true);
+    }
+  }, [displayName]);
   const [saving, setSaving] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
