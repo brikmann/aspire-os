@@ -13,6 +13,7 @@ import CadenceWidget, {
   type CalendarEvent,
 } from '@/components/CadenceWidget';
 import FourFChat from '@/components/FourFChat';
+import UserProfile from '@/components/UserProfile';
 
 // Page-level stagger — parent fires children 0.12s apart
 const page: Variants = {
@@ -67,13 +68,15 @@ export default function DashboardPage() {
   const [healthData,   setHealthData]     = useState<HealthData | null>(null);
   const [healthError,  setHealthError]    = useState('');
 
-  const [calStatus,      setCalStatus]      = useState<CalStatus>('loading');
-  const [calEvents,      setCalEvents]      = useState<CalendarEvent[]>([]);
-  const [calError,       setCalError]       = useState('');
+  const [calStatus,  setCalStatus]  = useState<CalStatus>('loading');
+  const [calEvents,  setCalEvents]  = useState<CalendarEvent[]>([]);
+  const [calError,   setCalError]   = useState('');
 
-  const [outlookStatus,  setOutlookStatus]  = useState<CalStatus>('loading');
-  const [outlookEvents,  setOutlookEvents]  = useState<CalendarEvent[]>([]);
-  const [outlookError,   setOutlookError]   = useState('');
+  // ── XP + profile state ───────────────────────────────────────────────
+
+  const [xp,            setXp]            = useState(0);
+  const [displayName,   setDisplayName]   = useState<string | null>(null);
+  const [completedTasks, setCompletedTasks] = useState<Set<number>>(new Set());
 
   // ── 4F chat state ────────────────────────────────────────────────────
 
@@ -92,25 +95,11 @@ export default function DashboardPage() {
       setCalError('Google Calendar authorisation failed — please try again.');
       setCalStatus('disconnected');
     }
-    if (params.get('error') === 'outlook_auth_failed') {
-      const reason = params.get('reason');
-      const detail = params.get('detail');
-      const msg = reason === 'no_cookie' || reason === 'state_mismatch'
-        ? 'Outlook session expired mid-flow — please try connecting again.'
-        : reason === 'token_exchange'
-        ? `Outlook token exchange failed${detail ? `: ${detail}` : ''}`
-        : reason
-        ? `Outlook auth failed: ${reason}`
-        : 'Outlook authorisation failed — please try again.';
-      setOutlookError(msg);
-      setOutlookStatus('disconnected');
-    }
-
     if (params.toString()) window.history.replaceState({}, '', '/dashboard');
 
     fetchHealth();
     fetchCalendar();
-    fetchOutlook();
+    fetchXpStatus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -154,20 +143,15 @@ export default function DashboardPage() {
     }
   }
 
-  async function fetchOutlook() {
-    setOutlookStatus('loading');
+  async function fetchXpStatus() {
     try {
-      const res  = await fetch('/api/auth/outlook/data');
+      const res  = await fetch('/api/xp/status');
+      if (!res.ok) return;
       const json = await res.json();
-      if (!json.connected) {
-        setOutlookStatus(json.reconnectNeeded ? 'reconnect-needed' : 'disconnected');
-        return;
-      }
-      setOutlookStatus('connected');
-      setOutlookEvents(json.events ?? []);
-    } catch {
-      setOutlookStatus('disconnected');
-    }
+      setXp(json.xp ?? 0);
+      setDisplayName(json.displayName ?? null);
+      setCompletedTasks(new Set(json.completedToday ?? []));
+    } catch { /* silent */ }
   }
 
   // ── Disconnect handlers ──────────────────────────────────────────────
@@ -184,10 +168,45 @@ export default function DashboardPage() {
     setCalEvents([]);
   }
 
-  async function handleOutlookDisconnect() {
-    await fetch('/api/auth/outlook/disconnect', { method: 'POST' });
-    setOutlookStatus('disconnected');
-    setOutlookEvents([]);
+  // ── Task XP toggle ───────────────────────────────────────────────────
+
+  async function handleTaskToggle(index: number, done: boolean) {
+    const today = new Date().toISOString().slice(0, 10);
+    const task = currentCadence?.protocol?.[index];
+
+    // Optimistic update
+    setCompletedTasks(prev => {
+      const next = new Set(prev);
+      done ? next.add(index) : next.delete(index);
+      return next;
+    });
+
+    try {
+      if (done) {
+        const res = await fetch('/api/xp/complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ taskIndex: index, taskText: task?.action ?? '', date: today }),
+        });
+        const json = await res.json();
+        if (json.xp != null) setXp(json.xp);
+      } else {
+        const res = await fetch('/api/xp/uncomplete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ taskIndex: index, date: today }),
+        });
+        const json = await res.json();
+        if (json.xp != null) setXp(json.xp);
+      }
+    } catch {
+      // Revert on failure
+      setCompletedTasks(prev => {
+        const next = new Set(prev);
+        done ? next.delete(index) : next.add(index);
+        return next;
+      });
+    }
   }
 
   // ── Derived ──────────────────────────────────────────────────────────
@@ -205,26 +224,8 @@ export default function DashboardPage() {
     ? `${calEvents.length} event${calEvents.length !== 1 ? 's' : ''} today`
     : undefined;
 
-  const outlookSummary = outlookStatus === 'connected'
-    ? `${outlookEvents.length} event${outlookEvents.length !== 1 ? 's' : ''} today`
-    : undefined;
-
-  // Merged calendar data for CadenceWidget
-  const effectiveCalStatus: CalStatus =
-    calStatus === 'connected' || outlookStatus === 'connected' ? 'connected' :
-    calStatus === 'loading'   || outlookStatus === 'loading'   ? 'loading' :
-    calStatus === 'reconnect-needed' || outlookStatus === 'reconnect-needed' ? 'reconnect-needed' :
-    'disconnected';
-
-  const mergedCalEvents = [...calEvents, ...outlookEvents];
-
-  const calSourceLabel = [
-    calStatus === 'connected' ? 'Google Calendar' : null,
-    outlookStatus === 'connected' ? 'Outlook' : null,
-  ].filter(Boolean).join(' + ');
-
-  const allLoaded = healthStatus !== 'loading' && calStatus !== 'loading' && outlookStatus !== 'loading';
-  const autoTrigger = allLoaded && healthStatus === 'connected' && (calStatus === 'connected' || outlookStatus === 'connected');
+  const allLoaded = healthStatus !== 'loading' && calStatus !== 'loading';
+  const autoTrigger = allLoaded && healthStatus === 'connected' && calStatus === 'connected';
 
   // ── Render ────────────────────────────────────────────────────────────
 
@@ -240,25 +241,21 @@ export default function DashboardPage() {
       <div className="max-w-[680px] mx-auto px-4 sm:px-6">
 
         {/* ── Section A: Header ────────────────────────────────────────── */}
-        <motion.header className="py-12 sm:py-16" variants={section}>
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="font-mono text-[10px] font-medium uppercase tracking-[4px] text-silver-dim leading-none">Aspire OS</p>
-              <p className="font-sans font-semibold text-2xl text-silver-bright tracking-tight leading-tight mt-2">Dashboard</p>
-            </div>
-            <div className="flex items-center gap-3 pt-1 flex-wrap justify-end">
-              <ConnectionBadge
-                label="Health"
-                connected={healthStatus === 'connected'}
-                loading={healthStatus === 'loading'}
-              />
-              <ConnectionBadge
-                label="Calendar"
-                connected={calStatus === 'connected'}
-                loading={calStatus === 'loading'}
-              />
+        <motion.header className="py-10 sm:py-14" variants={section}>
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <p className="font-mono text-[10px] font-medium uppercase tracking-[4px] text-silver-dim leading-none pt-1">Aspire OS · Dashboard</p>
+            <div className="flex items-center gap-3 flex-wrap justify-end">
+              <ConnectionBadge label="Health" connected={healthStatus === 'connected'} loading={healthStatus === 'loading'} />
+              <ConnectionBadge label="Calendar" connected={calStatus === 'connected'} loading={calStatus === 'loading'} />
               <SignOutButton />
             </div>
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <UserProfile
+              displayName={displayName}
+              xp={xp}
+              onNameSaved={(name) => setDisplayName(name)}
+            />
           </div>
         </motion.header>
 
@@ -301,19 +298,6 @@ export default function DashboardPage() {
               />
             </motion.div>
 
-            <motion.div variants={section}>
-              <IntegrationCard
-                name="Outlook Calendar"
-                description="Pulls Microsoft 365 or Outlook.com meetings into Cadence alongside Google Calendar."
-                status={outlookStatus}
-                connectHref="/api/auth/outlook"
-                connectLabel="Connect"
-                reconnectHref="/api/auth/outlook"
-                connectedSummary={outlookSummary}
-                onDisconnect={handleOutlookDisconnect}
-                errorMessage={outlookError || undefined}
-              />
-            </motion.div>
           </motion.div>
         </motion.section>
 
@@ -326,14 +310,15 @@ export default function DashboardPage() {
           <CadenceWidget
             healthStatus={healthStatus}
             healthData={healthData}
-            calStatus={effectiveCalStatus}
-            calEvents={mergedCalEvents}
-            calSourceLabel={calSourceLabel}
+            calStatus={calStatus}
+            calEvents={calEvents}
             onCadenceGenerated={(cadence) => {
               setCurrentCadence(cadence);
               setCadenceReady(true);
             }}
             autoTrigger={autoTrigger}
+            completedTasks={completedTasks}
+            onTaskToggle={handleTaskToggle}
           />
         </motion.section>
 

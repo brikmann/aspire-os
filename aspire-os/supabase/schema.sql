@@ -102,6 +102,33 @@ INSERT INTO public.goals (slug, label, description, pillar, sort_order) VALUES
   ('more-strength',  'More strength',  'Build a body that holds up.',             'satiate',  6)
 ON CONFLICT (slug) DO NOTHING;
 
+-- ── XP + display name on profiles ───────────────────────────────────────────
+-- Run these ALTER TABLE statements after the initial CREATE TABLE above.
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS display_name TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS xp INTEGER NOT NULL DEFAULT 0;
+
+-- ── protocol_completions ──────────────────────────────────────────────────────
+-- Tracks which protocol tasks a user checked off each day.
+CREATE TABLE IF NOT EXISTS public.protocol_completions (
+  id             UUID        NOT NULL DEFAULT gen_random_uuid(),
+  user_id        UUID        NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  completed_date DATE        NOT NULL,
+  task_index     INTEGER     NOT NULL,
+  task_text      TEXT        NOT NULL,
+  xp_earned      INTEGER     NOT NULL DEFAULT 10,
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (id),
+  UNIQUE (user_id, completed_date, task_index)
+);
+
+ALTER TABLE public.protocol_completions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "protocol_completions: users manage own"
+  ON public.protocol_completions
+  FOR ALL
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
 -- ── user_oauth ────────────────────────────────────────────────────────────────
 -- Stores encrypted OAuth tokens for all third-party integrations.
 -- Keyed by (session_id, provider) — session_id is the cadence_session cookie.

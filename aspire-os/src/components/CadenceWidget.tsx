@@ -45,9 +45,10 @@ type Props = {
   healthData: HealthData | null;
   calStatus: CalStatus;
   calEvents: CalendarEvent[];
-  calSourceLabel?: string;
   onCadenceGenerated: (cadence: CadenceOutput) => void;
   autoTrigger: boolean;
+  completedTasks?: Set<number>;
+  onTaskToggle?: (index: number, done: boolean) => void;
 };
 
 // ── JSON streaming helpers ─────────────────────────────────────────────────
@@ -200,25 +201,73 @@ function WearableBadge() {
   );
 }
 
-function ProtocolCard({ item, index, isNow }: { item: ProtocolItem; index: number; isNow: boolean }) {
+function ProtocolCard({
+  item, index, isNow, done, onToggle,
+}: {
+  item: ProtocolItem;
+  index: number;
+  isNow: boolean;
+  done: boolean;
+  onToggle: () => void;
+}) {
+  const [xpPop, setXpPop] = useState(false);
   const [timeNum, timePeriod] = item.time.split(' ');
   const emoji = CATEGORY_EMOJI[item.category] ?? '·';
+
+  function handleToggle() {
+    if (!done) { setXpPop(true); setTimeout(() => setXpPop(false), 1200); }
+    onToggle();
+  }
+
   return (
     <motion.div
-      className={`flex rounded-2xl p-4 border transition-colors ${
-        isNow
+      className={`relative flex rounded-2xl p-4 border transition-colors ${
+        done
+          ? 'bg-midnight-light/15 border-midnight-edge/30 opacity-60'
+          : isNow
           ? 'bg-midnight-light/50 border-cobalt-soft/30'
           : 'bg-midnight-light/30 border-midnight-edge/50'
       }`}
       initial={{ opacity: 0, y: 18, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ type: 'spring', stiffness: 360, damping: 28, mass: 0.8, delay: index * 0.07 }}
-      whileHover={{ scale: 1.015, y: -1, transition: { type: 'spring', stiffness: 500, damping: 20 } }}
+      whileHover={{ scale: done ? 1 : 1.015, y: done ? 0 : -1, transition: { type: 'spring', stiffness: 500, damping: 20 } }}
     >
-      <div className="w-16 flex-shrink-0">
+      {/* +XP pop */}
+      <AnimatePresence>
+        {xpPop && (
+          <motion.span
+            key="xp-pop"
+            className="absolute -top-2 left-6 text-xs font-bold text-cobalt pointer-events-none select-none"
+            initial={{ opacity: 1, y: 0 }}
+            animate={{ opacity: 0, y: -20 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1 }}
+          >
+            +10 XP
+          </motion.span>
+        )}
+      </AnimatePresence>
+
+      {/* Checkbox */}
+      <button
+        type="button"
+        onClick={handleToggle}
+        aria-label={done ? 'Mark incomplete' : 'Mark complete'}
+        className="shrink-0 w-5 h-5 mt-0.5 rounded-full border-2 flex items-center justify-center transition-colors mr-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cobalt"
+        style={{ borderColor: done ? 'var(--color-cobalt)' : undefined }}
+      >
+        {done && (
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <path d="M2 5l2.5 2.5L8 3" stroke="#2C6BE0" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        )}
+      </button>
+
+      <div className="w-14 flex-shrink-0">
         <p className="font-mono text-base font-semibold text-cobalt-soft leading-none">{timeNum}</p>
         <p className="font-mono text-xs text-cobalt-soft/60 mt-0.5">{timePeriod}</p>
-        {isNow && (
+        {isNow && !done && (
           <div className="flex items-center gap-1 mt-2">
             <span className="relative flex h-2 w-2 flex-shrink-0">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cobalt opacity-70" />
@@ -230,7 +279,7 @@ function ProtocolCard({ item, index, isNow }: { item: ProtocolItem; index: numbe
       </div>
       <div className="flex-1 pl-4 border-l border-midnight-edge">
         <div className="flex items-start justify-between gap-2">
-          <p className="text-base text-silver-bright font-medium leading-snug flex-1">
+          <p className={`text-base font-medium leading-snug flex-1 ${done ? 'line-through text-silver-muted' : 'text-silver-bright'}`}>
             {item.action}
             {item.duration_min != null && (
               <span className="text-silver-muted font-normal"> ({item.duration_min} min)</span>
@@ -256,9 +305,10 @@ export default function CadenceWidget({
   healthData,
   calStatus,
   calEvents,
-  calSourceLabel,
   onCadenceGenerated,
   autoTrigger,
+  completedTasks = new Set(),
+  onTaskToggle,
 }: Props) {
   const [view, setView] = useState<'input' | 'output'>('input');
 
@@ -611,7 +661,7 @@ export default function CadenceWidget({
             <div>
               {calConnected && calEvents.length > 0 ? (
                 <>
-                  <p className={LABEL_BASE}>Today&apos;s calendar {calSourceLabel && <span className="text-cobalt-soft normal-case tracking-normal">({calSourceLabel})</span>}</p>
+                  <p className={LABEL_BASE}>Today&apos;s calendar <span className="text-cobalt-soft normal-case tracking-normal">(Google Calendar)</span></p>
                   <div className="bg-midnight border border-midnight-edge rounded-lg px-3 py-2 space-y-2 mb-4">
                     {calEvents.map((ev, i) => (
                       <p key={i} className="text-sm text-silver-bright leading-relaxed">
@@ -766,7 +816,14 @@ export default function CadenceWidget({
             <p className={EYEBROW}>Protocol</p>
             <div className="space-y-3" aria-live="polite" aria-label="Daily protocol">
               {displayProtocol.map((item, i) => (
-                <ProtocolCard key={`${item.time}-${i}`} item={item} index={i} isNow={i === nowIndex} />
+                <ProtocolCard
+                  key={`${item.time}-${i}`}
+                  item={item}
+                  index={i}
+                  isNow={i === nowIndex}
+                  done={completedTasks.has(i)}
+                  onToggle={() => onTaskToggle?.(i, !completedTasks.has(i))}
+                />
               ))}
               {isGenerating && displayProtocol.length === 0 && (
                 <>{[0, 1, 2].map(i => <SkeletonProtocolCard key={i} />)}</>
