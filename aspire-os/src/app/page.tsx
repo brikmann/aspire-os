@@ -1,6 +1,3 @@
-export const dynamic = 'force-static';
-export const revalidate = false;
-
 import Link from "next/link";
 import FadeIn from "@/components/FadeIn";
 import CadenceDemo from "@/components/CadenceDemo";
