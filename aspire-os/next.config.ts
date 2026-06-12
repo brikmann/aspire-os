@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
   experimental: {
     // Never serve stale HTML — every request gets the latest deployment.
     // Without this, Vercel serves cached pages for up to 5 min after a deploy.
-    staleTimes: { dynamic: 0, static: 0 },
+    staleTimes: { dynamic: 0, static: 30 },
   },
 };
 
