@@ -29,7 +29,11 @@ export async function GET(request: NextRequest) {
   const { data: { session }, error } = await supabase.auth.exchangeCodeForSession(code)
 
   if (error || !session) {
-    return NextResponse.redirect(new URL('/sign-in?error=auth_failed', origin))
+    console.error('Auth callback exchange failed:', error?.message, error?.code, error?.status);
+    const dest = new URL('/sign-in', origin);
+    dest.searchParams.set('error', 'auth_failed');
+    if (error?.message) dest.searchParams.set('detail', error.message.slice(0, 120));
+    return NextResponse.redirect(dest);
   }
 
   // Route based on onboarding status

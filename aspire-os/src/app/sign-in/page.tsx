@@ -24,7 +24,13 @@ function GoogleIcon() {
 
 export default function SignInPage() {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(() => {
+    if (typeof window === 'undefined') return '';
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('error') !== 'auth_failed') return '';
+    const detail = p.get('detail');
+    return detail ? `Sign-in failed: ${detail}` : 'Sign-in failed — please try again.';
+  });
 
   async function handleGoogleSignIn() {
     setLoading(true);
