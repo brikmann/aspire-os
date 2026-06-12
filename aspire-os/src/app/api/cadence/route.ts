@@ -155,7 +155,7 @@ export async function POST(req: NextRequest) {
     model: anthropic('claude-sonnet-4-5'),
     schema: cadenceSchema,
     system: SYSTEM_PROMPT,
-    prompt: buildUserMessage(data, healthData, calEvents.length ? calEvents : null, calLabel),
+    prompt: buildUserMessage(data, healthData, calEvents, calLabel),
   });
 
   return result.toTextStreamResponse();
