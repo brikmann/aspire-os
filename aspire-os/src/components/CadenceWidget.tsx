@@ -215,9 +215,7 @@ function ProtocolCard({
   const emoji = CATEGORY_EMOJI[item.category] ?? '·';
 
   function handleToggle() {
-    if (done) return;
-    setXpPop(true);
-    setTimeout(() => setXpPop(false), 1200);
+    if (!done) { setXpPop(true); setTimeout(() => setXpPop(false), 1200); }
     onToggle();
   }
 
