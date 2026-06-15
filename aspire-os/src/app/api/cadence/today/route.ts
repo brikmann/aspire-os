@@ -1,28 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/lib/supabase-server';
 
+// Stores today's cadence in the existing user_oauth table keyed by
+// (user_id, 'cadence-YYYY-MM-DD') — avoids needing a new table.
+function todayProvider() {
+  return `cadence-${new Date().toISOString().slice(0, 10)}`;
+}
+
 export async function GET() {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ cadence: null });
 
-  const today = new Date().toISOString().slice(0, 10);
-
   const { data } = await supabase
-    .from('cadence_protocols')
-    .select('protocol_json, generated_at')
-    .eq('user_id', user.id)
-    .eq('protocol_date', today)
+    .from('user_oauth')
+    .select('access_token, updated_at')
+    .eq('session_id', user.id)
+    .eq('provider', todayProvider())
     .single();
 
-  if (!data) return NextResponse.json({ cadence: null });
+  if (!data?.access_token) return NextResponse.json({ cadence: null });
 
-  return NextResponse.json({
-    cadence: data.protocol_json,
-    generatedAt: new Date(data.generated_at).toLocaleTimeString('en-US', {
+  try {
+    const cadence = JSON.parse(data.access_token);
+    const generatedAt = new Date(data.updated_at).toLocaleTimeString('en-US', {
       hour: 'numeric', minute: '2-digit', hour12: true,
-    }),
-  });
+    });
+    return NextResponse.json({ cadence, generatedAt });
+  } catch {
+    return NextResponse.json({ cadence: null });
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -31,11 +38,14 @@ export async function POST(req: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { cadence } = await req.json();
-  const today = new Date().toISOString().slice(0, 10);
 
-  await supabase.from('cadence_protocols').upsert(
-    { user_id: user.id, protocol_date: today, protocol_json: cadence },
-    { onConflict: 'user_id,protocol_date' }
+  await supabase.from('user_oauth').upsert(
+    {
+      session_id: user.id,
+      provider: todayProvider(),
+      access_token: JSON.stringify(cadence),
+    },
+    { onConflict: 'session_id,provider' }
   );
 
   return NextResponse.json({ ok: true });
