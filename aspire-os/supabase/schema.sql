@@ -129,6 +129,23 @@ CREATE POLICY "protocol_completions: users manage own"
   USING (auth.uid() = user_id)
   WITH CHECK (auth.uid() = user_id);
 
+-- ── cadence_protocols ────────────────────────────────────────────────────────
+-- Stores each user's generated Cadence protocol per day for cross-device sync.
+CREATE TABLE IF NOT EXISTS public.cadence_protocols (
+  user_id       UUID  NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  protocol_date DATE  NOT NULL,
+  protocol_json JSONB NOT NULL,
+  generated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (user_id, protocol_date)
+);
+
+ALTER TABLE public.cadence_protocols ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "cadence_protocols: users manage own"
+  ON public.cadence_protocols FOR ALL
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
 -- ── user_oauth ────────────────────────────────────────────────────────────────
 -- Stores encrypted OAuth tokens for all third-party integrations.
 -- Keyed by (session_id, provider) — session_id is the cadence_session cookie.
