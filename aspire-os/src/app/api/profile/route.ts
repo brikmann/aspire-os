@@ -30,8 +30,7 @@ export async function PATCH(req: NextRequest) {
 
   const { error } = await supabase
     .from('profiles')
-    .update({ display_name: displayName.trim().slice(0, 40) })
-    .eq('id', user.id);
+    .upsert({ id: user.id, display_name: displayName.trim().slice(0, 40) }, { onConflict: 'id' });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 

@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
   // Award XP
   const { data: profile } = await supabase.from('profiles').select('xp').eq('id', user.id).single();
   const newXp = (profile?.xp ?? 0) + XP_PER_TASK;
-  await supabase.from('profiles').update({ xp: newXp }).eq('id', user.id);
+  await supabase.from('profiles').upsert({ id: user.id, xp: newXp }, { onConflict: 'id' });
 
   return NextResponse.json({ xp: newXp, awarded: true });
 }

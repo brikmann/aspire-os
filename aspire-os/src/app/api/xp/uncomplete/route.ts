@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
 
   const { data: profile } = await supabase.from('profiles').select('xp').eq('id', user.id).single();
   const newXp = Math.max(0, (profile?.xp ?? 0) - (deleted.xp_earned ?? XP_PER_TASK));
-  await supabase.from('profiles').update({ xp: newXp }).eq('id', user.id);
+  await supabase.from('profiles').upsert({ id: user.id, xp: newXp }, { onConflict: 'id' });
 
   return NextResponse.json({ xp: newXp, deducted: true });
 }

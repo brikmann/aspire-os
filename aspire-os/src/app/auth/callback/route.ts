@@ -44,6 +44,11 @@ export async function GET(request: NextRequest) {
     )
   }
 
+  // Ensure the profile row exists regardless of whether the DB trigger fired.
+  await supabase
+    .from('profiles')
+    .upsert({ id: session.user.id }, { onConflict: 'id', ignoreDuplicates: true })
+
   const { data: profile } = await supabase
     .from('profiles')
     .select('onboarded')
