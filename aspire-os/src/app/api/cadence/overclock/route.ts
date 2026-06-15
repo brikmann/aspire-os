@@ -33,6 +33,7 @@ FORBIDDEN:
 - Hedge words: "might," "could," "may help," "journey," "wellness," "honor your body"
 
 RULES:
+- The user message begins with CURRENT LOCAL TIME. Every protocol item MUST be scheduled at or after that time. Never schedule anything in the past.
 - Every protocol item must have a specific time — no vague ranges
 - Don't fabricate metrics they didn't provide
 - Set is_from_calendar=false for protocol items you generate; set is_from_calendar=true only for items that correspond to a named calendar event in the input.
