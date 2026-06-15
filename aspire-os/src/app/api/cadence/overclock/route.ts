@@ -9,6 +9,7 @@ import { getRefreshedGoogleHealthTokens, fetchTodaysGoogleHealthData, type Healt
 const inputSchema = z.object({
   window: z.string().min(1),
   existingCadence: z.unknown().optional(),
+  currentTime: z.string().optional(),
 });
 
 const BASE_SYSTEM = `You are Cadence — the synthesis engine inside Aspire OS. You translate biometric data + a founder's calendar into a structured operational protocol.
@@ -57,8 +58,9 @@ function buildPrompt(
   existing: CadenceOutput | null | undefined,
   health: HealthData | null,
   cal: CalendarEvent[] | null,
+  currentTime?: string,
 ): string {
-  const lines: string[] = [`OVERCLOCK MODE ACTIVATED`, `High-stakes window: "${win}"`, ''];
+  const lines: string[] = [`CURRENT LOCAL TIME: ${currentTime ?? 'unknown'}`, '', `OVERCLOCK MODE ACTIVATED`, `High-stakes window: "${win}"`, ''];
 
   if (existing) {
     lines.push('BASE CADENCE (restructure around the overclock window):');
@@ -137,7 +139,7 @@ export async function POST(req: NextRequest) {
     model: anthropic('claude-sonnet-4-6'),
     schema: cadenceSchema,
     system: buildSystemPrompt(data.window),
-    prompt: buildPrompt(data.window, existing, health, cal),
+    prompt: buildPrompt(data.window, existing, health, cal, data.currentTime),
   });
 
   return result.toTextStreamResponse();

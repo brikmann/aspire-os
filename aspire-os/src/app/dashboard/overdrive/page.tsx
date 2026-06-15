@@ -234,7 +234,10 @@ export default function OverdrivePage() {
       const res = await fetch('/api/cadence/overclock', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ window: 'the full day' }),
+        body: JSON.stringify({
+          window: 'the full day',
+          currentTime: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
+        }),
       });
       if (!res.ok || !res.body) {
         throw new Error((await res.text().catch(() => '')) || 'Request failed');

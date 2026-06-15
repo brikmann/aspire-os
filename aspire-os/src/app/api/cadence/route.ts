@@ -16,6 +16,7 @@ const inputSchema = z.object({
   morningEnergy: z.number(),
   priorities: z.string(),
   calendar: z.string(),
+  currentTime: z.string().optional(),
 });
 
 const SYSTEM_PROMPT = `You are Cadence — the synthesis engine inside Aspire OS. You translate biometric data + a founder's calendar into a structured operational protocol.
@@ -68,7 +69,7 @@ function buildUserMessage(
   calEvents: CalendarEvent[] | null,
   calLabel: string,
 ): string {
-  const lines: string[] = ['MORNING BIOMETRICS'];
+  const lines: string[] = [`CURRENT LOCAL TIME: ${data.currentTime ?? 'unknown'}`, '', 'MORNING BIOMETRICS'];
   lines.push(`- Wearable: ${data.wearable}`);
   if (data.hrv != null) lines.push(`- HRV: ${data.hrv} ms`);
   if (data.restingHr != null) lines.push(`- Resting HR: ${data.restingHr} bpm`);

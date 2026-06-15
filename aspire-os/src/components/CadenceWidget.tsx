@@ -495,6 +495,7 @@ export default function CadenceWidget({
       morningEnergy: parseFloat(form.morningEnergy),
       priorities: form.priorities,
       calendar: form.calendar,
+      currentTime: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
     };
   }
 
@@ -537,6 +538,7 @@ export default function CadenceWidget({
       morningEnergy: parseFloat(form.morningEnergy) || 7,
       priorities: form.priorities,
       calendar: form.calendar,
+      currentTime: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
     });
   }
 
