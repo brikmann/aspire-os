@@ -358,6 +358,7 @@ export default function CadenceWidget({
       setView('output');
       onGeneratedRef.current(cached.cadence);
       autoTriggeredRef.current = true;
+      saveProtocolToCloud(cached.cadence); // back-fill cloud if not saved yet
       return;
     }
     // No local cache — try the user's saved protocol in Supabase
